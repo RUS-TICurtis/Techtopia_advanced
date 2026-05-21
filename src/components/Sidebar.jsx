@@ -34,7 +34,7 @@ export default function Sidebar({
         <div className="brand-logo-wrapper">
           <Sparkles fill="#FFFFFF" size={18} />
         </div>
-        <span className="brand-text">BankDash CRM</span>
+        <span className="brand-text">Techtopia CRM</span>
       </div>
 
       <nav className="sidebar-menu">

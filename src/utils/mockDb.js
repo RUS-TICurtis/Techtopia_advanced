@@ -179,8 +179,8 @@ const INITIAL_TASKS = [
 ];
 
 const INITIAL_PROFILE = {
-  name: "Curtis Miller",
-  email: "curtis.miller@techcorp.io",
+  name: "Curtis Tungsten",
+  email: "curtis.tungsten@techcorp.io",
   company: "TechCorp Labs",
   role: "Sales Director & Account lead",
   phone: "+1 (555) 901-2345",
@@ -209,6 +209,7 @@ const setStorageItem = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
+// export Db
 export const mockDb = {
   // Contacts
   getContacts: () => getStorageItem("crm_contacts", INITIAL_CONTACTS),
@@ -218,7 +219,7 @@ export const mockDb = {
     const newContact = {
       id: "c_" + Date.now(),
       created: new Date().toISOString().split('T')[0],
-      owner: mockDb.getProfile().name || "Curtis Miller",
+      owner: mockDb.getProfile().name || "Curtis Tungsten",
       ...contact
     };
     contacts.push(newContact);
@@ -240,6 +241,30 @@ export const mockDb = {
     const filtered = contacts.filter(c => c.id !== id);
     mockDb.saveContacts(filtered);
   },
+    getProfile: () => getStorageItem("crm_profile", INITIAL_PROFILE),
+  saveProfile: (profiles) => setStorageItem("crm_profile", profiles),
+  addProfile: (profile) => {
+    const profiles = mockDb.getProfile();
+    const newProfile = {
+      id: "p_" + Date.now(),
+      created: new Date().toISOString().split('T')[0],
+      owner: mockDb.getProfile().name || "Curtis Tungsten",
+      ...contact
+    };
+    profile.push(newProfile);
+    mockDb.saveProfile(profile);
+    return newProfile;
+  },
+  updateUserProfile:(updateUserProfile)=>{
+    const profile = mockDb.getProfile();
+    const index1 = profile.findIndex(p => p.id === updateUserProfile.id);
+    if (index !== -1) {
+      deals[index] = updateUserProfile;
+      mockDb.saveProfile(profile);
+      return true;
+    }
+    return false;
+    },
 
   // Deals
   getDeals: () => getStorageItem("crm_deals", INITIAL_DEALS),

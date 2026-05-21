@@ -38,7 +38,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [dealThresholdAlert, setDealThresholdAlert] = useState(true);
 
   useEffect(() => {
-    const user = mockDb.getUserProfile();
+    const user = mockDb.getProfile();
     if (user) {
       setName(user.name);
       setUsername(user.username);

@@ -14,7 +14,7 @@ function App() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('crm-theme') || 'light');
-  const [profile, setProfile] = useState(mockDb.getUserProfile());
+  const [profile, setProfile] = useState(mockDb.getProfile());
   const [searchValue, setSearchValue] = useState('');
 
   // Sync theme attribute on change
