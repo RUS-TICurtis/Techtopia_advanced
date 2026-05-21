@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Search, 
   Bell, 
   Settings, 
   Sun, 
   Moon,
-  Menu,
-  X
+  Menu
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -141,7 +140,7 @@ export default function Navbar({
         >
           <img 
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" 
-            alt="Profile Avatar" 
+            alt={profile?.name || "Profile Avatar"} 
             onError={(e) => {
               e.target.src = "https://via.placeholder.com/100";
             }}

@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   TrendingUp, 
-  ArrowUpRight, 
   DollarSign, 
   Percent, 
   Award, 
-  Sliders,
-  ChevronRight
+  Sliders
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
-import { WeeklyActivityChart, MonthlyTrendsChart } from '../components/Charts';
+import { MonthlyTrendsChart } from '../components/Charts';
 
 export default function Analytics() {
-  const [deals, setDeals] = useState([]);
+  const [deals, setDeals] = useState(() => mockDb.getDeals());
   const [targetConversion, setTargetConversion] = useState(25); // default 25% target
-
-  useEffect(() => {
-    setDeals(mockDb.getDeals());
-  }, []);
 
   const totalValue = deals.reduce((acc, curr) => acc + curr.value, 0);
   const activeDeals = deals.filter(d => d.stage !== 'Won' && d.stage !== 'Lost');

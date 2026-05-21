@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // ==========================================================================
 // 1. Weekly Activity Chart (Bar Chart)
 // ==========================================================================
-export const WeeklyActivityChart = ({ deals = [] }) => {
+export const WeeklyActivityChart = () => {
   // Let's summarize the deals value by stage or mock weekly values for visual beauty
   const data = [
     { day: "Mon", leads: 4, revenue: 15000 },

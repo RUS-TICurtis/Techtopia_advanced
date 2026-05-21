@@ -1,31 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Users, 
   TrendingUp, 
   CheckCircle, 
   DollarSign, 
-  ArrowUpRight, 
   Clock, 
-  Send,
   UserPlus
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
 import { WeeklyActivityChart, DealPipelineChart, MonthlyTrendsChart } from '../components/Charts';
 
 export default function Dashboard({ setCurrentTab }) {
-  const [contacts, setContacts] = useState([]);
-  const [deals, setDeals] = useState([]);
-  const [tasks, setTasks] = useState([]);
+  const [contacts, setContacts] = useState(() => mockDb.getContacts());
+  const [deals, setDeals] = useState(() => mockDb.getDeals());
   const [quickLeadName, setQuickLeadName] = useState('');
   const [quickLeadCompany, setQuickLeadCompany] = useState('');
   const [quickLeadValue, setQuickLeadValue] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  useEffect(() => {
-    setContacts(mockDb.getContacts());
-    setDeals(mockDb.getDeals());
-    setTasks(mockDb.getTasks());
-  }, []);
 
   const totalValue = deals.reduce((acc, curr) => acc + curr.value, 0);
   const activeDealsCount = deals.filter(d => d.stage !== 'Won' && d.stage !== 'Lost').length;

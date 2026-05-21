@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
-  Search, 
   Edit3, 
   Trash2, 
   X,
-  FileText,
   User,
   Phone,
   Mail,
@@ -15,7 +13,7 @@ import {
 import { mockDb } from '../utils/mockDb';
 
 export default function Contacts({ searchValue = '' }) {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(() => mockDb.getContacts());
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedContact, setSelectedContact] = useState(null);
   
@@ -32,11 +30,6 @@ export default function Contacts({ searchValue = '' }) {
   const [value, setValue] = useState('');
   const [notes, setNotes] = useState('');
   const [editId, setEditId] = useState(null);
-
-  // Load contacts
-  useEffect(() => {
-    setContacts(mockDb.getContacts());
-  }, []);
 
   const refreshContacts = () => {
     setContacts(mockDb.getContacts());

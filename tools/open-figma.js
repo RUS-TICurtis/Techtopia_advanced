@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-undef */
 
 const FIGMA_URL = 'https://www.figma.com/design/LYdQCJSC4e6tetqSM9vio6/Modernize---Figma%E2%80%99s-Most-Trending-Powerful-UI-Kit-Design-System-Library---Design-Starter-Kit--Community-?node-id=0-1&t=9TT6wOblDVanfWXo-1';
 

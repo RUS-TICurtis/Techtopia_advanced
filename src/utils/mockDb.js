@@ -200,7 +200,7 @@ const getStorageItem = (key, initialValue) => {
   }
   try {
     return JSON.parse(item);
-  } catch (e) {
+  } catch {
     return initialValue;
   }
 };
@@ -241,30 +241,12 @@ export const mockDb = {
     const filtered = contacts.filter(c => c.id !== id);
     mockDb.saveContacts(filtered);
   },
-    getProfile: () => getStorageItem("crm_profile", INITIAL_PROFILE),
-  saveProfile: (profiles) => setStorageItem("crm_profile", profiles),
-  addProfile: (profile) => {
-    const profiles = mockDb.getProfile();
-    const newProfile = {
-      id: "p_" + Date.now(),
-      created: new Date().toISOString().split('T')[0],
-      owner: mockDb.getProfile().name || "Curtis Tungsten",
-      ...contact
-    };
-    profile.push(newProfile);
-    mockDb.saveProfile(profile);
-    return newProfile;
-  },
-  updateUserProfile:(updateUserProfile)=>{
+  updateUserProfile: (updatedProfile) => {
     const profile = mockDb.getProfile();
-    const index1 = profile.findIndex(p => p.id === updateUserProfile.id);
-    if (index !== -1) {
-      deals[index] = updateUserProfile;
-      mockDb.saveProfile(profile);
-      return true;
-    }
-    return false;
-    },
+    const newProfile = { ...profile, ...updatedProfile };
+    mockDb.saveProfile(newProfile);
+    return true;
+  },
 
   // Deals
   getDeals: () => getStorageItem("crm_deals", INITIAL_DEALS),

@@ -7,10 +7,18 @@
   --font-main: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
 
-  /* Color Palette - Light Mode (Default BankDash Vibe) */
-  --primary: #2D60FF;
-  --primary-hover: #1b4cd6;
-  --primary-rgb: 45, 96, 255;
+  /* Techtopia Brand Color Palette */
+  --brand-chartreuse: #E4FF1A;
+  --brand-cyan: #01FDF6;
+  --brand-green: #21FA90;
+  --brand-magenta: #FF47DA;
+  --brand-purple: #8A4FFF;
+  --brand-blue: #3772FF;
+
+  /* Theme Mappings - Light Mode */
+  --primary: var(--brand-blue);
+  --primary-hover: #1e59f2; /* Premium hover shade for Blue Crayola */
+  --primary-rgb: 55, 114, 255;
   --bg-app: #F5F7FA;
   --bg-sidebar: #FFFFFF;
   --bg-card: #FFFFFF;
@@ -21,22 +29,22 @@
   --text-light: #A3AED0;
   
   --border-light: #E6EFF5;
-  --border-focus: rgba(45, 96, 255, 0.4);
+  --border-focus: rgba(55, 114, 255, 0.4);
   
-  --success: #41D430;
-  --success-bg: rgba(65, 212, 48, 0.1);
+  --success: #1EC973;
+  --success-bg: rgba(33, 250, 144, 0.12); /* Based on Brand Green */
   --error: #FF4B4A;
   --error-bg: rgba(255, 75, 74, 0.1);
   --warning: #FFBB38;
   --warning-bg: rgba(255, 187, 56, 0.1);
-  --info: #1814F3;
-  --info-bg: rgba(24, 20, 243, 0.1);
+  --info: var(--brand-purple);
+  --info-bg: rgba(138, 79, 255, 0.1);
 
   /* Shadows & Depth */
   --shadow-sm: 0 4px 10px rgba(113, 142, 191, 0.04);
   --shadow-md: 0 10px 30px rgba(113, 142, 191, 0.08);
   --shadow-lg: 0 20px 40px rgba(113, 142, 191, 0.12);
-  --shadow-glow: 0 8px 20px rgba(45, 96, 255, 0.25);
+  --shadow-glow: 0 8px 20px rgba(55, 114, 255, 0.25);
 
   /* Border Radii */
   --radius-xl: 25px;
@@ -68,16 +76,16 @@
   --text-light: #64748B;
   
   --border-light: #1F2937;
-  --border-focus: rgba(45, 96, 255, 0.6);
+  --border-focus: rgba(55, 114, 255, 0.6);
   
-  --success-bg: rgba(65, 212, 48, 0.15);
+  --success-bg: rgba(33, 250, 144, 0.18);
   --error-bg: rgba(255, 75, 74, 0.15);
   --warning-bg: rgba(255, 187, 56, 0.15);
   
   --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 8px 25px rgba(45, 96, 255, 0.35);
+  --shadow-glow: 0 8px 25px rgba(55, 114, 255, 0.35);
 }
 
 /* ==========================================================================

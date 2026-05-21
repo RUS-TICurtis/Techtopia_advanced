@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
   ChevronLeft, 
   ChevronRight, 
-  Sparkles, 
   Calendar, 
-  DollarSign, 
   Trash2,
   X
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
 
 export default function Pipeline({ searchValue = '' }) {
-  const [deals, setDeals] = useState([]);
-  const [contacts, setContacts] = useState([]);
+  const [deals, setDeals] = useState(() => mockDb.getDeals());
+  const [contacts, setContacts] = useState(() => mockDb.getContacts());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Form states
@@ -26,11 +24,6 @@ export default function Pipeline({ searchValue = '' }) {
   const [selectedContactId, setSelectedContactId] = useState('');
 
   const stages = ['Lead', 'Qualified', 'In Progress', 'Proposal', 'Won'];
-
-  useEffect(() => {
-    setDeals(mockDb.getDeals());
-    setContacts(mockDb.getContacts());
-  }, []);
 
   const refreshDeals = () => {
     setDeals(mockDb.getDeals());

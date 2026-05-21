@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   User, 
-  Settings as SettingsIcon, 
+  Settings as SettingsIcon,
   Lock, 
   Camera, 
   Check, 
-  Bell, 
   Eye, 
   EyeOff
 } from 'lucide-react';
@@ -15,13 +14,14 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [activeSubTab, setActiveSubTab] = useState('profile');
   
   // Profile form states
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [role, setRole] = useState('');
-  const [location, setLocation] = useState('');
-  const [profilePic, setProfilePic] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200');
+  const user = mockDb.getProfile() || {};
+  const [name, setName] = useState(user.name || '');
+  const [username, setUsername] = useState(user.username || '');
+  const [email, setEmail] = useState(user.email || '');
+  const [phone, setPhone] = useState(user.phone || '');
+  const [role, setRole] = useState(user.role || '');
+  const [location, setLocation] = useState(user.location || '');
+  const profilePic = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200';
 
   // Security states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -36,18 +36,6 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [notifications, setNotifications] = useState('daily');
   const [leadAlerts, setLeadAlerts] = useState(true);
   const [dealThresholdAlert, setDealThresholdAlert] = useState(true);
-
-  useEffect(() => {
-    const user = mockDb.getProfile();
-    if (user) {
-      setName(user.name);
-      setUsername(user.username);
-      setEmail(user.email);
-      setPhone(user.phone);
-      setRole(user.role);
-      setLocation(user.location);
-    }
-  }, []);
 
   const handleProfileSubmit = (e) => {
     e.preventDefault();

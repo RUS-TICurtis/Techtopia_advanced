@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
-  CheckSquare, 
   Calendar as CalendarIcon, 
   User, 
   Trash2,
-  X,
-  Play,
-  CheckCircle2
+  X
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState([]);
-  const [contacts, setContacts] = useState([]);
+  const [tasks, setTasks] = useState(() => mockDb.getTasks());
+  const [contacts, setContacts] = useState(() => mockDb.getContacts());
   const [activeFilter, setActiveFilter] = useState('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -22,11 +19,6 @@ export default function Tasks() {
   const [selectedContactId, setSelectedContactId] = useState('');
   const [date, setDate] = useState('');
   const [priority, setPriority] = useState('Medium');
-
-  useEffect(() => {
-    setTasks(mockDb.getTasks());
-    setContacts(mockDb.getContacts());
-  }, []);
 
   const refreshTasks = () => {
     setTasks(mockDb.getTasks());
@@ -83,7 +75,6 @@ export default function Tasks() {
 
   // Calendar logic (Current Month - May 2026)
   const currentYear = 2026;
-  const currentMonth = 4; // May (0-indexed)
   const monthName = "May 2026";
   const daysInMonth = 31;
   const startDayOffset = 5; // May 1, 2026 is a Friday (Sunday=0, Friday=5)
