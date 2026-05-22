@@ -1,0 +1,47 @@
+/* Clients Page */
+.clients-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  width: fit-content;
+  border: 1px solid var(--border-light);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.clients-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.clients-tab:hover { color: var(--text-title); }
+
+.clients-tab.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--shadow-glow);
+}
+
+.clients-tab-count {
+  background: rgba(255,255,255,0.2);
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+}
+
+.clients-tab:not(.active) .clients-tab-count {
+  background: var(--bg-app);
+  color: var(--text-muted);
+}

@@ -267,3 +267,17 @@
     display: none;
   }
 }
+
+/* Dark mode login overrides */
+[data-theme="dark"] .demo-role-btn:hover {
+  border-color: var(--brand-cyan);
+  background-color: rgba(1, 253, 246, 0.06);
+}
+
+[data-theme="dark"] .forgot-password {
+  color: var(--brand-cyan);
+}
+
+[data-theme="dark"] .remember-me input {
+  accent-color: var(--brand-cyan);
+}

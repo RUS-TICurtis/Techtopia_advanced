@@ -1,0 +1,84 @@
+/* Leads Page */
+.leads-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.leads-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.leads-status-pill.badge-info    { background: var(--info-bg);    color: var(--info);    border-color: rgba(138,79,255,0.2); }
+.leads-status-pill.badge-neutral { background: rgba(113,142,191,0.1); color: var(--text-muted); }
+.leads-status-pill.badge-warning { background: var(--warning-bg); color: var(--warning); border-color: rgba(228,255,26,0.2); }
+.leads-status-pill.badge-success { background: var(--success-bg); color: var(--success); border-color: rgba(33,250,144,0.2); }
+.leads-status-pill.badge-danger  { background: var(--error-bg);   color: var(--error);   border-color: rgba(255,71,218,0.2); }
+
+.leads-status-count {
+  background: rgba(255,255,255,0.15);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+}
+
+.leads-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-select-wrapper {
+  position: relative;
+}
+
+.filter-select {
+  padding-right: 36px !important;
+  appearance: none;
+  min-width: 160px;
+}
+
+.filter-select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+  gap: 16px;
+}
+
+.empty-icon {
+  color: var(--text-light);
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 320px;
+}

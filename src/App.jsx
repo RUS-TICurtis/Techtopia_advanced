@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 import Dashboard from './pages/Dashboard';
 import Contacts from './pages/Contacts';
 import Pipeline from './pages/Pipeline';
@@ -12,6 +13,12 @@ import Invoices from './pages/Invoices';
 import Calendar from './pages/Calendar';
 import Messages from './pages/Messages';
 import Support from './pages/Support';
+import Leads from './pages/Leads';
+import Clients from './pages/Clients';
+import Billing from './pages/Billing';
+import Contracts from './pages/Contracts';
+import Team from './pages/Team';
+import AiAssistant from './pages/AiAssistant';
 import { mockDb } from './utils/mockDb';
 import { useAuthStore } from './store/authStore';
 import Login from './pages/Login';
@@ -25,7 +32,6 @@ function App() {
   const [profile, setProfile] = useState(mockDb.getProfile());
   const [searchValue, setSearchValue] = useState('');
 
-  // Sync theme attribute on change
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('crm-theme', theme);
@@ -39,39 +45,33 @@ function App() {
     setProfile(updatedProfile);
   };
 
-  // Render correct page viewport
   const renderActivePage = () => {
     switch (currentTab) {
-      case 'dashboard':
-        return <Dashboard setCurrentTab={setCurrentTab} />;
-      case 'contacts':
-        return <Contacts searchValue={searchValue} />;
-      case 'companies':
-        return <Companies searchValue={searchValue} />;
-      case 'pipeline':
-        return <Pipeline searchValue={searchValue} />;
-      case 'invoices':
-        return <Invoices searchValue={searchValue} />;
-      case 'tasks':
-        return <Tasks />;
-      case 'calendar':
-        return <Calendar />;
-      case 'messages':
-        return <Messages />;
-      case 'support':
-        return <Support />;
-      case 'analytics':
-        return <Analytics />;
-      case 'settings':
-        return (
-          <Settings 
-            theme={theme} 
-            toggleTheme={toggleTheme} 
-            onProfileUpdate={handleProfileUpdate} 
-          />
-        );
-      default:
-        return <Dashboard setCurrentTab={setCurrentTab} />;
+      case 'dashboard':    return <Dashboard setCurrentTab={setCurrentTab} />;
+      case 'leads':        return <Leads searchValue={searchValue} />;
+      case 'clients':      return <Clients searchValue={searchValue} />;
+      case 'pipeline':     return <Pipeline searchValue={searchValue} />;
+      case 'billing':      return <Billing searchValue={searchValue} />;
+      case 'contracts':    return <Contracts searchValue={searchValue} />;
+      case 'support':      return <Support />;
+      case 'ai-assistant': return <AiAssistant />;
+      case 'analytics':    return <Analytics />;
+      case 'team':         return <Team />;
+      case 'settings':     return (
+        <Settings 
+          theme={theme} 
+          toggleTheme={toggleTheme} 
+          onProfileUpdate={handleProfileUpdate} 
+        />
+      );
+      // Legacy pages — kept but not in primary nav
+      case 'contacts':  return <Contacts searchValue={searchValue} />;
+      case 'companies': return <Companies searchValue={searchValue} />;
+      case 'invoices':  return <Invoices searchValue={searchValue} />;
+      case 'tasks':     return <Tasks />;
+      case 'calendar':  return <Calendar />;
+      case 'messages':  return <Messages />;
+      default:          return <Dashboard setCurrentTab={setCurrentTab} />;
     }
   };
 
@@ -81,7 +81,6 @@ function App() {
 
   return (
     <div className="app-wrapper">
-      {/* Mobile Drawer Overlay */}
       {mobileOpen && (
         <div 
           className="sidebar-overlay" 
@@ -89,12 +88,11 @@ function App() {
         ></div>
       )}
 
-      {/* Navigation Sidebar Panel */}
       <Sidebar 
         currentTab={currentTab} 
         setCurrentTab={(tab) => {
           setCurrentTab(tab);
-          setSearchValue(''); // Clear search on tab switch
+          setSearchValue('');
         }}
         isCollapsed={isCollapsed} 
         setIsCollapsed={setIsCollapsed} 
@@ -103,7 +101,6 @@ function App() {
         theme={theme}
       />
 
-      {/* Main Panel Viewport */}
       <div className={`main-content ${isCollapsed ? 'collapsed' : ''}`}>
         <Navbar 
           currentTab={currentTab} 
@@ -123,6 +120,8 @@ function App() {
           {renderActivePage()}
         </main>
       </div>
+      
+      <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
     </div>
   );
 }

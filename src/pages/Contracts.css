@@ -1,0 +1,98 @@
+/* Contracts Page */
+.contract-templates {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.contract-template-btn {
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  background: var(--bg-app);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.contract-template-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.contract-template-btn.active {
+  background: var(--primary-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Upload Zone */
+.contract-upload-zone {
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+  background: var(--bg-app);
+}
+
+.contract-upload-zone:hover {
+  border-color: var(--primary);
+  background: var(--primary-bg);
+}
+
+.contract-upload-zone.has-file {
+  border-style: solid;
+  border-color: var(--primary);
+  background: var(--primary-bg);
+  padding: 16px 24px;
+}
+
+.upload-icon {
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.contract-upload-zone p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.contract-upload-zone p span {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.contract-upload-zone small {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.contract-upload-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-title);
+}
+
+.contract-file-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--primary);
+  background: var(--primary-bg);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}

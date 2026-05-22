@@ -1,0 +1,51 @@
+/* Billing Page */
+.billing-modal { max-width: 680px; }
+
+.billing-items-section {
+  margin-bottom: 8px;
+}
+
+.billing-items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.billing-items-cols {
+  display: grid;
+  grid-template-columns: 3fr 80px 110px 90px 36px;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 0 4px 6px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 8px;
+}
+
+.billing-item-row {
+  display: grid;
+  grid-template-columns: 3fr 80px 110px 90px 36px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.billing-item-total {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-title);
+  text-align: right;
+}
+
+.billing-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 4px 0;
+  border-top: 1px solid var(--border-light);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-title);
+}

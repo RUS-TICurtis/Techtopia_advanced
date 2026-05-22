@@ -1,43 +1,84 @@
-/* ==========================================================================
-   Dashboard Page Styles
-   ========================================================================== */
-.dashboard-activity-feed {
+/* Dashboard Specific Styles */
+
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.dashboard-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-main-grid,
+  .dashboard-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Quick Access List */
+.quick-access-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-.activity-item {
+.quick-access-item {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  position: relative;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-app);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 100%;
 }
 
-.activity-item:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: 18px;
-  top: 38px;
-  bottom: -16px;
-  width: 1px;
-  background-color: var(--border-light);
+.quick-access-item:hover {
+  background: var(--bg-card);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
-.activity-icon {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+.quick-access-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  font-size: 16px;
 }
 
-.activity-body { flex: 1; min-width: 0; }
-.activity-title { font-size: 14px; font-weight: 600; color: var(--text-title); line-height: 1.4; }
-.activity-time  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.quick-access-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 2px;
+}
 
-/* Overview chart card full-height */
-.chart-card-full { height: 100%; min-height: 300px; }
+.quick-access-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
 
-/* Quick-lead form */
-.quick-lead-form { display: flex; flex-direction: column; gap: 14px; }
+/* Activity Items */
+.activity-icon {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+}
+
+.activity-icon.success { background: var(--success-bg); color: var(--success); }
+.activity-icon.info { background: var(--info-bg); color: var(--info); }
+.activity-icon.warning { background: var(--warning-bg); color: var(--warning); }
