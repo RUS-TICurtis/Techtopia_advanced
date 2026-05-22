@@ -8,6 +8,9 @@ import {
   Menu
 } from 'lucide-react';
 
+import './Navbar.css';
+
+
 export default function Navbar({ 
   currentTab, 
   setCurrentTab,
@@ -19,13 +22,21 @@ export default function Navbar({
   onMenuClick
 }) {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+
+
 
   // Map tabs to titles
   const tabTitles = {
     dashboard: 'Overview',
     contacts: 'Contacts & Leads',
+    companies: 'Companies & Organizations',
     pipeline: 'Sales Pipeline',
+    invoices: 'Billing & Invoices',
     tasks: 'Task Manager',
+    calendar: 'Schedule',
+    messages: 'Communications',
+    support: 'Support Tickets',
     analytics: 'Analytics & Forecasts',
     settings: 'CRM Settings'
   };
@@ -36,13 +47,14 @@ export default function Navbar({
     { id: 3, text: "Task 'Send SLA Proposal' is due tomorrow", time: "4h ago", unread: false }
   ];
 
+  const searchableTabs = ['contacts', 'dashboard', 'pipeline', 'companies', 'invoices', 'messages', 'support'];
+
   return (
     <header className="navbar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className="navbar-left">
         <button 
           className="mobile-menu-toggle nav-icon-btn" 
           onClick={onMenuClick}
-          style={{ width: '40px', height: '40px' }}
         >
           <Menu size={20} />
         </button>
@@ -51,36 +63,47 @@ export default function Navbar({
 
       <div className="navbar-actions">
         {/* Search */}
-        {(currentTab === 'contacts' || currentTab === 'dashboard' || currentTab === 'pipeline') && (
-          <div className="search-wrapper">
-            <Search className="search-icon" size={18} />
-            <input 
-              type="text" 
-              className="search-input" 
-              placeholder="Search leads, companies..." 
-              value={searchValue}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
+        {searchableTabs.includes(currentTab) && (
+          <>
+            <div className="navbar-search">
+              <Search className="search-icon" size={18} />
+              <input 
+                type="text" 
+                className="search-input" 
+                placeholder="Search..." 
+                value={searchValue}
+                onChange={(e) => onSearchChange(e.target.value)}
+              />
+            </div>
+            {/* Mobile Search Toggle */}
+            <button 
+              className="navbar-search-toggle"
+              onClick={() => setShowMobileSearch(!showMobileSearch)}
+            >
+              <Search size={18} />
+            </button>
+          </>
         )}
 
-        {/* Theme Toggle */}
-        <button 
-          className="nav-icon-btn" 
-          onClick={toggleTheme}
-          title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        >
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
+        <div className="navbar-secondary" style={{ display: 'flex', gap: '12px' }}>
+          {/* Theme Toggle */}
+          <button 
+            className="nav-icon-btn" 
+            onClick={toggleTheme}
+            title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
 
-        {/* Settings Button */}
-        <button 
-          className="nav-icon-btn" 
-          onClick={() => setCurrentTab('settings')}
-          title="Go to Settings"
-        >
-          <Settings size={20} />
-        </button>
+          {/* Settings Button */}
+          <button 
+            className="nav-icon-btn" 
+            onClick={() => setCurrentTab('settings')}
+            title="Go to Settings"
+          >
+            <Settings size={20} />
+          </button>
+        </div>
 
         {/* Notification Button */}
         <div style={{ position: 'relative' }}>
@@ -94,37 +117,16 @@ export default function Navbar({
           </button>
 
           {showNotifications && (
-            <div style={{
-              position: 'absolute',
-              top: '55px',
-              right: 0,
-              width: '320px',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-light)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: 'var(--shadow-lg)',
-              zIndex: 200,
-              padding: '16px',
-              animation: 'fadeIn var(--transition-fast) ease-out'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px' }}>
+            <div className="nav-notifications-dropdown">
+              <div className="nav-notifications-header">
                 <span style={{ fontWeight: 700, color: 'var(--text-title)' }}>Recent Notifications</span>
                 <span style={{ fontSize: '12px', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}>Mark all read</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {dummyNotifications.map(n => (
-                  <div key={n.id} style={{
-                    padding: '10px',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: n.unread ? 'var(--bg-app)' : 'transparent',
-                    fontSize: '13px',
-                    borderLeft: n.unread ? '3px solid var(--primary)' : 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px'
-                  }}>
+                  <div key={n.id} className={`nav-notification-item ${n.unread ? 'unread' : ''}`}>
                     <span style={{ color: 'var(--text-main)', fontWeight: n.unread ? 600 : 400 }}>{n.text}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-light)', alignSelf: 'flex-end' }}>{n.time}</span>
+                    <span className="nav-notification-time">{n.time}</span>
                   </div>
                 ))}
               </div>
@@ -146,6 +148,24 @@ export default function Navbar({
             }}
           />
         </div>
+      </div>
+
+      {/* Mobile Search Overlay */}
+      <div className={`navbar-search-overlay ${showMobileSearch ? 'open' : ''}`}>
+        <div className="search-wrapper">
+          <Search className="search-icon" size={18} />
+          <input 
+            type="text" 
+            className="search-input" 
+            placeholder="Search..." 
+            value={searchValue}
+            onChange={(e) => onSearchChange(e.target.value)}
+            autoFocus={showMobileSearch}
+          />
+        </div>
+        <button className="btn-icon" onClick={() => setShowMobileSearch(false)}>
+          <span style={{ fontSize: '18px', fontWeight: 'bold' }}>&times;</span>
+        </button>
       </div>
     </header>
   );

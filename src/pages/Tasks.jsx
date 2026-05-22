@@ -7,10 +7,11 @@ import {
   X
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
+import './Tasks.css';
 
-export default function Tasks() {
+export default function Tasks({ searchValue }) {
   const [tasks, setTasks] = useState(() => mockDb.getTasks());
-  const [contacts, setContacts] = useState(() => mockDb.getContacts());
+  const [contacts] = useState(() => mockDb.getContacts());
   const [activeFilter, setActiveFilter] = useState('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /* eslint-disable no-undef */
+import { spawn } from 'node:child_process';
 
 const FIGMA_URL = 'https://www.figma.com/design/LYdQCJSC4e6tetqSM9vio6/Modernize---Figma%E2%80%99s-Most-Trending-Powerful-UI-Kit-Design-System-Library---Design-Starter-Kit--Community-?node-id=0-1&t=9TT6wOblDVanfWXo-1';
 
 const openUrl = () => {
-  const { spawn } = require('node:child_process');
   const platform = process.platform;
 
   let command;

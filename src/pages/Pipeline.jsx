@@ -8,10 +8,11 @@ import {
   X
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
+import './Pipeline.css';
 
 export default function Pipeline({ searchValue = '' }) {
   const [deals, setDeals] = useState(() => mockDb.getDeals());
-  const [contacts, setContacts] = useState(() => mockDb.getContacts());
+  const [contacts] = useState(() => mockDb.getContacts());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Form states

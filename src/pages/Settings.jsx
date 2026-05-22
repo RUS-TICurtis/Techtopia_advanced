@@ -9,6 +9,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
+import './Settings.css';
 
 export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [activeSubTab, setActiveSubTab] = useState('profile');
@@ -377,7 +378,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
               <div style={{ 
                 padding: '16px', 
-                backgroundColor: 'rgba(24, 20, 243, 0.04)', 
+                backgroundColor: 'rgba(138, 79, 255, 0.04)', 
                 borderLeft: '4px solid var(--info)',
                 borderRadius: '0 var(--radius-md) var(--radius-md) 0',
                 fontSize: '13px',

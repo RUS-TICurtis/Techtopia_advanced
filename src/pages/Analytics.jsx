@@ -8,9 +8,10 @@ import {
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
 import { MonthlyTrendsChart } from '../components/Charts';
+import './Analytics.css';
 
 export default function Analytics() {
-  const [deals, setDeals] = useState(() => mockDb.getDeals());
+  const [deals] = useState(() => mockDb.getDeals());
   const [targetConversion, setTargetConversion] = useState(25); // default 25% target
 
   const totalValue = deals.reduce((acc, curr) => acc + curr.value, 0);
@@ -45,7 +46,7 @@ export default function Analytics() {
         </div>
 
         <div className="card metric-card">
-          <div className="metric-icon-wrapper" style={{ backgroundColor: 'rgba(45, 96, 255, 0.1)', color: 'var(--primary)' }}>
+          <div className="metric-icon-wrapper" style={{ backgroundColor: 'var(--primary-bg)', color: 'var(--primary)' }}>
             <DollarSign />
           </div>
           <div className="metric-info">
@@ -132,7 +133,7 @@ export default function Analytics() {
               </div>
               <div style={{
                 padding: '12px 20px',
-                backgroundColor: 'rgba(65, 212, 48, 0.1)',
+                backgroundColor: 'var(--success-bg)',
                 color: 'var(--success)',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '14px',

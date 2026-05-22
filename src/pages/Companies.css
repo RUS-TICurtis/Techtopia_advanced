@@ -1,0 +1,72 @@
+/* Companies Page Styles */
+.companies-table .company-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.companies-table .company-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.companies-table .company-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.companies-table .company-title {
+  font-weight: 600;
+  color: var(--text-title);
+}
+
+.companies-table .company-meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.companies-table .cell-flex {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.companies-table .btn-icon {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.companies-table .btn-icon:hover {
+  background: var(--bg-app);
+  color: var(--text-title);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.py-8 {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+.text-secondary {
+  color: var(--text-muted);
+}

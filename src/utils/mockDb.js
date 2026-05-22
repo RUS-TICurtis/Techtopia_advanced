@@ -192,6 +192,39 @@ const INITIAL_PROFILE = {
   }
 };
 
+const INITIAL_COMPANIES = [
+  { id: "comp1", name: "CloudScale Inc.", industry: "Technology", location: "San Francisco, CA", website: "cloudscale.com", employees: "500-1000", status: "Customer", value: 45000 },
+  { id: "comp2", name: "DevFlow.io", industry: "Software", location: "Austin, TX", website: "devflow.io", employees: "50-200", status: "Prospect", value: 12500 },
+  { id: "comp3", name: "BioGen Lab", industry: "Healthcare", location: "London, UK", website: "biogen.org", employees: "1000+", status: "Customer", value: 30000 },
+  { id: "comp4", name: "FutureLogic", industry: "Consulting", location: "Berlin, DE", website: "futurelogic.net", employees: "10-50", status: "Lead", value: 8500 },
+  { id: "comp5", name: "CyberPulse Security", industry: "Security", location: "New York, NY", website: "cyberpulse.com", employees: "200-500", status: "Customer", value: 75000 }
+];
+
+const INITIAL_INVOICES = [
+  { id: "INV-2026-001", client: "CyberPulse Security", amount: 75000, issueDate: "2026-05-01", dueDate: "2026-05-31", status: "Paid" },
+  { id: "INV-2026-002", client: "CloudScale Inc.", amount: 45000, issueDate: "2026-05-10", dueDate: "2026-06-10", status: "Sent" },
+  { id: "INV-2026-003", client: "BioGen Lab", amount: 30000, issueDate: "2026-05-15", dueDate: "2026-06-15", status: "Draft" },
+  { id: "INV-2026-004", client: "Roma Tech", amount: 15000, issueDate: "2026-04-01", dueDate: "2026-05-01", status: "Overdue" }
+];
+
+const INITIAL_EVENTS = [
+  { id: "e1", title: "Product Demo: CloudScale", date: "2026-05-22", time: "10:00 AM - 11:00 AM", type: "Meeting", attendees: ["Alice Vance", "Curtis Miller"] },
+  { id: "e2", title: "Discovery Call: DevFlow", date: "2026-05-23", time: "2:00 PM - 2:30 PM", type: "Call", attendees: ["Bob Miller", "Curtis Miller"] },
+  { id: "e3", title: "Contract Review: BioGen", date: "2026-05-24", time: "1:00 PM - 2:00 PM", type: "Meeting", attendees: ["Catherine Song", "Legal Team"] }
+];
+
+const INITIAL_MESSAGES = [
+  { id: "th1", name: "Alice Vance", avatar: "A", lastMessage: "Yes, the SOC2 details look good.", time: "10:42 AM", unread: true },
+  { id: "th2", name: "Sales Team", avatar: "S", lastMessage: "Don't forget the weekly sync at 3.", time: "Yesterday", unread: false },
+  { id: "th3", name: "Bob Miller", avatar: "B", lastMessage: "Can we reschedule the demo?", time: "Mon", unread: false }
+];
+
+const INITIAL_TICKETS = [
+  { id: "TK-2026-001", subject: "API Integration Error - 401 Unauthorized", client: "FutureLogic", priority: "High", status: "Open", lastUpdated: "10 mins ago" },
+  { id: "TK-2026-002", subject: "Dashboard loading slowly", client: "DevFlow.io", priority: "Medium", status: "In Progress", lastUpdated: "1 hour ago" },
+  { id: "TK-2026-003", subject: "Need help setting up user roles", client: "BioGen Lab", priority: "Low", status: "Resolved", lastUpdated: "1 day ago" }
+];
+
 const getStorageItem = (key, initialValue) => {
   const item = localStorage.getItem(key);
   if (!item) {
@@ -307,6 +340,26 @@ export const mockDb = {
     mockDb.saveTasks(filtered);
   },
 
+  // Companies
+  getCompanies: () => getStorageItem("crm_companies", INITIAL_COMPANIES),
+  saveCompanies: (companies) => setStorageItem("crm_companies", companies),
+  
+  // Invoices
+  getInvoices: () => getStorageItem("crm_invoices", INITIAL_INVOICES),
+  saveInvoices: (invoices) => setStorageItem("crm_invoices", invoices),
+  
+  // Events
+  getEvents: () => getStorageItem("crm_events", INITIAL_EVENTS),
+  saveEvents: (events) => setStorageItem("crm_events", events),
+  
+  // Messages
+  getMessages: () => getStorageItem("crm_messages", INITIAL_MESSAGES),
+  saveMessages: (messages) => setStorageItem("crm_messages", messages),
+  
+  // Tickets
+  getTickets: () => getStorageItem("crm_tickets", INITIAL_TICKETS),
+  saveTickets: (tickets) => setStorageItem("crm_tickets", tickets),
+
   // Profile / Settings
   getProfile: () => getStorageItem("crm_profile", INITIAL_PROFILE),
   saveProfile: (profile) => setStorageItem("crm_profile", profile),
@@ -316,11 +369,21 @@ export const mockDb = {
     localStorage.removeItem("crm_contacts");
     localStorage.removeItem("crm_deals");
     localStorage.removeItem("crm_tasks");
+    localStorage.removeItem("crm_companies");
+    localStorage.removeItem("crm_invoices");
+    localStorage.removeItem("crm_events");
+    localStorage.removeItem("crm_messages");
+    localStorage.removeItem("crm_tickets");
     localStorage.removeItem("crm_profile");
     return {
       contacts: mockDb.getContacts(),
       deals: mockDb.getDeals(),
       tasks: mockDb.getTasks(),
+      companies: mockDb.getCompanies(),
+      invoices: mockDb.getInvoices(),
+      events: mockDb.getEvents(),
+      messages: mockDb.getMessages(),
+      tickets: mockDb.getTickets(),
       profile: mockDb.getProfile()
     };
   }

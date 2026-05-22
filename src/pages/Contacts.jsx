@@ -11,6 +11,7 @@ import {
   Briefcase
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
+import './Contacts.css';
 
 export default function Contacts({ searchValue = '' }) {
   const [contacts, setContacts] = useState(() => mockDb.getContacts());
@@ -194,7 +195,7 @@ export default function Contacts({ searchValue = '' }) {
                       onClick={() => setSelectedContact(contact)}
                       style={{ 
                         cursor: 'pointer',
-                        backgroundColor: selectedContact?.id === contact.id ? 'rgba(45, 96, 255, 0.03)' : 'transparent'
+                        backgroundColor: selectedContact?.id === contact.id ? 'rgba(var(--primary-rgb), 0.03)' : 'transparent'
                       }}
                     >
                       <td style={{ fontWeight: 700, color: 'var(--text-title)' }}>{contact.name}</td>
@@ -262,7 +263,7 @@ export default function Contacts({ searchValue = '' }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{
                 width: '60px', height: '60px', borderRadius: '50%',
-                backgroundColor: 'rgba(45, 96, 255, 0.1)', color: 'var(--primary)',
+                backgroundColor: 'var(--primary-bg)', color: 'var(--primary)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '24px', fontWeight: 'bold'
               }}>
@@ -303,8 +304,8 @@ export default function Contacts({ searchValue = '' }) {
               <h5 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>Administrative Notes</h5>
               <div style={{
                 padding: '16px', 
-                backgroundColor: 'rgba(255,187,56,0.04)', 
-                borderLeft: '4px solid var(--accent-orange, #FFBB38)',
+                backgroundColor: 'rgba(228, 255, 26, 0.04)', 
+                borderLeft: '4px solid var(--warning)',
                 borderRadius: '0 var(--radius-md) var(--radius-md) 0',
                 fontSize: '14px',
                 color: 'var(--text-main)',

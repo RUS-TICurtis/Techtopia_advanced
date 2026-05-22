@@ -7,9 +7,17 @@ import Pipeline from './pages/Pipeline';
 import Tasks from './pages/Tasks';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import Companies from './pages/Companies';
+import Invoices from './pages/Invoices';
+import Calendar from './pages/Calendar';
+import Messages from './pages/Messages';
+import Support from './pages/Support';
 import { mockDb } from './utils/mockDb';
+import { useAuthStore } from './store/authStore';
+import Login from './pages/Login';
 
 function App() {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -38,10 +46,20 @@ function App() {
         return <Dashboard setCurrentTab={setCurrentTab} />;
       case 'contacts':
         return <Contacts searchValue={searchValue} />;
+      case 'companies':
+        return <Companies searchValue={searchValue} />;
       case 'pipeline':
         return <Pipeline searchValue={searchValue} />;
+      case 'invoices':
+        return <Invoices searchValue={searchValue} />;
       case 'tasks':
         return <Tasks />;
+      case 'calendar':
+        return <Calendar />;
+      case 'messages':
+        return <Messages />;
+      case 'support':
+        return <Support />;
       case 'analytics':
         return <Analytics />;
       case 'settings':
@@ -56,6 +74,10 @@ function App() {
         return <Dashboard setCurrentTab={setCurrentTab} />;
     }
   };
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
 
   return (
     <div className="app-wrapper">
@@ -78,6 +100,7 @@ function App() {
         setIsCollapsed={setIsCollapsed} 
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
+        theme={theme}
       />
 
       {/* Main Panel Viewport */}

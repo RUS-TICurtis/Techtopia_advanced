@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
 import { WeeklyActivityChart, DealPipelineChart, MonthlyTrendsChart } from '../components/Charts';
+import './Dashboard.css';
 
 export default function Dashboard({ setCurrentTab }) {
   const [contacts, setContacts] = useState(() => mockDb.getContacts());
@@ -70,7 +71,7 @@ export default function Dashboard({ setCurrentTab }) {
       {/* Metrics Row */}
       <div className="metrics-grid">
         <div className="card metric-card">
-          <div className="metric-icon-wrapper" style={{ backgroundColor: 'rgba(45, 96, 255, 0.1)', color: 'var(--primary)' }}>
+          <div className="metric-icon-wrapper" style={{ backgroundColor: 'var(--primary-bg)', color: 'var(--primary)' }}>
             <Users />
           </div>
           <div className="metric-info">
@@ -83,7 +84,7 @@ export default function Dashboard({ setCurrentTab }) {
         </div>
 
         <div className="card metric-card">
-          <div className="metric-icon-wrapper" style={{ backgroundColor: 'rgba(24, 20, 243, 0.1)', color: 'var(--info)' }}>
+          <div className="metric-icon-wrapper" style={{ backgroundColor: 'var(--info-bg)', color: 'var(--info)' }}>
             <TrendingUp />
           </div>
           <div className="metric-info">
@@ -96,7 +97,7 @@ export default function Dashboard({ setCurrentTab }) {
         </div>
 
         <div className="card metric-card">
-          <div className="metric-icon-wrapper" style={{ backgroundColor: 'rgba(65, 212, 48, 0.1)', color: 'var(--success)' }}>
+          <div className="metric-icon-wrapper" style={{ backgroundColor: 'var(--success-bg)', color: 'var(--success)' }}>
             <CheckCircle />
           </div>
           <div className="metric-info">
@@ -109,7 +110,7 @@ export default function Dashboard({ setCurrentTab }) {
         </div>
 
         <div className="card metric-card">
-          <div className="metric-icon-wrapper" style={{ backgroundColor: 'rgba(255, 187, 56, 0.1)', color: 'var(--warning)' }}>
+          <div className="metric-icon-wrapper" style={{ backgroundColor: 'var(--warning-bg)', color: 'var(--warning)' }}>
             <DollarSign />
           </div>
           <div className="metric-info">
@@ -236,7 +237,7 @@ export default function Dashboard({ setCurrentTab }) {
               <div style={{ display: 'flex', gap: '15px' }}>
                 <div style={{
                   minWidth: '36px', height: '36px', borderRadius: '50%',
-                  backgroundColor: 'rgba(45, 96, 255, 0.1)', color: 'var(--primary)',
+                  backgroundColor: 'var(--primary-bg)', color: 'var(--primary)',
                   display: 'flex', alignItems: 'center', justifyContents: 'center', alignSelf: 'flex-start',
                   justifyContent: 'center'
                 }}>

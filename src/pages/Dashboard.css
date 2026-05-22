@@ -1,0 +1,43 @@
+/* ==========================================================================
+   Dashboard Page Styles
+   ========================================================================== */
+.dashboard-activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+}
+
+.activity-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 38px;
+  bottom: -16px;
+  width: 1px;
+  background-color: var(--border-light);
+}
+
+.activity-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.activity-body { flex: 1; min-width: 0; }
+.activity-title { font-size: 14px; font-weight: 600; color: var(--text-title); line-height: 1.4; }
+.activity-time  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Overview chart card full-height */
+.chart-card-full { height: 100%; min-height: 300px; }
+
+/* Quick-lead form */
+.quick-lead-form { display: flex; flex-direction: column; gap: 14px; }
