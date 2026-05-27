@@ -97,8 +97,7 @@ export default function Clients({ searchValue = '' }) {
           <input 
             className="search-input w-full" 
             placeholder="Search clients..." 
-            value={searchValue} 
-            readOnly 
+            value={searchValue}  
             style={{
               backgroundColor: 'var(--bg-app)',
               borderColor: 'var(--border-light)',

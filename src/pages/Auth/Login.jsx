@@ -21,13 +21,14 @@ export default function AuthLogin() {
     try {
       const res = await login(email, password);
       if (res.success) {
-        // Redirection to MFA check if required
-        const requireMfa = email.includes('admin') || email.includes('finance');
-        if (requireMfa) {
-          useAuthStore.setState({ mfaRequired: true });
+        if (res.mfaRequired) {
           navigate('/auth/mfa');
         } else {
-          navigate('/');
+          if (res.user?.role === 'client') {
+            navigate('/client');
+          } else {
+            navigate('/');
+          }
         }
       } else {
         setError(res.error || 'Invalid credentials. Select a demo role below.');

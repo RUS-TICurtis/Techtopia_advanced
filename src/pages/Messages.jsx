@@ -39,7 +39,7 @@ export default function Messages() {
       <div className="messages-layout">
         <div className="messages-sidebar">
           <div className="messages-sidebar-header">
-            <div className="search-wrapper" style={{ width: '100%', display: 'block' }}>
+            <div className="search-wrapper" >
               <Search size={16} className="search-icon" />
               <input type="text" className="search-input" placeholder="Search messages..." />
             </div>

@@ -20,7 +20,8 @@ import { mockDb } from '../utils/mockDb';
 import DataTable from '../components/ui/DataTable';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
-import FilterBar from '../components/ui/FilterBar';
+import PageContainer from '../components/layout/PageContainer';
+import PageHeader from '../components/layout/PageHeader';
 import './Contacts.css';
 
 export default function Contacts({ searchValue = '' }) {
@@ -252,18 +253,17 @@ export default function Contacts({ searchValue = '' }) {
   });
 
   return (
-    <div className="page-container contacts-page">
-      <div className="page-header flex justify-between items-center mb-6">
-        <div>
-          <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#8A4FFF]">⚡</span> Lead Ledger
-          </h1>
-          <p className="page-subtitle">Unified customer records with Radix right-click execution & dossiers</p>
-        </div>
-        <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
-          <Plus size={18} /> Add New Lead
-        </button>
-      </div>
+    <PageContainer className="contacts-page">
+      <PageHeader
+        title="Lead Ledger"
+        subtitle="Unified customer records with Radix right-click execution & dossiers"
+        icon={<span className="text-[#8A4FFF] text-xl">⚡</span>}
+        actions={
+          <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
+            <Plus size={18} /> Add New Lead
+          </button>
+        }
+      />
 
       {/* Filter Tabs & Counter */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -602,6 +602,6 @@ export default function Contacts({ searchValue = '' }) {
           </div>
         </form>
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

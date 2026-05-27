@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
       } catch {
         localStorage.removeItem('crm_access_token');
         localStorage.removeItem('crm_refresh_token');
-        window.location.href = '/login';
+        window.location.href = '/auth/login';
       }
     }
     return Promise.reject(error);
@@ -69,6 +69,7 @@ export function createResourceService(path) {
 export const authApi = {
   login: (credentials) => apiClient.post('/auth/login', credentials).then(r => r.data),
   logout: () => apiClient.post('/auth/logout').then(r => r.data),
+  verifyMfa: (code, tempToken) => apiClient.post('/auth/mfa/verify', { code, tempToken }).then(r => r.data),
   refresh: (refreshToken) => apiClient.post('/auth/refresh', { refreshToken }).then(r => r.data),
   me: () => apiClient.get('/auth/me').then(r => r.data),
   sessions: () => apiClient.get('/auth/sessions').then(r => r.data),

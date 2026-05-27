@@ -173,7 +173,7 @@ export default function Dashboard({ setCurrentTab }) {
           <div className="dashboard-charts-grid">
             <div className="card">
               <div className="card-title">Deal Pipeline Stages</div>
-              <div style={{ height: 180, display: 'flex', alignItems: 'center' }}>
+              <div style={{ height: 210, display: 'flex', alignItems: 'center' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie

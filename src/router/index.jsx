@@ -1,7 +1,8 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { can, ROLES } from '../lib/permissions';
+import { hasPermission } from '../services/auth/authService';
+import { ROLES, PERMISSIONS } from '../constants/permissions';
 
 // ─── Lazy Load Pages ────────────────────────────────────────────────────────
 const Dashboard = lazy(() => import('../pages/Dashboard'));
@@ -30,6 +31,7 @@ const AuditLogs = lazy(() => import('../pages/AuditLogs'));
 const Automations = lazy(() => import('../pages/Automations'));
 const Reports = lazy(() => import('../pages/Reports'));
 const Activities = lazy(() => import('../pages/Activities'));
+const Unauthorized = lazy(() => import('../pages/Unauthorized'));
 
 // Client Portal Pages
 const ClientDashboard = lazy(() => import('../pages/ClientPortal/ClientDashboard'));
@@ -53,67 +55,14 @@ const PageLoader = () => (
   </div>
 );
 
-// ─── Route Guards ───────────────────────────────────────────────────────────
-
-// Guard for authenticated staff/admin users
-const ProtectedRoute = ({ permission }) => {
-  const { isAuthenticated, user, mfaRequired } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
-  }
-
-  if (mfaRequired) {
-    return <Navigate to="/auth/mfa" replace />;
-  }
-
-  // Client role users belong in the Client Portal subtree
-  if (user?.role === ROLES.CLIENT) {
-    return <Navigate to="/client" replace />;
-  }
-
-  if (permission && !can(user?.role, permission)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <Outlet />;
-};
-
-// Guard for client-specific portal access
-const ClientPortalRoute = () => {
-  const { isAuthenticated, user } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
-  }
-
-  // Super admins are allowed inside client portal for debugging
-  if (user?.role !== ROLES.CLIENT && user?.role !== ROLES.SUPER_ADMIN) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <Outlet />;
-};
-
-// Public routing (accessible only when logged out)
-const PublicRoute = () => {
-  const { isAuthenticated, mfaRequired } = useAuthStore();
-
-  if (isAuthenticated) {
-    if (mfaRequired) {
-      return <Navigate to="/auth/mfa" replace />;
-    }
-    return <Navigate to="/" replace />;
-  }
-
-  return <Outlet />;
-};
+import ProtectedRoute from '../components/guards/ProtectedRoute';
+import ClientPortalRoute from '../components/guards/ClientPortalRoute';
+import PublicRoute from '../components/guards/PublicRoute';
 
 export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate, searchValue, setSearchValue }) {
   // Navigation wrapper for legacy pages that use setCurrentTab prop
   const currentTabAdapter = (Component) => (props) => {
     const handleSetTab = (tab) => {
-      // In real routing, we redirect instead of switching tab state
       const urlMap = {
         'dashboard': '/',
         'leads': '/leads',
@@ -153,40 +102,77 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
 
         {/* Protected App Routes (Internal Staff / Admins) */}
         <Route element={<ProtectedRoute />}>
+          {/* Base protected routes for internal staff */}
           <Route path="/" element={<LegacyDashboard />} />
-          <Route path="/leads" element={<Leads searchValue={searchValue} />} />
-          <Route path="/contacts" element={<Contacts searchValue={searchValue} />} />
-          <Route path="/companies" element={<Companies searchValue={searchValue} />} />
-          <Route path="/pipeline" element={<Pipeline searchValue={searchValue} />} />
-          <Route path="/clients" element={<Clients searchValue={searchValue} />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/activities" element={<Activities />} />
-          
-          {/* Projects Subtree */}
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/board" element={<ProjectBoard />} />
-          <Route path="/projects/timeline" element={<ProjectTimeline />} />
-
-          {/* Core operation modules */}
-          <Route path="/support" element={<Support />} />
           <Route path="/messages" element={<Messages />} />
-          <Route path="/billing" element={<Billing searchValue={searchValue} />} />
-          <Route path="/invoices" element={<Invoices searchValue={searchValue} />} />
-          <Route path="/contracts" element={<Contracts searchValue={searchValue} />} />
-          
-          {/* Business Insights */}
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/reports" element={<Reports />} />
 
-          {/* Intelligence Modules */}
-          <Route path="/ai" element={<AiAssistant />} />
-          <Route path="/automations" element={<Automations />} />
+          {/* Granular Permission-Guarded Staff Routes */}
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_LEADS} />}>
+            <Route path="/leads" element={<Leads searchValue={searchValue} />} />
+          </Route>
 
-          {/* Admin Panels */}
-          <Route path="/team" element={<Team />} />
-          <Route path="/audit-logs" element={<AuditLogs />} />
-          <Route path="/settings" element={<LegacySettings theme={theme} toggleTheme={toggleTheme} onProfileUpdate={onProfileUpdate} />} />
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_CONTACTS} />}>
+            <Route path="/contacts" element={<Contacts searchValue={searchValue} />} />
+            <Route path="/companies" element={<Companies searchValue={searchValue} />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_PIPELINE} />}>
+            <Route path="/pipeline" element={<Pipeline searchValue={searchValue} />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_CLIENTS} />}>
+            <Route path="/clients" element={<Clients searchValue={searchValue} />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_PROJECTS} />}>
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/board" element={<ProjectBoard />} />
+            <Route path="/projects/timeline" element={<ProjectTimeline />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_SUPPORT} />}>
+            <Route path="/support" element={<Support />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_BILLING} />}>
+            <Route path="/billing" element={<Billing searchValue={searchValue} />} />
+            <Route path="/invoices" element={<Invoices searchValue={searchValue} />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_CONTRACTS} />}>
+            <Route path="/contracts" element={<Contracts searchValue={searchValue} />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_ANALYTICS} />}>
+            <Route path="/analytics" element={<Analytics />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.EXPORT_ANALYTICS} />}>
+            <Route path="/reports" element={<Reports />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.AI_CHAT} />}>
+            <Route path="/ai" element={<AiAssistant />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_AUTOMATIONS} />}>
+            <Route path="/automations" element={<Automations />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_TEAM} />}>
+            <Route path="/team" element={<Team />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_AUDIT} />}>
+            <Route path="/audit-logs" element={<AuditLogs />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_SETTINGS} />}>
+            <Route path="/settings" element={<LegacySettings theme={theme} toggleTheme={toggleTheme} onProfileUpdate={onProfileUpdate} />} />
+          </Route>
         </Route>
 
         {/* Client Portal subtree */}

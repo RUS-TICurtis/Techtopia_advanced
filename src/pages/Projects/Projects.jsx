@@ -84,6 +84,9 @@ const INITIAL_PROJECTS = [
   }
 ];
 
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
+
 export default function Projects() {
   const [projects, setProjects] = useState(() => {
     const saved = localStorage.getItem('crm_projects');
@@ -154,21 +157,20 @@ export default function Projects() {
   });
 
   return (
-    <div className="page-container projects-page">
-      <div className="page-header flex justify-between items-center mb-6">
-        <div>
-          <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#21FA90]">⚡</span> Project Portfolio
-          </h1>
-          <p className="page-subtitle">Track project health, progress bars, budgets, and milestones</p>
-        </div>
-        <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
-          <Plus size={18} /> New Project
-        </button>
-      </div>
+    <PageContainer className="projects-page">
+      <PageHeader
+        title="Project Portfolio"
+        subtitle="Track project health, progress bars, budgets, and milestones"
+        icon={<span className="text-[#21FA90] text-xl">⚡</span>}
+        actions={
+          <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
+            <Plus size={18} /> New Project
+          </button>
+        }
+      />
 
       {/* Health Tabs */}
-      <div className="flex justify-between items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6">
         <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 custom-scrollbar">
           {['All', 'On Track', 'At Risk', 'Off Track', 'Completed'].map(tab => (
             <button
@@ -431,6 +433,6 @@ export default function Projects() {
           </div>
         </form>
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

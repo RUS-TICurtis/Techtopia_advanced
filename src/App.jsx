@@ -1,18 +1,21 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import Sidebar from './components/Sidebar';
-import Navbar from './components/Navbar';
-import BottomNav from './components/BottomNav';
-import CommandPalette from './components/ui/CommandPalette';
-import NotificationCenter from './components/layout/NotificationCenter';
+import AppLayout from './components/layout/AppLayout';
 import AppRoutes from './router';
-import { useAuthStore } from './store/authStore';
+import { useAuth } from './context/AuthContext';
 import { useUIStore } from './store/uiStore';
 
 function App() {
-  const { isAuthenticated } = useAuthStore();
-  const { theme, toggleTheme, sidebarCollapsed, setSidebarCollapsed, mobileSidebarOpen, setMobileSidebarOpen } = useUIStore();
+  const { isAuthenticated } = useAuth();
+  const {
+    theme,
+    toggleTheme,
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    sidebarMobileOpen: mobileSidebarOpen,
+    setSidebarMobileOpen: setMobileSidebarOpen
+  } = useUIStore();
   const location = useLocation();
 
   useEffect(() => {
@@ -25,56 +28,29 @@ function App() {
   if (!isAuthenticated || isAuthPage) {
     return (
       <div className="app-wrapper auth-only">
+        <Toaster position="bottom-right" reverseOrder={false} />
         <AppRoutes 
           theme={theme} 
           toggleTheme={toggleTheme} 
         />
-        <Toaster position="bottom-right" reverseOrder={false} />
       </div>
     );
   }
 
   return (
-    <div className="app-wrapper">
-      {/* Toast Notification Provider */}
-      <Toaster position="bottom-right" reverseOrder={false} />
-
-      {/* Global Interactive Utilities */}
-      <CommandPalette />
-      <NotificationCenter />
-
-      {mobileSidebarOpen && (
-        <div 
-          className="sidebar-overlay" 
-          onClick={() => setMobileSidebarOpen(false)}
-        ></div>
-      )}
-
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
-        setIsCollapsed={setSidebarCollapsed} 
-        mobileOpen={mobileSidebarOpen}
-        setMobileOpen={setMobileSidebarOpen}
-        theme={theme}
+    <AppLayout
+      theme={theme}
+      toggleTheme={toggleTheme}
+      sidebarCollapsed={sidebarCollapsed}
+      setSidebarCollapsed={setSidebarCollapsed}
+      mobileSidebarOpen={mobileSidebarOpen}
+      setMobileSidebarOpen={setMobileSidebarOpen}
+    >
+      <AppRoutes 
+        theme={theme} 
+        toggleTheme={toggleTheme} 
       />
-
-      <div className={`main-content ${sidebarCollapsed ? 'collapsed' : ''}`}>
-        <Navbar 
-          theme={theme} 
-          toggleTheme={toggleTheme} 
-          onMenuClick={() => setMobileSidebarOpen(true)}
-        />
-
-        <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <AppRoutes 
-            theme={theme} 
-            toggleTheme={toggleTheme} 
-          />
-        </main>
-      </div>
-      
-      <BottomNav />
-    </div>
+    </AppLayout>
   );
 }
 

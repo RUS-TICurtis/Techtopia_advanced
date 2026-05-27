@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { getNavItemsForRole } from '../lib/permissions';
-import { motion, AnimatePresence } from 'framer-motion';
+import { SIDEBAR_CONFIG, GROUP_LABELS } from '../sidebar/sidebar.config';
+import { hasPermission } from '../services/auth/authService';
 import { 
   LayoutDashboard, Users, Building2, FileText, GitBranch, 
   CheckSquare, Calendar, MessageSquare, LifeBuoy, BarChart3, 
@@ -37,16 +37,6 @@ const ICON_MAP = {
   'settings': Settings,
 };
 
-const GROUP_LABELS = {
-  'main': 'Home',
-  'crm': 'Customer Relations',
-  'operations': 'Operations',
-  'finance': 'Finance & Billing',
-  'insights': 'Business Insights',
-  'intelligence': 'AI & Automations',
-  'admin': 'Administration',
-};
-
 export default function Sidebar({ 
   isCollapsed, 
   setIsCollapsed,
@@ -56,10 +46,10 @@ export default function Sidebar({
 }) {
   const logout = useAuthStore(state => state.logout);
   const user = useAuthStore(state => state.user);
-  const role = user?.role || 'guest';
   const navigate = useNavigate();
 
-  const navItems = getNavItemsForRole(role);
+  // Enforce central permission evaluation
+  const navItems = SIDEBAR_CONFIG.filter(item => hasPermission(user, item.permission));
 
   // Group nav items by section
   const groupedItems = navItems.reduce((acc, item) => {
@@ -87,11 +77,10 @@ export default function Sidebar({
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-brand">
         {isCollapsed ? (
-          <span className="logo-icon-only text-2xl text-[#00e5ff] font-bold">⚡</span>
+          <span className="logo-icon-only text-2xl text-[#00e5ff] font-bold"><img  className='logo' src="favicon.png" alt="" /></span>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-2xl text-[#00e5ff] font-bold">⚡</span>
-            <span className="text-lg font-bold font-display text-white tracking-wide">Techtopia Hub</span>
+            <span className=""><img className='logo' src="logo-dark.png" alt="" /></span>
           </div>
         )}
       </div>

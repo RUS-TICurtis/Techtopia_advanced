@@ -65,13 +65,13 @@ export default function Team() {
 
       {/* Search */}
       <div className="search-wrapper" style={{ maxWidth: 440 }}>
-        <Search size={16} className="search-icon" />
-        <input
+        
+        <input style={{ maxWidth: 440 }} 
           className="search-input"
           placeholder="Search members..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-        />
+        /><Search size={16} className="search-icon" />
       </div>
 
       {/* Empty / List */}

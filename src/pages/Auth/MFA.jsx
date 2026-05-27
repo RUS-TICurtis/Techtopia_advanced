@@ -12,6 +12,7 @@ export default function MFA() {
   const navigate = useNavigate();
   
   const user = useAuthStore(state => state.user);
+  const verifyMfa = useAuthStore(state => state.verifyMfa);
 
   useEffect(() => {
     // Redirect if they got here without being partially authed
@@ -45,7 +46,7 @@ export default function MFA() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const verificationCode = code.join('');
     if (verificationCode.length < 6) {
@@ -56,16 +57,17 @@ export default function MFA() {
     setLoading(true);
     setError('');
 
-    // Simulate MFA check
-    setTimeout(() => {
-      if (verificationCode === '123456' || verificationCode === '000000') {
-        useAuthStore.setState({ mfaRequired: false, mfaVerified: true });
-        navigate('/');
+    const res = await verifyMfa(verificationCode);
+    if (res.success) {
+      if (res.user?.role === 'client') {
+        navigate('/client');
       } else {
-        setError('Invalid verification code. Use demo code 123456.');
-        setLoading(false);
+        navigate('/');
       }
-    }, 1000);
+    } else {
+      setError(res.error || 'Invalid verification code. Use demo code 123456.');
+      setLoading(false);
+    }
   };
 
   const handleResend = () => {

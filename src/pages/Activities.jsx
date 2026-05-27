@@ -177,20 +177,21 @@ export default function Activities() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 w-full md:max-w-xs relative">
-          <Search className="absolute left-3.5 text-gray-500" size={14} />
+        <div className="search-wrapper flex items-center gap-2 w-full md:max-w-xs relative">
+          
           <input 
+          className="search-input"
             type="text" 
             placeholder="Search timeline..." 
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[#0a0f1e]/85 border border-gray-800 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#E4FF1A] transition-all"
+            
             style={{
               backgroundColor: 'var(--bg-app)',
               borderColor: 'var(--border-light)',
               color: 'var(--text-main)'
             }}
-          />
+          /><Search className="absolute left-3.5 text-gray-500" size={14} />
         </div>
       </div>
 

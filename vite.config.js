@@ -5,6 +5,9 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 5185,
+  },
   resolve: {
     alias: {
       'es-toolkit/compat/get': path.resolve('src/lib/es-toolkit-compat/get.js'),

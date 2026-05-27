@@ -23,7 +23,8 @@ import { mockDb } from '../utils/mockDb';
 import DataTable from '../components/ui/DataTable';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
-import { showToast } from '../components/ui/Toast';
+import PageContainer from '../components/layout/PageContainer';
+import PageHeader from '../components/layout/PageHeader';
 import './Leads.css';
 
 const STATUSES = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
@@ -384,18 +385,17 @@ export default function Leads({ searchValue = '' }) {
   ];
 
   return (
-    <div className="page-container leads-page">
-      <div className="page-header flex justify-between items-center mb-6">
-        <div>
-          <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#01FDF6]">⚡</span> Inbound Leads
-          </h1>
-          <p className="page-subtitle">Prospect enrichment engine with integrated clearbit lookup & RBAC promotion</p>
-        </div>
-        <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
-          <Plus size={18} /> New Prospect
-        </button>
-      </div>
+    <PageContainer className="leads-page">
+      <PageHeader
+        title="Inbound Leads"
+        subtitle="Prospect enrichment engine with integrated clearbit lookup & RBAC promotion"
+        icon={<span className="text-[#01FDF6] text-xl">⚡</span>}
+        actions={
+          <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
+            <Plus size={18} /> New Prospect
+          </button>
+        }
+      />
 
       {/* Leads metrics pills */}
       <div className="leads-status-row grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
@@ -766,6 +766,6 @@ export default function Leads({ searchValue = '' }) {
           </div>
         </form>
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

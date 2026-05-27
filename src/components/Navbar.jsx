@@ -84,7 +84,6 @@ export default function Navbar({
             type="text" 
             className="search-input cursor-pointer" 
             placeholder="Search CRM... (Ctrl+K)" 
-            readOnly
           />
           <span className="search-kbd-hint font-mono text-[10px] bg-gray-800/80 border border-gray-700/80 rounded px-1.5 py-0.5 text-gray-500 ml-auto">
             Ctrl+K
