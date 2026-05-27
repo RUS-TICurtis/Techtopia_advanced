@@ -25,3 +25,5 @@ dist-ssr
 
 refer/*
 LOCAL_TESTING.md
+
+.agyignore

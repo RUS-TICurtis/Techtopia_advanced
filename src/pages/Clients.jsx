@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { UserCircle2, Plus, Search, X, ChevronDown } from 'lucide-react';
+import { UserCircle2, Plus, Search, X, ShieldAlert, Award, Briefcase, Activity } from 'lucide-react';
+import Badge from '../components/ui/Badge';
 import './Clients.css';
 
 const TABS     = ['All', 'Active', 'Prospect', 'Inactive'];
@@ -11,7 +12,11 @@ const emptyForm = {
 };
 
 export default function Clients({ searchValue = '' }) {
-  const [clients, setClients]   = useState([]);
+  const [clients, setClients]   = useState([
+    { id: '1', companyName: 'CyberPulse Security', industry: 'Technology', status: 'Active', contactName: 'Curtis Miller', email: 'curtis@cyberpulse.io', phone: '+1 (555) 019-9233' },
+    { id: '2', companyName: 'BioGen Lab Systems', industry: 'Healthcare', status: 'Prospect', contactName: 'Catherine Song', email: 'c.song@biogen.com', phone: '+1 (555) 014-8821' },
+    { id: '3', companyName: 'Roma Tech Inc.', industry: 'Finance', status: 'Active', contactName: 'Faye Morgan', email: 'f.morgan@romatech.eu', phone: '+39 06 555 1290' },
+  ]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm]          = useState(emptyForm);
   const [activeTab, setActiveTab] = useState('All');
@@ -30,50 +35,85 @@ export default function Clients({ searchValue = '' }) {
     return matchesSearch && matchesTab;
   });
 
-  const statusColors = {
-    Active: 'badge-success', Prospect: 'badge-info', Inactive: 'badge-neutral'
-  };
+  const metrics = [
+    { label: 'Total Clients', value: clients.length, icon: UserCircle2, color: 'var(--brand-blue)' },
+    { label: 'Active',        value: clients.filter(c => c.status === 'Active').length, icon: Award, color: 'var(--brand-green)' },
+    { label: 'Prospects',     value: clients.filter(c => c.status === 'Prospect').length, icon: Briefcase, color: 'var(--brand-cyan)' },
+    { label: 'Inactive',      value: clients.filter(c => c.status === 'Inactive').length, icon: ShieldAlert, color: 'var(--brand-magenta)' }
+  ];
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <div className="page-container clients-page">
+      <div className="page-header flex justify-between items-center mb-6">
         <div>
-          <h1 className="page-title">Clients</h1>
-          <p className="page-subtitle">Manage your client accounts</p>
+          <h1 className="page-title flex items-center gap-2">
+            <UserCircle2 className="text-[#3772FF]" />
+            Corporate Clients
+          </h1>
+          <p className="page-subtitle">Manage executive business client accounts & profiles</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
           <Plus size={18} /> New Client
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="clients-tabs">
-        {TABS.map(t => (
-          <button
-            key={t}
-            className={`clients-tab ${activeTab === t ? 'active' : ''}`}
-            onClick={() => setActiveTab(t)}
-          >
-            {t}
-            <span className="clients-tab-count">
-              {t === 'All' ? clients.length : clients.filter(c => c.status === t).length}
-            </span>
-          </button>
-        ))}
+      {/* Premium KPI Metrics */}
+      <div className="metrics-grid mb-6">
+        {metrics.map(m => {
+          const Icon = m.icon;
+          return (
+            <div key={m.label} className="card metric-card">
+              <div className="metric-icon-wrapper" style={{ background: `${m.color}15` }}>
+                <Icon size={22} style={{ color: m.color }} />
+              </div>
+              <div className="metric-info">
+                <span className="metric-label">{m.label}</span>
+                <span className="metric-value">{m.value}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Search */}
-      <div className="search-wrapper" style={{ maxWidth: 400 }}>
-        <Search size={16} className="search-icon" />
-        <input className="search-input" placeholder="Search clients..." readOnly value={searchValue} />
+      {/* Tabs Row */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="clients-tabs flex gap-2">
+          {TABS.map(t => (
+            <button
+              key={t}
+              className={`clients-tab ${activeTab === t ? 'active' : ''}`}
+              onClick={() => setActiveTab(t)}
+            >
+              {t}
+              <span className="clients-tab-count">
+                {t === 'All' ? clients.length : clients.filter(c => c.status === t).length}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="search-wrapper w-full md:max-w-xs" style={{ margin: 0 }}>
+          <Search size={16} className="search-icon" />
+          <input 
+            className="search-input w-full" 
+            placeholder="Search clients..." 
+            value={searchValue} 
+            readOnly 
+            style={{
+              backgroundColor: 'var(--bg-app)',
+              borderColor: 'var(--border-light)',
+              color: 'var(--text-main)'
+            }}
+          />
+        </div>
       </div>
 
-      {/* Empty / Table */}
+      {/* Table grid */}
       {filtered.length === 0 ? (
         <div className="empty-state card">
           <UserCircle2 size={48} className="empty-icon" />
-          <h3>No clients yet</h3>
-          <p>Add your first client to start managing your accounts.</p>
+          <h3>No clients cataloged</h3>
+          <p>Register your first business account to initialize portfolios.</p>
           <button className="btn btn-primary" onClick={() => setShowModal(true)}>
             <Plus size={18} /> New Client
           </button>
@@ -83,18 +123,25 @@ export default function Clients({ searchValue = '' }) {
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Company</th><th>Contact</th><th>Industry</th>
+                <th>Company</th><th>Primary Contact</th><th>Industry</th>
                 <th>Phone</th><th>Status</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(c => (
                 <tr key={c.id}>
-                  <td style={{ fontWeight: 600 }}>{c.companyName}</td>
-                  <td>{c.contactName}<br/><span style={{fontSize:12,color:'var(--text-muted)'}}>{c.email}</span></td>
+                  <td style={{ fontWeight: 700, color: 'var(--text-title)' }}>{c.companyName}</td>
+                  <td>
+                    <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{c.contactName}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{c.email}</div>
+                  </td>
                   <td>{c.industry}</td>
-                  <td>{c.phone || '—'}</td>
-                  <td><span className={`badge ${statusColors[c.status] || 'badge-neutral'}`}>{c.status}</span></td>
+                  <td><code>{c.phone || '—'}</code></td>
+                  <td>
+                    <Badge variant={c.status === 'Active' ? 'success' : c.status === 'Prospect' ? 'info' : 'neutral'}>
+                      {c.status}
+                    </Badge>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -106,7 +153,7 @@ export default function Clients({ searchValue = '' }) {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>New Client</h2>
+              <h2>New Client Account</h2>
               <button className="btn-icon" onClick={() => setShowModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleSubmit} className="modal-body">

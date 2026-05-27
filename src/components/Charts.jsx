@@ -24,17 +24,31 @@ export const WeeklyActivityChart = () => {
   return (
     <div style={{ width: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', marginBottom: '15px', fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>
-        <div style={{ display: 'flex', alignHover: 'center', gap: '6px' }}>
-          <span style={{ width: '12px', height: '12px', borderRadius: '4px', backgroundColor: 'var(--primary)', display: 'inline-block' }}></span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '12px', height: '12px', borderRadius: '4px', backgroundColor: 'var(--brand-blue, var(--primary))', display: 'inline-block' }}></span>
           <span>Sales Revenue ($)</span>
         </div>
-        <div style={{ display: 'flex', alignHover: 'center', gap: '6px' }}>
-          <span style={{ width: '12px', height: '12px', borderRadius: '4px', backgroundColor: 'var(--accent-orange, #FFBB38)', display: 'inline-block' }}></span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ width: '12px', height: '12px', borderRadius: '4px', backgroundColor: 'var(--brand-cyan, #FFBB38)', display: 'inline-block' }}></span>
           <span>New Leads</span>
         </div>
       </div>
 
       <svg viewBox={`0 0 ${chartWidth} 240`} width="100%" height="100%" style={{ overflow: 'visible' }}>
+        <defs>
+          <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feOffset dy="4" in="SourceAlpha" result="off" />
+            <feGaussianBlur in="off" stdDeviation="6" result="blur" />
+            <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0" result="shadow" />
+            <feBlend in="SourceGraphic" in2="shadow" mode="normal" />
+          </filter>
+
+          <filter id="tooltipDrop" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3.5" result="tb" />
+            <feColorMatrix in="tb" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0" />
+            <feBlend in="SourceGraphic" />
+          </filter>
+        </defs>
         {/* Horizontal grid lines */}
         {[0, 0.25, 0.5, 0.75, 1].map((ratio, idx) => {
           const y = 30 + ratio * chartHeight;
@@ -78,9 +92,10 @@ export const WeeklyActivityChart = () => {
                 width={barWidth}
                 height={revenueHeight}
                 rx="6"
-                fill="var(--primary)"
+                fill="var(--brand-blue, var(--primary))"
                 opacity={hoveredBar === null || isHovered ? 1 : 0.6}
-                style={{ transition: 'all 0.3s ease' }}
+                style={{ transition: 'all 0.22s cubic-bezier(.2,.9,.3,1)' }}
+                filter="url(#dropShadow)"
               />
 
               {/* Leads Bar */}
@@ -90,9 +105,10 @@ export const WeeklyActivityChart = () => {
                 width={barWidth}
                 height={leadsHeight}
                 rx="6"
-                fill="var(--accent-orange, #FFBB38)"
+                fill="var(--brand-cyan, var(--accent-orange, #FFBB38))"
                 opacity={hoveredBar === null || isHovered ? 1 : 0.6}
-                style={{ transition: 'all 0.3s ease' }}
+                style={{ transition: 'all 0.22s cubic-bezier(.2,.9,.3,1)' }}
+                filter="url(#dropShadow)"
               />
 
               {/* Day Label */}
@@ -118,7 +134,7 @@ export const WeeklyActivityChart = () => {
                     height="40"
                     rx="6"
                     fill="var(--text-title)"
-                    filter="drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.15))"
+                    filter="url(#tooltipDrop)"
                   />
                   <text
                     x={x + sectionWidth / 2}
@@ -195,6 +211,18 @@ export const DealPipelineChart = ({ deals = [] }) => {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
       <div style={{ position: 'relative', width: '200px', height: '200px' }}>
         <svg viewBox="0 0 200 200" width="100%" height="100%">
+          <defs>
+            <filter id="donutShadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feOffset dy="3" in="SourceAlpha" result="off" />
+              <feGaussianBlur in="off" stdDeviation="5" result="blur" />
+              <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0" />
+              <feBlend in="SourceGraphic" in2="blur" mode="normal" />
+            </filter>
+            <radialGradient id="donutCenterGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+            </radialGradient>
+          </defs>
           {chartData.map((item, idx) => {
             const percentage = item.value / total;
             const strokeDashoffset = circumference - percentage * circumference;
@@ -213,9 +241,12 @@ export const DealPipelineChart = ({ deals = [] }) => {
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
                 transform={`rotate(${rotation - 90} ${cx} ${cy})`}
+                strokeLinecap="round"
                 style={{
-                  transition: 'stroke-dashoffset 0.8s ease-in-out, stroke 0.3s',
+                  transition: 'stroke-dashoffset 0.5s ease-in-out, stroke 0.28s',
+                  transformOrigin: `${cx}px ${cy}px`,
                 }}
+                filter="url(#donutShadow)"
               />
             );
           })}
@@ -305,6 +336,16 @@ export const MonthlyTrendsChart = () => {
             <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.25" />
             <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.00" />
           </linearGradient>
+          <filter id="lineGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="lg" />
+            <feColorMatrix in="lg" type="matrix" values="0 0 0 0 0  0 0 0 0 0.22  0 0 0 0 1  0 0 0 0.12 0" />
+            <feBlend in="SourceGraphic" in2="lg" mode="normal" />
+          </filter>
+          <filter id="tooltipDrop" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="tb" />
+            <feColorMatrix in="tb" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.14 0" />
+            <feBlend in="SourceGraphic" />
+          </filter>
         </defs>
 
         {/* Render horizontal lines */}
@@ -325,7 +366,7 @@ export const MonthlyTrendsChart = () => {
         <path d={areaPath} fill="url(#areaGradient)" />
 
         {/* Render Stroke Line */}
-        <path d={linePath} fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={linePath} fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" filter="url(#lineGlow)" />
 
         {/* Render Interactive Nodes */}
         {coordinates.map((p, idx) => {
@@ -365,7 +406,7 @@ export const MonthlyTrendsChart = () => {
                     height="28"
                     rx="5"
                     fill="var(--text-title)"
-                    filter="drop-shadow(0 4px 6px rgba(0,0,0,0.1))"
+                    filter="url(#tooltipDrop)"
                   />
                   <text
                     x={p.x}

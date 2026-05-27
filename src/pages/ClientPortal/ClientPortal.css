@@ -1,0 +1,434 @@
+/* ==========================================================================
+   Techtopia CRM Hub - Client Portal Stylesheet
+   Design Spec: Dark Mode Premium, Glassmorphism, 6-color Neon Gradients
+   ========================================================================== */
+
+.client-portal-page {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Premium Panel Container */
+.premium-panel {
+  position: relative;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.premium-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(55, 114, 255, 0.2);
+}
+
+[data-theme="dark"] .premium-panel {
+  background-color: rgba(15, 22, 41, 0.45);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .premium-panel:hover {
+  border-color: rgba(1, 253, 246, 0.2);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 12px rgba(1, 253, 246, 0.03);
+}
+
+/* Welcome Banner */
+.portal-welcome-banner {
+  border-left: 4px solid var(--brand-cyan) !important;
+  background: linear-gradient(135deg, rgba(55, 114, 255, 0.05) 0%, rgba(138, 79, 255, 0.03) 100%);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+}
+
+[data-theme="dark"] .portal-welcome-banner {
+  border-left-color: var(--brand-cyan) !important;
+  background: linear-gradient(135deg, rgba(1, 253, 246, 0.08) 0%, rgba(138, 79, 255, 0.04) 100%);
+}
+
+.portal-welcome-banner:hover {
+  border-color: rgba(55, 114, 255, 0.2);
+}
+
+[data-theme="dark"] .portal-welcome-banner:hover {
+  border-color: rgba(1, 253, 246, 0.2);
+}
+
+/* Header Text elements */
+.portal-header-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-title);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.portal-header-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.portal-header-company {
+  color: var(--text-title);
+  font-weight: 700;
+}
+
+/* Operational Status badge */
+.portal-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(33, 250, 144, 0.06);
+  border: 1px solid rgba(33, 250, 144, 0.25);
+  color: var(--success);
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* Metrics Link Cards */
+.portal-metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border-left-width: 4px !important;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  transition: all var(--transition-normal);
+}
+
+.portal-metric-card:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--shadow-md);
+  border-left-width: 7px !important;
+}
+
+[data-theme="dark"] .portal-metric-card {
+  background-color: rgba(15, 22, 41, 0.45);
+}
+
+/* Panel Headers & Details */
+.portal-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.portal-panel-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-title);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Text Overrides */
+.portal-text-title {
+  color: var(--text-title);
+  font-weight: 800;
+  font-family: var(--font-display);
+}
+
+.portal-text-main {
+  color: var(--text-main);
+}
+
+.portal-text-muted {
+  color: var(--text-muted);
+}
+
+/* Progress Gauges */
+.portal-progress-bg {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.portal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-purple) 0%, var(--brand-cyan) 100%);
+  border-radius: var(--radius-full);
+}
+
+[data-theme="light"] .portal-progress-fill {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--brand-blue) 100%);
+}
+
+/* Box Panels for Metadata */
+.portal-info-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.portal-bullet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-main);
+  padding: 10px 14px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+}
+
+.portal-bullet-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background-color: var(--brand-cyan);
+}
+
+[data-theme="light"] .portal-bullet-dot {
+  background-color: var(--primary);
+}
+
+/* System Announcements */
+.portal-announcement {
+  padding: 16px;
+  background-color: rgba(228, 255, 10, 0.04);
+  border-left: 4px solid var(--brand-chartreuse);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+.portal-announcement-title {
+  font-weight: 800;
+  color: var(--text-title);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Documents / Contracts Scrolling View */
+.portal-document-scroll {
+  padding: 16px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  height: 144px;
+  overflow-y: auto;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.portal-document-section-title {
+  font-weight: 700;
+  color: var(--text-title);
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.portal-document-section-title:first-child {
+  margin-top: 0;
+}
+
+/* Support Dossier Sync Chat logs */
+.portal-chat-logs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 144px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.portal-chat-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--text-main);
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+}
+
+.portal-chat-msg.agent {
+  border-left: 3px solid var(--brand-cyan);
+  background-color: rgba(1, 253, 246, 0.015);
+}
+
+[data-theme="light"] .portal-chat-msg.agent {
+  border-left-color: var(--primary);
+  background-color: rgba(55, 114, 255, 0.015);
+}
+
+.portal-chat-sender {
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+.portal-chat-time {
+  font-weight: 400;
+  color: var(--text-light);
+  margin-left: 6px;
+}
+
+/* Sticky / Dossier sliding card */
+.dossier-card.card {
+  position: sticky;
+  top: 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  z-index: 10;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .dossier-card.card {
+  background-color: rgba(15, 22, 41, 0.85);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Scrollbar for all portal views */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Custom Cryptographic Header panels inside modals */
+.portal-modal-header-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  font-size: 12px;
+  color: var(--text-main);
+}
+
+@media (max-width: 600px) {
+  .portal-modal-header-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .portal-modal-header-panel .text-right {
+    text-align: left;
+  }
+}
+
+/* Cryptographic alert boxes */
+.portal-alert-cyan {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: rgba(1, 253, 246, 0.04);
+  border: 1px solid rgba(1, 253, 246, 0.25);
+  color: var(--brand-cyan);
+  border-radius: var(--radius-lg);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+[data-theme="light"] .portal-alert-cyan {
+  background-color: rgba(55, 114, 255, 0.04);
+  border-color: rgba(55, 114, 255, 0.25);
+  color: var(--primary);
+}
+
+.portal-alert-green {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: rgba(33, 250, 144, 0.04);
+  border: 1px solid rgba(33, 250, 144, 0.25);
+  color: var(--success);
+  border-radius: var(--radius-lg);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.portal-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--brand-cyan);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+}
+
+[data-theme="light"] .portal-checkbox {
+  accent-color: var(--primary);
+}
+
+@media (max-width: 1200px) {
+  .dossier-card.card {
+    width: 100% !important;
+    position: static;
+    max-height: none;
+  }
+}

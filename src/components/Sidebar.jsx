@@ -1,30 +1,53 @@
-import { 
-  LayoutDashboard, 
-  Users, 
-  Building2,
-  FileText,
-  GitBranch, 
-  CheckSquare, 
-  Calendar,
-  MessageSquare,
-  LifeBuoy,
-  BarChart3, 
-  Settings, 
-  ChevronLeft, 
-  ChevronRight,
-  Sparkles,
-  LogOut,
-  TrendingUp,
-  FileSignature,
-  UserCircle2,
-  Receipt
-} from 'lucide-react';
+import React from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { getNavItemsForRole } from '../lib/permissions';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  LayoutDashboard, Users, Building2, FileText, GitBranch, 
+  CheckSquare, Calendar, MessageSquare, LifeBuoy, BarChart3, 
+  Settings, ChevronLeft, ChevronRight, Sparkles, LogOut, 
+  TrendingUp, FileSignature, UserCircle2, Receipt, ShieldAlert,
+  Zap, FolderKanban, FileSpreadsheet, Clock
+} from 'lucide-react';
 import './Sidebar.css';
 
+const ICON_MAP = {
+  'dashboard': LayoutDashboard,
+  'leads': TrendingUp,
+  'contacts': Users,
+  'companies': Building2,
+  'pipeline': GitBranch,
+  'clients': UserCircle2,
+  'projects': FolderKanban,
+  'tasks': CheckSquare,
+  'calendar': Calendar,
+  'activities': Clock,
+  'support': LifeBuoy,
+  'messages': MessageSquare,
+  'billing': Receipt,
+  'invoices': FileText,
+  'contracts': FileSignature,
+  'analytics': BarChart3,
+  'reports': FileSpreadsheet,
+  'ai-assistant': Sparkles,
+  'automations': Zap,
+  'team': Users,
+  'audit-logs': ShieldAlert,
+  'settings': Settings,
+};
+
+const GROUP_LABELS = {
+  'main': 'Home',
+  'crm': 'Customer Relations',
+  'operations': 'Operations',
+  'finance': 'Finance & Billing',
+  'insights': 'Business Insights',
+  'intelligence': 'AI & Automations',
+  'admin': 'Administration',
+};
+
 export default function Sidebar({ 
-  currentTab, 
-  setCurrentTab, 
   isCollapsed, 
   setIsCollapsed,
   mobileOpen,
@@ -32,69 +55,77 @@ export default function Sidebar({
   theme
 }) {
   const logout = useAuthStore(state => state.logout);
+  const user = useAuthStore(state => state.user);
+  const role = user?.role || 'guest';
+  const navigate = useNavigate();
 
-  const menuItems = [
-    { id: 'dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
-    { id: 'leads',        label: 'Leads',        icon: TrendingUp },
-    { id: 'clients',      label: 'Clients',      icon: UserCircle2 },
-    { id: 'pipeline',     label: 'Pipeline',     icon: GitBranch },
-    { id: 'billing',      label: 'Billing',      icon: Receipt },
-    { id: 'contracts',    label: 'Contracts',    icon: FileSignature },
-    { id: 'support',      label: 'Support',      icon: LifeBuoy },
-    { id: 'ai-assistant', label: 'AI Assistant', icon: Sparkles },
-    { id: 'analytics',    label: 'Analytics',    icon: BarChart3 },
-    { id: 'team',         label: 'Team',         icon: Users },
-    { id: 'settings',     label: 'Settings',     icon: Settings },
-  ];
+  const navItems = getNavItemsForRole(role);
 
-  // Hidden extras still in the app but not in the primary nav
-  const hiddenItems = [
-    { id: 'contacts',  label: 'Contacts',  icon: Users },
-    { id: 'companies', label: 'Companies', icon: Building2 },
-    { id: 'invoices',  label: 'Invoices',  icon: FileText },
-    { id: 'calendar',  label: 'Calendar',  icon: Calendar },
-    { id: 'tasks',     label: 'Tasks',     icon: CheckSquare },
-    { id: 'messages',  label: 'Messages',  icon: MessageSquare },
-  ];
+  // Group nav items by section
+  const groupedItems = navItems.reduce((acc, item) => {
+    if (!acc[item.group]) {
+      acc[item.group] = [];
+    }
+    acc[item.group].push(item);
+    return acc;
+  }, {});
 
-  const allItems = [...menuItems, ...hiddenItems];
+  const handleLogout = () => {
+    logout();
+    navigate('/auth/login');
+  };
+
+  const getUrl = (id) => {
+    switch (id) {
+      case 'dashboard': return '/';
+      case 'ai-assistant': return '/ai';
+      default: return `/${id}`;
+    }
+  };
 
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-brand">
         {isCollapsed ? (
-          <img src="/src/assets/logomark.png" alt="Techtopia" style={{ height: '32px' }} />
+          <span className="logo-icon-only text-2xl text-[#00e5ff] font-bold">⚡</span>
         ) : (
-          <img 
-            src={theme === 'dark' ? '/src/assets/logo-dark.png' : '/src/assets/logo-light.png'} 
-            alt="Techtopia CRM" 
-            style={{ height: '32px', maxWidth: '100%', objectFit: 'contain' }} 
-          />
+          <div className="flex items-center gap-2">
+            <span className="text-2xl text-[#00e5ff] font-bold">⚡</span>
+            <span className="text-lg font-bold font-display text-white tracking-wide">Techtopia Hub</span>
+          </div>
         )}
       </div>
 
-      <nav className="sidebar-menu">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentTab === item.id;
+      <nav className="sidebar-menu custom-scrollbar">
+        {Object.entries(GROUP_LABELS).map(([groupKey, label]) => {
+          const items = groupedItems[groupKey];
+          if (!items || items.length === 0) return null;
+
           return (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className={`sidebar-item ${isActive ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                setCurrentTab(item.id);
-                if (setMobileOpen) setMobileOpen(false);
-              }}
-            >
-              <Icon size={20} />
-              {!isCollapsed && <span className="sidebar-item-label">{item.label}</span>}
-              {isCollapsed && isActive && <span className="sidebar-item-dot"></span>}
-              {item.badge && !isCollapsed && (
-                <span className="sidebar-item-badge">{item.badge}</span>
+            <React.Fragment key={groupKey}>
+              {!isCollapsed && (
+                <div className="sidebar-section-label">{label}</div>
               )}
-            </a>
+              {items.map((item) => {
+                const Icon = ICON_MAP[item.id] || LayoutDashboard;
+                return (
+                  <NavLink
+                    key={item.id}
+                    to={getUrl(item.id)}
+                    className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
+                    onClick={() => {
+                      if (setMobileOpen) setMobileOpen(false);
+                    }}
+                  >
+                    <Icon size={20} />
+                    {!isCollapsed && <span className="sidebar-item-label">{item.label}</span>}
+                    {item.badge && !isCollapsed && (
+                      <span className="sidebar-item-badge">{item.badge}</span>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </React.Fragment>
           );
         })}
       </nav>
@@ -104,17 +135,17 @@ export default function Sidebar({
           {!isCollapsed && (
             <div className="sidebar-user-details">
               <div className="sidebar-user-avatar">
-                <UserCircle2 size={28} />
+                {user?.avatar || 'U'}
               </div>
-              <div>
-                <div className="sidebar-user-name">User</div>
-                <div className="sidebar-user-role">Client</div>
+              <div className="min-w-0 flex-1">
+                <div className="sidebar-user-name" title={user?.name}>{user?.name || 'User'}</div>
+                <div className="sidebar-user-role">{user?.roleLabel || 'Guest'}</div>
               </div>
             </div>
           )}
           <button 
             className="sidebar-logout-btn" 
-            onClick={logout}
+            onClick={handleLogout}
             title="Logout"
           >
             <LogOut size={18} />

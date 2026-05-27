@@ -1,59 +1,141 @@
 /* ==========================================================================
-   Analytics Page Styles
+   Analytics Page — Premium Layout with Mobile Responsiveness
    ========================================================================== */
-.analytics-grid {
+
+.analytics-page {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Premium Panel Styling */
+.premium-panel {
+  position: relative;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.premium-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .premium-panel {
+  background-color: rgba(15, 22, 41, 0.6);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Range slider */
+.analytics-page input[type="range"] {
+  width: 100%;
+  accent-color: var(--brand-cyan);
+}
+
+.analytics-page input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #01FDF6;
+  box-shadow: 0 0 10px #01FDF6;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.analytics-page input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Analytics grids */
+.analytics-main-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 24px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.analytics-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1200px) {
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 1024px) {
-  .analytics-grid {
+  .analytics-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-charts-row {
     grid-template-columns: 1fr;
   }
 }
 
-.chart-container {
-  height: 350px;
-  width: 100%;
-  margin-top: 16px;
+@media (max-width: 768px) {
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .premium-panel {
+    padding: 16px;
+  }
 }
 
-.analytics-stat-row {
+@media (max-width: 480px) {
+  .analytics-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Funnel visualization */
+.analytics-funnel-bar {
+  height: 8px;
+  border-radius: var(--radius-full);
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Region table rows */
+.analytics-region-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border-light);
 }
 
-.analytics-stat-row:last-child {
+.analytics-region-row:last-child {
   border-bottom: none;
 }
 
-.analytics-stat-label {
-  font-size: 14px;
-  color: var(--text-muted);
-  font-weight: 500;
+/* Projection card */
+.analytics-projection-card {
+  background: linear-gradient(135deg, rgba(1, 253, 246, 0.06), rgba(138, 79, 255, 0.06));
+  border: 1px solid rgba(1, 253, 246, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-align: center;
 }
 
-.analytics-stat-value {
-  font-size: 16px;
-  color: var(--text-title);
-  font-weight: 700;
-  font-family: var(--font-display);
-}
-
-.analytics-progress-bar {
-  height: 8px;
-  background-color: var(--bg-app);
-  border-radius: var(--radius-full);
-  margin-top: 8px;
-  overflow: hidden;
-}
-
-.analytics-progress-fill {
-  height: 100%;
-  background-color: var(--primary);
-  border-radius: var(--radius-full);
+[data-theme="light"] .analytics-projection-card {
+  background: linear-gradient(135deg, rgba(55, 114, 255, 0.05), rgba(138, 79, 255, 0.05));
+  border-color: rgba(55, 114, 255, 0.15);
 }

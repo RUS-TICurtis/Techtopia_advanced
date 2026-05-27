@@ -1,161 +1,108 @@
 /* ==========================================================================
-   Contacts Page Styles
+   Contacts Page — Premium Responsive Layout
    ========================================================================== */
-.contacts-filter-bar {
+
+.contacts-page {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Contacts Layout Grid */
+.contacts-grid-wrapper {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.contacts-filter-btn {
-  padding: 6px 16px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background-color: var(--bg-app);
-  border: 1px solid var(--border-light);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-.contacts-filter-btn:hover,
-.contacts-filter-btn.active {
-  background-color: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-
-/* Contact name cell */
-.contact-name-cell {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.contact-avatar {
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.contact-name { font-weight: 600; color: var(--text-title); white-space: nowrap; }
-.contact-email { font-size: 12px; color: var(--text-muted); }
-
-/* Contact detail drawer */
-.contact-drawer-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(15, 23, 42, 0.35);
-  backdrop-filter: blur(3px);
-  z-index: 500;
-  animation: fadeIn var(--transition-fast) ease-out;
-}
-
-.contact-drawer {
-  position: fixed;
-  top: 0; right: 0; bottom: 0;
-  width: 420px;
+/* Dossier card */
+.dossier-card.card {
+  position: sticky;
+  top: 20px;
   background-color: var(--bg-card);
-  border-left: 1px solid var(--border-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
-  z-index: 501;
-  display: flex;
-  flex-direction: column;
-  animation: drawerSlideIn var(--transition-normal) cubic-bezier(0.34, 1.10, 0.64, 1);
+  padding: 24px;
+  z-index: 10;
+  max-height: calc(100vh - 120px);
   overflow-y: auto;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes drawerSlideIn {
-  from { transform: translateX(100%); opacity: 0.6; }
-  to   { transform: translateX(0);    opacity: 1; }
+[data-theme="dark"] .dossier-card.card {
+  background-color: rgba(15, 22, 41, 0.92);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
-@media (max-width: 600px) {
-  .contact-drawer {
-    width: 100%;
-    top: auto;
-    height: 90vh;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    border-left: none;
-    border-top: 1px solid var(--border-light);
-    animation: drawerSlideUp var(--transition-normal) cubic-bezier(0.34, 1.10, 0.64, 1);
-  }
-  @keyframes drawerSlideUp {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-  }
+.dossier-card button {
+  transition: all 0.2s ease-in-out;
 }
 
-.contact-drawer-header {
-  padding: 24px 24px 16px;
-  border-bottom: 1px solid var(--border-light);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
+/* Table row interactions */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
 }
 
-.contact-drawer-body { padding: 24px; flex: 1; overflow-y: auto; }
-
-.contact-drawer-profile {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
+.clickable-row:hover {
+  background-color: rgba(55, 114, 255, 0.04) !important;
 }
 
-.contact-drawer-avatar {
-  width: 64px; height: 64px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
+[data-theme="dark"] .clickable-row:hover {
+  background-color: rgba(1, 253, 246, 0.03) !important;
 }
 
-.contact-drawer-name {
-  font-family: var(--font-display);
-  font-size: 20px;
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(113, 142, 191, 0.15);
+  border-radius: 99px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(113, 142, 191, 0.3);
+}
+
+/* Badge styling in contacts */
+.contacts-page .badge {
+  text-transform: uppercase;
+  font-size: 10px;
   font-weight: 800;
-  color: var(--text-title);
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
 }
 
-.contact-drawer-company { font-size: 14px; color: var(--text-muted); margin-top: 2px; }
+/* Responsive */
+@media (max-width: 1200px) {
+  .contacts-grid-wrapper {
+    flex-direction: column !important;
+  }
 
-.contact-info-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: var(--text-main);
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border-light);
-}
-.contact-info-row:last-child { border-bottom: none; }
-.contact-info-label { color: var(--text-muted); width: 80px; flex-shrink: 0; font-size: 13px; }
-
-.contact-notes-section { margin-top: 20px; }
-.contact-notes-section h4 { font-size: 14px; font-weight: 700; color: var(--text-title); margin-bottom: 10px; }
-.contact-notes-text {
-  background-color: var(--bg-app);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.6;
+  .dossier-card.card {
+    width: 100% !important;
+    position: static;
+    max-height: 60vh;
+  }
 }
 
-.contact-drawer-footer {
-  padding: 16px 24px;
-  border-top: 1px solid var(--border-light);
-  display: flex;
-  gap: 10px;
-  flex-shrink: 0;
+@media (max-width: 768px) {
+  .dossier-card.card {
+    padding: 18px;
+    max-height: 55vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .dossier-card.card {
+    padding: 14px;
+  }
 }

@@ -7,16 +7,26 @@ import {
   User,
   Phone,
   Mail,
-  Building,
-  Briefcase
+  Building2,
+  Briefcase,
+  SlidersHorizontal,
+  ChevronRight,
+  Eye,
+  FileText,
+  CheckCircle,
+  MoreVertical
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
+import DataTable from '../components/ui/DataTable';
+import Modal from '../components/ui/Modal';
+import Badge from '../components/ui/Badge';
+import FilterBar from '../components/ui/FilterBar';
 import './Contacts.css';
 
 export default function Contacts({ searchValue = '' }) {
   const [contacts, setContacts] = useState(() => mockDb.getContacts());
-  const [activeFilter, setActiveFilter] = useState('All');
   const [selectedContact, setSelectedContact] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('All');
   
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -62,14 +72,15 @@ export default function Contacts({ searchValue = '' }) {
     refreshContacts();
   };
 
-  const handleEditClick = (contact) => {
+  const handleEditClick = (contact, e) => {
+    if (e) e.stopPropagation();
     setEditId(contact.id);
     setName(contact.name);
     setCompany(contact.company);
     setEmail(contact.email);
     setPhone(contact.phone);
     setStatus(contact.status);
-    setValue(contact.value);
+    setValue(contact.value.toString());
     setNotes(contact.notes || '');
     setIsEditModalOpen(true);
   };
@@ -77,6 +88,8 @@ export default function Contacts({ searchValue = '' }) {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!name || !company) return;
+
+    const existingContact = contacts.find(c => c.id === editId);
 
     mockDb.updateContact({
       id: editId,
@@ -87,12 +100,13 @@ export default function Contacts({ searchValue = '' }) {
       status,
       value: parseFloat(value) || 0,
       notes,
-      created: contacts.find(c => c.id === editId)?.created || new Date().toISOString().split('T')[0],
-      owner: contacts.find(c => c.id === editId)?.owner || "Curtis Miller"
+      created: existingContact?.created || new Date().toISOString().split('T')[0],
+      owner: existingContact?.owner || "Curtis Miller"
     });
 
     setIsEditModalOpen(false);
     refreshContacts();
+    
     // Update selected contact if open
     if (selectedContact && selectedContact.id === editId) {
       setSelectedContact(mockDb.getContacts().find(c => c.id === editId));
@@ -100,7 +114,7 @@ export default function Contacts({ searchValue = '' }) {
   };
 
   const handleDeleteClick = (id, e) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this contact?")) {
       mockDb.deleteContact(id);
       refreshContacts();
@@ -110,17 +124,121 @@ export default function Contacts({ searchValue = '' }) {
     }
   };
 
-  // Status mapping to badge classes
-  const badgeClasses = {
-    'New': 'badge-info',
-    'Qualified': 'badge-success',
-    'In Progress': 'badge-warning',
-    'Proposal': 'badge-success',
-    'Won': 'badge-success',
-    'Lost': 'badge-danger'
+  const changeStatusQuick = (contact, newStatus) => {
+    mockDb.updateContact({
+      ...contact,
+      status: newStatus
+    });
+    refreshContacts();
+    if (selectedContact && selectedContact.id === contact.id) {
+      setSelectedContact({ ...selectedContact, status: newStatus });
+    }
   };
 
-  // Filter contacts
+  // Status mapping to badge variants
+  const statusVariants = {
+    'New': 'info',
+    'Qualified': 'purple',
+    'In Progress': 'warning',
+    'Proposal': 'info',
+    'Won': 'success',
+    'Lost': 'error'
+  };
+
+  // Context Menu Items per Row
+  const getRowContextMenuItems = (contact) => [
+    {
+      label: 'View Dossier',
+      icon: Eye,
+      onClick: () => setSelectedContact(contact)
+    },
+    {
+      label: 'Edit Lead Details',
+      icon: Edit3,
+      onClick: (e) => handleEditClick(contact, e)
+    },
+    {
+      label: 'Quick Transition Status',
+      icon: SlidersHorizontal,
+      children: [
+        { label: 'New', onClick: () => changeStatusQuick(contact, 'New') },
+        { label: 'Qualified', onClick: () => changeStatusQuick(contact, 'Qualified') },
+        { label: 'In Progress', onClick: () => changeStatusQuick(contact, 'In Progress') },
+        { label: 'Proposal', onClick: () => changeStatusQuick(contact, 'Proposal') },
+        { label: 'Won', onClick: () => changeStatusQuick(contact, 'Won') },
+        { label: 'Lost', onClick: () => changeStatusQuick(contact, 'Lost') }
+      ]
+    },
+    { type: 'separator' },
+    {
+      label: 'Delete Lead Profile',
+      icon: Trash2,
+      variant: 'danger',
+      onClick: (e) => handleDeleteClick(contact.id, e)
+    }
+  ];
+
+  // TanStack table columns
+  const columns = [
+    {
+      accessorKey: 'name',
+      header: 'Contact Name',
+      cell: ({ row }) => {
+        const contact = row.original;
+        return (
+          <div className="flex items-center gap-3 py-1">
+            <div className="w-8 h-8 rounded-full bg-[#8A4FFF]/10 border border-[#8A4FFF]/25 text-[#8A4FFF] flex items-center justify-center font-bold text-sm">
+              {contact.name.charAt(0)}
+            </div>
+            <span className="font-bold text-white text-sm hover:text-[#01FDF6] transition-colors">{contact.name}</span>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: 'company',
+      header: 'Company / Org',
+      cell: ({ row }) => {
+        const contact = row.original;
+        return (
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-300 text-xs">{contact.company}</span>
+            <span className="text-[10px] text-gray-500 font-mono">{contact.email}</span>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: 'phone',
+      header: 'Phone Connection',
+      cell: ({ getValue }) => <span className="font-mono text-xs text-gray-400">{getValue() || '—'}</span>
+    },
+    {
+      accessorKey: 'value',
+      header: 'Deal Value',
+      cell: ({ getValue }) => (
+        <span className="font-display font-extrabold text-[#01FDF6] text-xs">
+          ${getValue().toLocaleString()}
+        </span>
+      )
+    },
+    {
+      accessorKey: 'owner',
+      header: 'Owner',
+      cell: ({ getValue }) => <span className="text-xs text-gray-400 font-medium">{getValue()}</span>
+    },
+    {
+      accessorKey: 'status',
+      header: 'Lead Stage',
+      cell: ({ getValue }) => (
+        <Badge variant={statusVariants[getValue()] || 'neutral'}>
+          {getValue()}
+        </Badge>
+      )
+    }
+  ];
+
+  // Filters setup
   const filteredContacts = contacts.filter(contact => {
     const matchesSearch = 
       contact.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -134,341 +252,356 @@ export default function Contacts({ searchValue = '' }) {
   });
 
   return (
-    <div className="page-container">
-      {/* Search & Actions Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-        {/* Filter Tabs */}
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+    <div className="page-container contacts-page">
+      <div className="page-header flex justify-between items-center mb-6">
+        <div>
+          <h1 className="page-title flex items-center gap-2">
+            <span className="text-[#8A4FFF]">⚡</span> Lead Ledger
+          </h1>
+          <p className="page-subtitle">Unified customer records with Radix right-click execution & dossiers</p>
+        </div>
+        <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
+          <Plus size={18} /> Add New Lead
+        </button>
+      </div>
+
+      {/* Filter Tabs & Counter */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 custom-scrollbar">
           {['All', 'New', 'Qualified', 'In Progress', 'Proposal', 'Won', 'Lost'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveFilter(tab)}
-              style={{
-                padding: '10px 18px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: '14px',
-                fontWeight: 600,
-                backgroundColor: activeFilter === tab ? 'var(--primary)' : 'var(--bg-card)',
-                color: activeFilter === tab ? '#FFFFFF' : 'var(--text-muted)',
-                boxShadow: activeFilter === tab ? 'var(--shadow-glow)' : 'var(--shadow-sm)',
-                transition: 'all var(--transition-fast)',
-                border: activeFilter === tab ? 'none' : '1px solid var(--border-light)'
-              }}
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${
+                activeFilter === tab 
+                  ? 'bg-[#8A4FFF] border-[#8A4FFF] text-white shadow-glow' 
+                  : 'bg-[#0f1629]/40 border-gray-800 text-gray-400 hover:text-white'
+              }`}
             >
               {tab}
             </button>
           ))}
         </div>
-
-        <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
-          <Plus size={18} /> Add New Lead
-        </button>
+        <div className="text-xs text-gray-500 font-mono">
+          Showing <span className="text-[#01FDF6] font-bold">{filteredContacts.length}</span> leads in roster
+        </div>
       </div>
 
-      {/* Main Ledger Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: selectedContact ? '1.8fr 1.2fr' : '1fr', gap: '30px', transition: 'all 0.3s' }}>
+      {/* Grid Layout (List vs Drawer Split) */}
+      <div className="contacts-grid-wrapper flex flex-col xl:flex-row gap-6">
         
-        {/* Leads Table Card */}
-        <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
-          <div style={{ padding: '24px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 className="card-title" style={{ margin: 0 }}>Lead Ledger</h3>
-            <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600 }}>Showing {filteredContacts.length} results</span>
-          </div>
-
-          <div className="table-container" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>Contact Name</th>
-                  <th>Company</th>
-                  <th>Owner</th>
-                  <th>Value</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'center' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredContacts.length > 0 ? (
-                  filteredContacts.map(contact => (
-                    <tr 
-                      key={contact.id} 
-                      onClick={() => setSelectedContact(contact)}
-                      style={{ 
-                        cursor: 'pointer',
-                        backgroundColor: selectedContact?.id === contact.id ? 'rgba(var(--primary-rgb), 0.03)' : 'transparent'
-                      }}
-                    >
-                      <td style={{ fontWeight: 700, color: 'var(--text-title)' }}>{contact.name}</td>
-                      <td>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontWeight: 600 }}>{contact.company}</span>
-                          <span style={{ fontSize: '12px', color: 'var(--text-light)' }}>{contact.email}</span>
-                        </div>
-                      </td>
-                      <td style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500 }}>{contact.owner}</td>
-                      <td style={{ fontWeight: 800, color: 'var(--text-title)' }}>${contact.value.toLocaleString()}</td>
-                      <td>
-                        <span className={`badge ${badgeClasses[contact.status]}`}>
-                          {contact.status}
-                        </span>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                          <button 
-                            className="nav-icon-btn" 
-                            style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)' }}
-                            onClick={(e) => { e.stopPropagation(); handleEditClick(contact); }}
-                            title="Edit Contact"
-                          >
-                            <Edit3 size={14} />
-                          </button>
-                          <button 
-                            className="nav-icon-btn" 
-                            style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', color: 'var(--error)' }}
-                            onClick={(e) => handleDeleteClick(contact.id, e)}
-                            title="Delete Contact"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-                      No contacts found matching criteria.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Table Container */}
+        <div className="flex-1 min-w-0 bg-[#0f1629]/30 border border-gray-800/80 rounded-xl overflow-hidden backdrop-blur-md">
+          <DataTable 
+            columns={columns}
+            data={filteredContacts}
+            onRowClick={(row) => setSelectedContact(row)}
+            getRowContextMenuItems={getRowContextMenuItems}
+            pageSize={10}
+          />
         </div>
 
-        {/* Selected Contact Detail Drawer Panel */}
+        {/* Sliding Panel / Drawer style card when contact selected */}
         {selectedContact && (
-          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '20px', animation: 'fadeIn var(--transition-fast) ease-out' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '16px' }}>
-              <h3 className="card-title" style={{ margin: 0 }}>Client Dossier</h3>
+          <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#0f1629]/80 backdrop-blur-lg">
+            <div className="flex justify-between items-center border-b border-gray-850 pb-4">
+              <h3 className="card-title text-white font-black font-display text-base tracking-wide m-0">Client Dossier</h3>
               <button 
                 onClick={() => setSelectedContact(null)} 
-                style={{ color: 'var(--text-muted)', cursor: 'pointer' }}
+                className="text-gray-400 hover:text-white p-1 hover:bg-gray-800 rounded-lg transition-all"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            {/* Avatar Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '60px', height: '60px', borderRadius: '50%',
-                backgroundColor: 'var(--primary-bg)', color: 'var(--primary)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '24px', fontWeight: 'bold'
-              }}>
+            {/* Profile Avatar & Title */}
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-[#8A4FFF]/20 border border-[#8A4FFF]/40 text-[#8A4FFF] flex items-center justify-center font-display font-black text-xl shadow-glow">
                 {selectedContact.name.charAt(0)}
               </div>
-              <div>
-                <h4 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-title)' }}>{selectedContact.name}</h4>
-                <p style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500 }}>{selectedContact.company}</p>
+              <div className="min-w-0 flex-1">
+                <h4 className="text-white font-extrabold text-base tracking-tight truncate">{selectedContact.name}</h4>
+                <p className="text-gray-400 text-xs font-semibold flex items-center gap-1.5 mt-0.5 truncate">
+                  <Building2 size={12} className="text-gray-500" />
+                  {selectedContact.company}
+                </p>
               </div>
             </div>
 
-            {/* Info grid */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', backgroundColor: 'var(--bg-app)', borderRadius: 'var(--radius-lg)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px' }}>
-                <Mail size={16} color="var(--text-muted)" />
-                <span style={{ fontWeight: 500 }}>{selectedContact.email}</span>
+            {/* Metadata Fields */}
+            <div className="flex flex-col gap-2.5 p-4 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl">
+              <div className="flex items-center gap-3 text-xs text-gray-300">
+                <Mail size={14} className="text-gray-500 w-4" />
+                <span className="truncate">{selectedContact.email || '—'}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px' }}>
-                <Phone size={16} color="var(--text-muted)" />
-                <span style={{ fontWeight: 500 }}>{selectedContact.phone}</span>
+              <div className="flex items-center gap-3 text-xs text-gray-300">
+                <Phone size={14} className="text-gray-500 w-4" />
+                <span className="font-mono">{selectedContact.phone || '—'}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px' }}>
-                <Briefcase size={16} color="var(--text-muted)" />
-                <span style={{ fontWeight: 500 }}>Estimated Value: <strong style={{ color: 'var(--primary)' }}>${selectedContact.value.toLocaleString()}</strong></span>
+              <div className="flex items-center gap-3 text-xs text-gray-300 border-t border-gray-850/50 pt-2.5 mt-1">
+                <Briefcase size={14} className="text-gray-500 w-4" />
+                <span>
+                  Deal Value:{' '}
+                  <strong className="text-[#01FDF6] font-display font-black ml-1">
+                    ${selectedContact.value.toLocaleString()}
+                  </strong>
+                </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px' }}>
-                <User size={16} color="var(--text-muted)" />
-                <span style={{ fontWeight: 500 }}>Lead Representative: {selectedContact.owner}</span>
+              <div className="flex items-center gap-3 text-xs text-gray-300">
+                <User size={14} className="text-gray-500 w-4" />
+                <span>Account Manager: <span className="font-semibold">{selectedContact.owner}</span></span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px' }}>
-                <Building size={16} color="var(--text-muted)" />
-                <span style={{ fontWeight: 500 }}>Registered Date: {selectedContact.created}</span>
+              <div className="flex items-center gap-3 text-xs text-gray-300">
+                <FileText size={14} className="text-gray-500 w-4" />
+                <span>First Contact: <span className="font-mono">{selectedContact.created}</span></span>
               </div>
             </div>
 
             {/* Notes Section */}
-            <div>
-              <h5 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>Administrative Notes</h5>
-              <div style={{
-                padding: '16px', 
-                backgroundColor: 'rgba(228, 255, 26, 0.04)', 
-                borderLeft: '4px solid var(--warning)',
-                borderRadius: '0 var(--radius-md) var(--radius-md) 0',
-                fontSize: '14px',
-                color: 'var(--text-main)',
-                lineHeight: 1.5
-              }}>
-                {selectedContact.notes || "No administrative notes recorded for this lead yet."}
+            <div className="flex flex-col gap-1.5">
+              <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Administrative Dossier Notes</h5>
+              <div className="p-3 bg-[#E4FF1A]/5 border-l-4 border-[#E4FF1A] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
+                {selectedContact.notes || "No administrative intelligence records filed for this customer."}
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-light)', paddingTop: '16px', display: 'flex', gap: '10px' }}>
-              <button className="btn btn-primary" style={{ flexGrow: 1 }} onClick={() => handleEditClick(selectedContact)}>
+            {/* Drawer Actions Footer */}
+            <div className="mt-auto border-t border-gray-850 pt-4 flex gap-3">
+              <button 
+                className="btn btn-primary flex-1 py-3 text-xs" 
+                onClick={(e) => handleEditClick(selectedContact, e)}
+              >
                 Edit Dossier
               </button>
               <button 
-                className="btn btn-outline" 
-                style={{ color: 'var(--error)', borderColor: 'var(--error)' }}
+                className="btn btn-outline text-red-500 hover:text-white hover:bg-red-950/20 border-red-950/60 hover:border-red-800 flex items-center justify-center p-3"
                 onClick={(e) => handleDeleteClick(selectedContact.id, e)}
+                title="Delete Lead"
               >
-                Delete Lead
+                <Trash2 size={16} />
               </button>
             </div>
-
           </div>
         )}
       </div>
 
-      {/* ==========================================================================
-         ADD NEW LEAD MODAL
-         ========================================================================== */}
-      {isAddModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsAddModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">Create New Lead Profile</h3>
-              <button className="modal-close-btn" onClick={() => setIsAddModalOpen(false)}>
-                <X size={20} />
-              </button>
+      {/* Add Contact Modal */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Create Customer Lead Profile"
+        size="md"
+      >
+        <form onSubmit={handleAddSubmit} className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Contact Name *</label>
+              <input 
+                type="text" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                placeholder="e.g. Alice Vance" 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                required 
+              />
             </div>
-
-            <form onSubmit={handleAddSubmit}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Full Name</label>
-                  <input type="text" className="form-input" placeholder="Client Name" value={name} onChange={e => setName(e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Company</label>
-                  <input type="text" className="form-input" placeholder="Company Name" value={company} onChange={e => setCompany(e.target.value)} required />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Email Address</label>
-                  <input type="email" className="form-input" placeholder="email@company.com" value={email} onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Phone Number</label>
-                  <input type="text" className="form-input" placeholder="+1 (555) 000-0000" value={phone} onChange={e => setPhone(e.target.value)} />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Lead Stage</label>
-                  <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
-                    <option value="New">New</option>
-                    <option value="Qualified">Qualified</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Proposal">Proposal</option>
-                    <option value="Won">Won</option>
-                    <option value="Lost">Lost</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Deal Value ($)</label>
-                  <input type="number" className="form-input" placeholder="Estimated Value" value={value} onChange={e => setValue(e.target.value)} />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Dossier Notes</label>
-                <textarea className="form-textarea" placeholder="Add custom notes regarding customer contact..." value={notes} onChange={e => setNotes(e.target.value)}></textarea>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setIsAddModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Create Lead</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ==========================================================================
-         EDIT LEAD MODAL
-         ========================================================================== */}
-      {isEditModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsEditModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">Modify Lead Profile</h3>
-              <button className="modal-close-btn" onClick={() => setIsEditModalOpen(false)}>
-                <X size={20} />
-              </button>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company / Org *</label>
+              <input 
+                type="text" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                placeholder="e.g. CloudScale Inc." 
+                value={company} 
+                onChange={e => setCompany(e.target.value)} 
+                required 
+              />
             </div>
-
-            <form onSubmit={handleEditSubmit}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Full Name</label>
-                  <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Company</label>
-                  <input type="text" className="form-input" value={company} onChange={e => setCompany(e.target.value)} required />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Email Address</label>
-                  <input type="email" className="form-input" value={email} onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Phone Number</label>
-                  <input type="text" className="form-input" value={phone} onChange={e => setPhone(e.target.value)} />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label">Lead Stage</label>
-                  <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
-                    <option value="New">New</option>
-                    <option value="Qualified">Qualified</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Proposal">Proposal</option>
-                    <option value="Won">Won</option>
-                    <option value="Lost">Lost</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Deal Value ($)</label>
-                  <input type="number" className="form-input" value={value} onChange={e => setValue(e.target.value)} />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Dossier Notes</label>
-                <textarea className="form-textarea" value={notes} onChange={e => setNotes(e.target.value)}></textarea>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setIsEditModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Changes</button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
+              <input 
+                type="email" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                placeholder="e.g. alice@cloudscale.com" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
+              <input 
+                type="text" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                placeholder="e.g. +1 (555) 234-5678" 
+                value={phone} 
+                onChange={e => setPhone(e.target.value)} 
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
+              <select 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                value={status} 
+                onChange={e => setStatus(e.target.value)}
+              >
+                <option value="New">New</option>
+                <option value="Qualified">Qualified</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Proposal">Proposal</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Estimated Account Value ($)</label>
+              <input 
+                type="number" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                placeholder="e.g. 45000" 
+                value={value} 
+                onChange={e => setValue(e.target.value)} 
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Dossier Intelligence Notes</label>
+            <textarea 
+              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF] h-20 resize-none" 
+              placeholder="e.g. Prefers email connection. Requires SOC2 documentation for proposal..." 
+              value={notes} 
+              onChange={e => setNotes(e.target.value)}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 mt-4">
+            <button 
+              type="button" 
+              className="px-5 py-2.5 rounded-lg text-sm bg-gray-950 border border-gray-850 text-gray-300 hover:text-white transition-all" 
+              onClick={() => setIsAddModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#8A4FFF] hover:bg-[#783eeb] text-white font-bold shadow-glow transition-all"
+            >
+              Create Dossier
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Contact Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Modify Lead Dossier"
+        size="md"
+      >
+        <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Contact Name *</label>
+              <input 
+                type="text" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                required 
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company / Org *</label>
+              <input 
+                type="text" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                value={company} 
+                onChange={e => setCompany(e.target.value)} 
+                required 
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
+              <input 
+                type="email" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
+              <input 
+                type="text" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                value={phone} 
+                onChange={e => setPhone(e.target.value)} 
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
+              <select 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                value={status} 
+                onChange={e => setStatus(e.target.value)}
+              >
+                <option value="New">New</option>
+                <option value="Qualified">Qualified</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Proposal">Proposal</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Estimated Account Value ($)</label>
+              <input 
+                type="number" 
+                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                value={value} 
+                onChange={e => setValue(e.target.value)} 
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Dossier Intelligence Notes</label>
+            <textarea 
+              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF] h-20 resize-none" 
+              value={notes} 
+              onChange={e => setNotes(e.target.value)}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 mt-4">
+            <button 
+              type="button" 
+              className="px-5 py-2.5 rounded-lg text-sm bg-gray-950 border border-gray-850 text-gray-300 hover:text-white transition-all" 
+              onClick={() => setIsEditModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#8A4FFF] hover:bg-[#783eeb] text-white font-bold shadow-glow transition-all"
+            >
+              Save Dossier
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

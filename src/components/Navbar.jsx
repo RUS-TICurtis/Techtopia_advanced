@@ -1,19 +1,15 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useUIStore } from '../store/uiStore';
+import { useAuthStore } from '../store/authStore';
+import { useNotificationStore } from '../store/notificationStore';
 import { 
-  Search, 
-  Bell, 
-  Settings, 
-  Sun, 
-  Moon,
-  Menu
+  Search, Bell, Settings, Sun, Moon, Menu, Sparkles, Command
 } from 'lucide-react';
-
+import Dropdown from './ui/Dropdown';
 import './Navbar.css';
 
-
 export default function Navbar({ 
-  currentTab, 
-  setCurrentTab,
   theme, 
   toggleTheme, 
   profile,
@@ -21,33 +17,52 @@ export default function Navbar({
   searchValue,
   onMenuClick
 }) {
-  const [showNotifications, setShowNotifications] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { setCommandPaletteOpen, setNotificationCenterOpen, notificationCenterOpen } = useUIStore();
+  const { user, logout } = useAuthStore();
+  const { unreadCount } = useNotificationStore();
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
-
-
-  // Map tabs to titles
-  const tabTitles = {
-    dashboard: 'Overview',
-    contacts: 'Contacts & Leads',
-    companies: 'Companies & Organizations',
-    pipeline: 'Sales Pipeline',
-    invoices: 'Billing & Invoices',
-    tasks: 'Task Manager',
-    calendar: 'Schedule',
-    messages: 'Communications',
-    support: 'Support Tickets',
-    analytics: 'Analytics & Forecasts',
-    settings: 'CRM Settings'
+  // Map route paths to page titles
+  const getPageTitle = (path) => {
+    if (path === '/') return 'Overview';
+    const cleanPath = path.substring(1).split('/')[0];
+    const titles = {
+      leads: 'Leads Inbox',
+      contacts: 'Contacts Directory',
+      companies: 'Organizations',
+      pipeline: 'Sales Pipeline',
+      clients: 'Client Management',
+      projects: 'Project Hub',
+      tasks: 'Task Board',
+      calendar: 'Schedule',
+      activities: 'Activity Stream',
+      support: 'Help & Support',
+      messages: 'Inbox & Chat',
+      billing: 'Billing Dashboard',
+      invoices: 'Invoice Center',
+      contracts: 'Contracts',
+      analytics: 'Performance Analytics',
+      reports: 'Intelligence Reports',
+      ai: 'AI Orchestrator',
+      automations: 'Automated Workflows',
+      team: 'Team Workspace',
+      'audit-logs': 'Security Audit Trail',
+      settings: 'System Settings',
+    };
+    return titles[cleanPath] || 'Techtopia CRM';
   };
 
-  const dummyNotifications = [
-    { id: 1, text: "Deal 'Enterprise Cloud Optimization' moved to Qualified stage", time: "5m ago", unread: true },
-    { id: 2, text: "New lead 'David Kross' from FutureLogic registered", time: "1h ago", unread: true },
-    { id: 3, text: "Task 'Send SLA Proposal' is due tomorrow", time: "4h ago", unread: false }
-  ];
+  const currentTitle = getPageTitle(location.pathname);
 
-  const searchableTabs = ['contacts', 'dashboard', 'pipeline', 'companies', 'invoices', 'messages', 'support'];
+  // User Profile Dropdown Configuration
+  const profileDropdownItems = [
+    { label: 'My Settings', icon: Settings, onClick: () => navigate('/settings') },
+    { label: 'AI Assistant', icon: Sparkles, onClick: () => navigate('/ai') },
+    { type: 'separator' },
+    { label: 'Sign Out', icon: Settings, onClick: () => { logout(); navigate('/auth/login'); }, variant: 'danger' }
+  ];
 
   return (
     <header className="navbar">
@@ -58,114 +73,75 @@ export default function Navbar({
         >
           <Menu size={20} />
         </button>
-        <h2 className="navbar-title">{tabTitles[currentTab] || 'CRM Hub'}</h2>
+        <h2 className="navbar-title font-display font-bold text-xl text-white">{currentTitle}</h2>
       </div>
 
       <div className="navbar-actions">
         {/* Search */}
-        {searchableTabs.includes(currentTab) && (
-          <>
-            <div className="navbar-search">
-              <Search className="search-icon" size={18} />
-              <input 
-                type="text" 
-                className="search-input" 
-                placeholder="Search..." 
-                value={searchValue}
-                onChange={(e) => onSearchChange(e.target.value)}
-              />
-            </div>
-            {/* Mobile Search Toggle */}
-            <button 
-              className="navbar-search-toggle"
-              onClick={() => setShowMobileSearch(!showMobileSearch)}
-            >
-              <Search size={18} />
-            </button>
-          </>
-        )}
+        <div className="navbar-search" onClick={() => setCommandPaletteOpen(true)}>
+          <Search className="search-icon" size={16} />
+          <input 
+            type="text" 
+            className="search-input cursor-pointer" 
+            placeholder="Search CRM... (Ctrl+K)" 
+            readOnly
+          />
+          <span className="search-kbd-hint font-mono text-[10px] bg-gray-800/80 border border-gray-700/80 rounded px-1.5 py-0.5 text-gray-500 ml-auto">
+            Ctrl+K
+          </span>
+        </div>
 
-        <div className="navbar-secondary" style={{ display: 'flex', gap: '12px' }}>
+        {/* Mobile Search Toggle */}
+        <button 
+          className="navbar-search-toggle"
+          onClick={() => setCommandPaletteOpen(true)}
+        >
+          <Search size={18} />
+        </button>
+
+        <div className="navbar-secondary flex gap-2">
           {/* Theme Toggle */}
           <button 
             className="nav-icon-btn" 
             onClick={toggleTheme}
             title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          {/* Settings Button */}
+          {/* AI Quick Button */}
           <button 
-            className="nav-icon-btn" 
-            onClick={() => setCurrentTab('settings')}
-            title="Go to Settings"
+            className="nav-icon-btn text-[#01fdf6] hover:bg-[#01fdf6]/10" 
+            onClick={() => navigate('/ai')}
+            title="Ask AI Assistant"
           >
-            <Settings size={20} />
+            <Sparkles size={18} />
           </button>
         </div>
 
         {/* Notification Button */}
         <div style={{ position: 'relative' }}>
           <button 
-            className="nav-icon-btn" 
-            onClick={() => setShowNotifications(!showNotifications)}
+            className={`nav-icon-btn ${notificationCenterOpen ? 'bg-gray-800/60' : ''}`}
+            onClick={() => setNotificationCenterOpen(!notificationCenterOpen)}
             title="Notifications"
           >
-            <Bell size={20} />
-            <span className="nav-badge-dot"></span>
+            <Bell size={18} />
+            {unreadCount > 0 && <span className="nav-badge-dot animate-pulse"></span>}
           </button>
+        </div>
 
-          {showNotifications && (
-            <div className="nav-notifications-dropdown">
-              <div className="nav-notifications-header">
-                <span style={{ fontWeight: 700, color: 'var(--text-title)' }}>Recent Notifications</span>
-                <span style={{ fontSize: '12px', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}>Mark all read</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {dummyNotifications.map(n => (
-                  <div key={n.id} className={`nav-notification-item ${n.unread ? 'unread' : ''}`}>
-                    <span style={{ color: 'var(--text-main)', fontWeight: n.unread ? 600 : 400 }}>{n.text}</span>
-                    <span className="nav-notification-time">{n.time}</span>
-                  </div>
-                ))}
-              </div>
+        {/* User profile dropdown */}
+        <Dropdown 
+          trigger={
+            <div className="nav-profile cursor-pointer" title="User Profile">
+              <span className="profile-initials font-bold text-xs bg-[#00e5ff]/20 text-[#00e5ff] w-8 h-8 rounded-full flex items-center justify-center border border-[#00e5ff]/35">
+                {user?.avatar || 'U'}
+              </span>
             </div>
-          )}
-        </div>
-
-        {/* User profile */}
-        <div 
-          className="nav-profile" 
-          onClick={() => setCurrentTab('settings')}
-          title="User Profile"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" 
-            alt={profile?.name || "Profile Avatar"} 
-            onError={(e) => {
-              e.target.src = "https://via.placeholder.com/100";
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Mobile Search Overlay */}
-      <div className={`navbar-search-overlay ${showMobileSearch ? 'open' : ''}`}>
-        <div className="search-wrapper">
-          <Search className="search-icon" size={18} />
-          <input 
-            type="text" 
-            className="search-input" 
-            placeholder="Search..." 
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
-            autoFocus={showMobileSearch}
-          />
-        </div>
-        <button className="btn-icon" onClick={() => setShowMobileSearch(false)}>
-          <span style={{ fontSize: '18px', fontWeight: 'bold' }}>&times;</span>
-        </button>
+          }
+          items={profileDropdownItems}
+        />
       </div>
     </header>
   );

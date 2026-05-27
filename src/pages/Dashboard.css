@@ -1,59 +1,80 @@
-/* Dashboard Specific Styles */
+/* ==========================================================================
+   Dashboard — Premium Layout Styles
+   ========================================================================== */
 
+/* Main two-column grid */
 .dashboard-main-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 24px;
 }
 
+/* Sub-charts row */
 .dashboard-charts-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 20px;
 }
 
 @media (max-width: 1200px) {
-  .dashboard-main-grid,
-  .dashboard-charts-grid {
+  .dashboard-main-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Quick Access List */
+@media (max-width: 768px) {
+  .dashboard-charts-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+/* ── Quick Access List ──────────────────────────────────────── */
 .quick-access-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .quick-access-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: 14px;
+  padding: 14px 16px;
   background: var(--bg-app);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--transition-fast);
   width: 100%;
+  text-align: left;
 }
 
 .quick-access-item:hover {
   background: var(--bg-card);
   border-color: var(--primary);
-  transform: translateY(-2px);
+  transform: translateX(4px);
   box-shadow: var(--shadow-sm);
 }
 
+[data-theme="dark"] .quick-access-item:hover {
+  border-color: var(--brand-cyan);
+  background: rgba(1, 253, 246, 0.04);
+}
+
 .quick-access-icon {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.quick-access-item:hover .quick-access-icon {
+  transform: scale(1.1) rotate(-4deg);
 }
 
 .quick-access-name {
@@ -61,24 +82,115 @@
   font-weight: 700;
   color: var(--text-title);
   margin-bottom: 2px;
+  display: block;
 }
 
 .quick-access-desc {
   font-size: 12px;
   color: var(--text-muted);
+  display: block;
+  line-height: 1.3;
 }
 
-/* Activity Items */
+/* ── Activity Feed Items ──────────────────────────────────── */
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.activity-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
 .activity-icon {
-  min-width: 36px;
-  height: 36px;
+  min-width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   align-self: flex-start;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
 }
 
-.activity-icon.success { background: var(--success-bg); color: var(--success); }
-.activity-icon.info { background: var(--info-bg); color: var(--info); }
-.activity-icon.warning { background: var(--warning-bg); color: var(--warning); }
+.activity-item:hover .activity-icon {
+  transform: scale(1.1);
+}
+
+.activity-icon.success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.activity-icon.info {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.activity-icon.warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.activity-icon.ai {
+  background: rgba(1, 253, 246, 0.1);
+  color: var(--brand-cyan);
+}
+
+.activity-content h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 3px;
+}
+
+.activity-content p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.activity-content .activity-time {
+  font-size: 11px;
+  color: var(--text-light);
+  display: block;
+  margin-top: 5px;
+}
+
+/* ── Metric Cards — Accent Top Borders ───────────────────── */
+.metric-card-primary  { border-top: 3px solid var(--brand-blue); }
+.metric-card-info     { border-top: 3px solid var(--brand-purple); }
+.metric-card-success  { border-top: 3px solid var(--brand-green); }
+.metric-card-warning  { border-top: 3px solid var(--brand-chartreuse); }
+
+/* ── Mobile: dashboard grids collapse ─────────────────────── */
+@media (max-width: 640px) {
+  .dashboard-main-grid,
+  .dashboard-charts-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .quick-access-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .quick-access-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .quick-access-list {
+    grid-template-columns: 1fr;
+  }
+}

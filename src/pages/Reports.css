@@ -1,0 +1,113 @@
+/* ==========================================================================
+   Techtopia CRM Hub - Business Intelligence Reports Stylesheet
+   ========================================================================== */
+
+.reports-page {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reports-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .reports-main-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+.reports-card-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-title);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* Premium Card Layouts */
+.reports-chart-card,
+.reports-metrics-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .reports-chart-card,
+[data-theme="dark"] .reports-metrics-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%), var(--bg-card);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.reports-metrics-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Structured dividing lines inside boxes */
+.reports-metric-box {
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  transition: all var(--transition-fast);
+}
+
+.reports-metric-box:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .reports-metric-box:hover {
+  border-color: var(--brand-cyan);
+}
+
+.reports-metric-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.reports-metric-value {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-title);
+  display: block;
+}
+
+.reports-metric-trend {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+  display: block;
+}
+
+.reports-metric-trend.positive {
+  color: var(--success);
+}
+
+.reports-metric-trend.neutral {
+  color: var(--text-light);
+}
+
+/* Scheduled reports table heading */
+.reports-table-header-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

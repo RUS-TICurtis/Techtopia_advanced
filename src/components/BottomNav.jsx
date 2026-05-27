@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation, NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   TrendingUp, 
@@ -8,26 +9,28 @@ import {
 } from 'lucide-react';
 import './BottomNav.css';
 
-export default function BottomNav({ currentTab, setCurrentTab }) {
+export default function BottomNav() {
   const [hidden, setHidden] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const lastScrollY = useRef(0);
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const tabs = [
-    { id: 'dashboard', label: 'Home',     icon: LayoutDashboard },
-    { id: 'leads',     label: 'Leads',    icon: TrendingUp },
-    { id: 'clients',   label: 'Clients',  icon: UserCircle2 },
-    { id: 'pipeline',  label: 'Pipeline', icon: GitBranch },
+    { to: '/', label: 'Home', icon: LayoutDashboard },
+    { to: '/leads', label: 'Leads', icon: TrendingUp },
+    { to: '/clients', label: 'Clients', icon: UserCircle2 },
+    { to: '/pipeline', label: 'Pipeline', icon: GitBranch },
   ];
 
   const moreTabs = [
-    { id: 'billing',      label: 'Billing' },
-    { id: 'contracts',    label: 'Contracts' },
-    { id: 'support',      label: 'Support' },
-    { id: 'ai-assistant', label: 'AI Assistant' },
-    { id: 'analytics',    label: 'Analytics' },
-    { id: 'team',         label: 'Team' },
-    { id: 'settings',     label: 'Settings' },
+    { to: '/billing', label: 'Billing' },
+    { to: '/contracts', label: 'Contracts' },
+    { to: '/support', label: 'Support' },
+    { to: '/ai', label: 'AI Assistant' },
+    { to: '/analytics', label: 'Analytics' },
+    { to: '/team', label: 'Team' },
+    { to: '/settings', label: 'Settings' },
   ];
 
   // Hide on scroll down, show on scroll up
@@ -47,7 +50,7 @@ export default function BottomNav({ currentTab, setCurrentTab }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isMoreActive = moreTabs.some(t => t.id === currentTab);
+  const isMoreActive = moreTabs.some(t => t.to === currentPath);
 
   return (
     <>
@@ -64,16 +67,14 @@ export default function BottomNav({ currentTab, setCurrentTab }) {
         <div className="bottom-nav-more-menu">
           <div className="bottom-nav-more-title">More</div>
           {moreTabs.map(tab => (
-            <button
-              key={tab.id}
-              className={`bottom-nav-more-item ${currentTab === tab.id ? 'active' : ''}`}
-              onClick={() => {
-                setCurrentTab(tab.id);
-                setShowMore(false);
-              }}
+            <NavLink
+              key={tab.to}
+              to={tab.to}
+              className={({ isActive }) => `bottom-nav-more-item ${isActive ? 'active' : ''}`}
+              onClick={() => setShowMore(false)}
             >
               {tab.label}
-            </button>
+            </NavLink>
           ))}
         </div>
       )}
@@ -81,16 +82,15 @@ export default function BottomNav({ currentTab, setCurrentTab }) {
       <nav className={`bottom-nav${hidden ? ' hidden' : ''}`}>
         {tabs.map(tab => {
           const Icon = tab.icon;
-          const isActive = currentTab === tab.id;
           return (
-            <button
-              key={tab.id}
-              className={`bottom-nav-item${isActive ? ' active' : ''}`}
-              onClick={() => setCurrentTab(tab.id)}
+            <NavLink
+              key={tab.to}
+              to={tab.to}
+              className={({ isActive }) => `bottom-nav-item${isActive ? ' active' : ''}`}
             >
               <Icon size={22} className="bottom-nav-icon" />
               <span className="bottom-nav-label">{tab.label}</span>
-            </button>
+            </NavLink>
           );
         })}
 

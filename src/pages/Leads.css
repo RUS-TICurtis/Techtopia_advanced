@@ -1,84 +1,110 @@
-/* Leads Page */
-.leads-status-row {
+/* ==========================================================================
+   Leads Page — Premium Responsive Layout
+   ========================================================================== */
+
+.leads-page {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Status / KPI pills row */
+.leads-status-pill.card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  cursor: pointer;
+  padding: 16px 20px;
+}
+
+.leads-status-pill.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Dossier card right-side drawer */
+.dossier-card.card {
+  position: sticky;
+  top: 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  z-index: 10;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .dossier-card.card {
+  background-color: rgba(15, 22, 41, 0.92);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dossier-card button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(113, 142, 191, 0.15);
+  border-radius: 99px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(113, 142, 191, 0.3);
+}
+
+/* Lead score badge styling */
+.leads-page .badge {
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+}
+
+/* Lead row layout */
+.leads-layout {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  gap: 20px;
+  align-items: flex-start;
 }
 
-.leads-status-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid transparent;
+/* Responsive: stack at 1200px */
+@media (max-width: 1200px) {
+  .leads-layout {
+    flex-direction: column;
+  }
+
+  .dossier-card.card {
+    width: 100% !important;
+    position: static;
+    max-height: 65vh;
+  }
 }
 
-.leads-status-pill.badge-info    { background: var(--info-bg);    color: var(--info);    border-color: rgba(138,79,255,0.2); }
-.leads-status-pill.badge-neutral { background: rgba(113,142,191,0.1); color: var(--text-muted); }
-.leads-status-pill.badge-warning { background: var(--warning-bg); color: var(--warning); border-color: rgba(228,255,26,0.2); }
-.leads-status-pill.badge-success { background: var(--success-bg); color: var(--success); border-color: rgba(33,250,144,0.2); }
-.leads-status-pill.badge-danger  { background: var(--error-bg);   color: var(--error);   border-color: rgba(255,71,218,0.2); }
+@media (max-width: 768px) {
+  .dossier-card.card {
+    max-height: 55vh;
+    padding: 18px;
+  }
 
-.leads-status-count {
-  background: rgba(255,255,255,0.15);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
+  .leads-status-pill.card {
+    padding: 12px 14px;
+  }
 }
 
-.leads-filters {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.filter-select-wrapper {
-  position: relative;
-}
-
-.filter-select {
-  padding-right: 36px !important;
-  appearance: none;
-  min-width: 160px;
-}
-
-.filter-select-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  pointer-events: none;
-}
-
-/* Empty state */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 40px;
-  text-align: center;
-  gap: 16px;
-}
-
-.empty-icon {
-  color: var(--text-light);
-  opacity: 0.6;
-}
-
-.empty-state h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-title);
-}
-
-.empty-state p {
-  font-size: 14px;
-  color: var(--text-muted);
-  max-width: 320px;
+@media (max-width: 480px) {
+  .dossier-card.card {
+    padding: 14px;
+  }
 }

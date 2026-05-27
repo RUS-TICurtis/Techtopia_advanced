@@ -1,79 +1,130 @@
-/* Support Page Styles */
-.support-metrics {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
+/* ==========================================================================
+   Support Page — Premium Responsive Layout
+   ========================================================================== */
+
+.support-page {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@media (min-width: 768px) {
-  .support-metrics {
-    grid-template-columns: repeat(3, 1fr);
+/* Dossier sliding panel / card styling */
+.dossier-card.card {
+  position: sticky;
+  top: 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  z-index: 10;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .dossier-card.card {
+  background-color: rgba(15, 22, 41, 0.92);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Custom Scrollbar */
+.support-page .custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.support-page .custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.support-page .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(113, 142, 191, 0.12);
+  border-radius: 99px;
+}
+
+.support-page .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(113, 142, 191, 0.25);
+}
+
+/* KPI metric cards */
+.premium-metric {
+  position: relative;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background-color: var(--bg-card);
+}
+
+.premium-metric:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .premium-metric:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.metric-glow-dot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+  opacity: 0.7;
+}
+
+/* Support layout */
+.support-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* Ticket timeline entries */
+.timeline-entry {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .support-layout {
+    flex-direction: column;
+  }
+
+  .dossier-card.card {
+    width: 100% !important;
+    position: static;
+    max-height: 60vh;
   }
 }
 
-.support-metric-card {
-  padding: 16px;
+@media (max-width: 768px) {
+  .dossier-card.card {
+    padding: 18px;
+    max-height: 55vh;
+  }
+
+  .premium-metric {
+    padding: 16px !important;
+  }
 }
 
-.support-metric-label {
-  color: var(--text-muted);
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.support-metric-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-title);
-}
-
-.support-table .font-medium {
-  font-weight: 600;
-}
-
-.support-table .text-primary {
-  color: var(--primary);
-}
-
-.support-table .cell-date {
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-.support-table .status-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  width: fit-content;
-}
-
-.support-table .priority-indicator {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.priority-high { background-color: var(--error); }
-.priority-medium { background-color: var(--warning); }
-.priority-low { background-color: var(--success); }
-
-.support-table .btn-outline {
-  padding: 6px 12px;
-  font-size: 13px;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.py-8 {
-  padding-top: 32px;
-  padding-bottom: 32px;
-}
-
-.text-secondary {
-  color: var(--text-muted);
+@media (max-width: 480px) {
+  .dossier-card.card {
+    padding: 14px;
+  }
 }

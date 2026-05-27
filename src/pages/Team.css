@@ -13,6 +13,11 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.team-metric-card:hover .team-metric-icon {
+  transform: scale(1.08);
 }
 
 .team-metric-value {
@@ -37,8 +42,8 @@
 }
 
 .team-member-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--brand-purple), var(--brand-cyan));
   color: #fff;
@@ -48,4 +53,26 @@
   font-size: 13px;
   font-weight: 700;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(138, 79, 255, 0.3);
+}
+
+/* Team page grids */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-metric-card {
+    gap: 12px;
+  }
+
+  .team-metric-value {
+    font-size: 22px;
+  }
 }

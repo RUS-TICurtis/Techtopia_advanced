@@ -1,0 +1,13 @@
+.notification-item {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.notification-item.unread-active {
+  border-color: rgba(0, 229, 255, 0.25);
+  background: linear-gradient(135deg, rgba(18, 20, 26, 0.8), rgba(0, 229, 255, 0.02));
+}
+
+.notification-item:hover {
+  border-color: var(--border-focus);
+}

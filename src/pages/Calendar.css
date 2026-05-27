@@ -2,12 +2,13 @@
 .calendar-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 20px;
 }
 
 @media (min-width: 1024px) {
   .calendar-layout {
     grid-template-columns: 2fr 1fr;
+    align-items: start;
   }
 }
 
@@ -56,8 +57,32 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  height: 600px;
+  height: 560px;
   grid-auto-rows: 1fr;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    height: 420px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-grid {
+    height: 340px;
+  }
+
+  .calendar-date-number {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  .calendar-event-pill {
+    font-size: 10px;
+    padding: 2px 3px;
+  }
 }
 
 .calendar-day {
@@ -186,4 +211,28 @@
 
 .schedule-card-attendees .attendee-avatar:first-child {
   margin-left: 0;
+}
+
+/* Dark mode calendar */
+[data-theme="dark"] .calendar-grid-header {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .calendar-day.today {
+  background-color: rgba(1, 253, 246, 0.04);
+}
+
+[data-theme="dark"] .calendar-day.today .calendar-date-number {
+  background-color: var(--brand-cyan);
+  color: #000;
+}
+
+[data-theme="dark"] .calendar-event-pill {
+  background-color: rgba(1, 253, 246, 0.1);
+  color: var(--brand-cyan);
+  border-color: rgba(1, 253, 246, 0.2);
+}
+
+[data-theme="dark"] .schedule-card:hover {
+  border-color: var(--brand-cyan);
 }

@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Techtopia CRM Hub - Projects & Sprint Stylesheet
+   Design Spec: Dark Mode Premium, Glassmorphism, 6-color Neon Gradients
+   ========================================================================== */
+
+.projects-page {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Portfolio Cards */
+.project-portfolio-card.card {
+  position: relative;
+  overflow: hidden;
+  border-left-width: 4px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-md);
+  background-color: var(--bg-card);
+}
+
+.project-portfolio-card.card:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Progress bar fill gradient */
+.bg-gradient-to-r {
+  background: linear-gradient(90deg, #8A4FFF 0%, #01FDF6 100%);
+}
+
+/* Kanban Board additions specific to tasks */
+.project-board-page .kanban-column {
+  min-height: 550px;
+  background-color: rgba(15, 22, 41, 0.55);
+}
+
+.project-board-page .kanban-card {
+  border-left-width: 4px;
+}
+
+/* Timeline/Gantt specific overrides */
+.project-timeline-page .gantt-lane {
+  position: relative;
+  overflow: visible;
+}
+
+.gantt-lane .rotate-45 {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Custom Scrollbar for all projects files */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 768px) {
+  .gantt-months-grid {
+    font-size: 10px !important;
+  }
+}

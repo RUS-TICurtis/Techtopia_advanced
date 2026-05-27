@@ -1,127 +1,79 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
-import Dashboard from './pages/Dashboard';
-import Contacts from './pages/Contacts';
-import Pipeline from './pages/Pipeline';
-import Tasks from './pages/Tasks';
-import Analytics from './pages/Analytics';
-import Settings from './pages/Settings';
-import Companies from './pages/Companies';
-import Invoices from './pages/Invoices';
-import Calendar from './pages/Calendar';
-import Messages from './pages/Messages';
-import Support from './pages/Support';
-import Leads from './pages/Leads';
-import Clients from './pages/Clients';
-import Billing from './pages/Billing';
-import Contracts from './pages/Contracts';
-import Team from './pages/Team';
-import AiAssistant from './pages/AiAssistant';
-import { mockDb } from './utils/mockDb';
+import CommandPalette from './components/ui/CommandPalette';
+import NotificationCenter from './components/layout/NotificationCenter';
+import AppRoutes from './router';
 import { useAuthStore } from './store/authStore';
-import Login from './pages/Login';
+import { useUIStore } from './store/uiStore';
 
 function App() {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const [currentTab, setCurrentTab] = useState('dashboard');
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem('crm-theme') || 'light');
-  const [profile, setProfile] = useState(mockDb.getProfile());
-  const [searchValue, setSearchValue] = useState('');
+  const { isAuthenticated } = useAuthStore();
+  const { theme, toggleTheme, sidebarCollapsed, setSidebarCollapsed, mobileSidebarOpen, setMobileSidebarOpen } = useUIStore();
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('crm-theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
+  // Don't render layout shell on auth pages
+  const isAuthPage = location.pathname.startsWith('/auth');
 
-  const handleProfileUpdate = (updatedProfile) => {
-    setProfile(updatedProfile);
-  };
-
-  const renderActivePage = () => {
-    switch (currentTab) {
-      case 'dashboard':    return <Dashboard setCurrentTab={setCurrentTab} />;
-      case 'leads':        return <Leads searchValue={searchValue} />;
-      case 'clients':      return <Clients searchValue={searchValue} />;
-      case 'pipeline':     return <Pipeline searchValue={searchValue} />;
-      case 'billing':      return <Billing searchValue={searchValue} />;
-      case 'contracts':    return <Contracts searchValue={searchValue} />;
-      case 'support':      return <Support />;
-      case 'ai-assistant': return <AiAssistant />;
-      case 'analytics':    return <Analytics />;
-      case 'team':         return <Team />;
-      case 'settings':     return (
-        <Settings 
+  if (!isAuthenticated || isAuthPage) {
+    return (
+      <div className="app-wrapper auth-only">
+        <AppRoutes 
           theme={theme} 
           toggleTheme={toggleTheme} 
-          onProfileUpdate={handleProfileUpdate} 
         />
-      );
-      // Legacy pages — kept but not in primary nav
-      case 'contacts':  return <Contacts searchValue={searchValue} />;
-      case 'companies': return <Companies searchValue={searchValue} />;
-      case 'invoices':  return <Invoices searchValue={searchValue} />;
-      case 'tasks':     return <Tasks />;
-      case 'calendar':  return <Calendar />;
-      case 'messages':  return <Messages />;
-      default:          return <Dashboard setCurrentTab={setCurrentTab} />;
-    }
-  };
-
-  if (!isAuthenticated) {
-    return <Login />;
+        <Toaster position="bottom-right" reverseOrder={false} />
+      </div>
+    );
   }
 
   return (
     <div className="app-wrapper">
-      {mobileOpen && (
+      {/* Toast Notification Provider */}
+      <Toaster position="bottom-right" reverseOrder={false} />
+
+      {/* Global Interactive Utilities */}
+      <CommandPalette />
+      <NotificationCenter />
+
+      {mobileSidebarOpen && (
         <div 
           className="sidebar-overlay" 
-          onClick={() => setMobileOpen(false)}
+          onClick={() => setMobileSidebarOpen(false)}
         ></div>
       )}
 
       <Sidebar 
-        currentTab={currentTab} 
-        setCurrentTab={(tab) => {
-          setCurrentTab(tab);
-          setSearchValue('');
-        }}
-        isCollapsed={isCollapsed} 
-        setIsCollapsed={setIsCollapsed} 
-        mobileOpen={mobileOpen}
-        setMobileOpen={setMobileOpen}
+        isCollapsed={sidebarCollapsed} 
+        setIsCollapsed={setSidebarCollapsed} 
+        mobileOpen={mobileSidebarOpen}
+        setMobileOpen={setMobileSidebarOpen}
         theme={theme}
       />
 
-      <div className={`main-content ${isCollapsed ? 'collapsed' : ''}`}>
+      <div className={`main-content ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <Navbar 
-          currentTab={currentTab} 
-          setCurrentTab={(tab) => {
-            setCurrentTab(tab);
-            setSearchValue('');
-          }}
           theme={theme} 
           toggleTheme={toggleTheme} 
-          profile={profile}
-          searchValue={searchValue}
-          onSearchChange={setSearchValue}
-          onMenuClick={() => setMobileOpen(true)}
+          onMenuClick={() => setMobileSidebarOpen(true)}
         />
 
         <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {renderActivePage()}
+          <AppRoutes 
+            theme={theme} 
+            toggleTheme={toggleTheme} 
+          />
         </main>
       </div>
       
-      <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
+      <BottomNav />
     </div>
   );
 }

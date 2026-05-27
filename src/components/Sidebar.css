@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Sidebar Component
+   Sidebar Component - Premium Dark/Light Design
    ========================================================================== */
 .sidebar {
   position: fixed;
@@ -33,15 +33,16 @@
   }
 }
 
-/* Brand / Logo area (stays fixed above scrollable menu) */
+/* Brand / Logo area */
 .sidebar-brand {
   height: var(--navbar-height);
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 24px;
+  padding: 0 20px;
   border-bottom: 1px solid var(--border-light);
   flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(55, 114, 255, 0.04), rgba(138, 79, 255, 0.02));
 }
 
 .sidebar.collapsed .sidebar-brand {
@@ -49,9 +50,13 @@
   justify-content: center;
 }
 
+[data-theme="dark"] .sidebar-brand {
+  background: linear-gradient(135deg, rgba(1, 253, 246, 0.05), rgba(138, 79, 255, 0.03));
+}
+
 /* Scrollable menu area */
 .sidebar-menu {
-  padding: 16px 0 8px;
+  padding: 12px 8px 8px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -79,12 +84,12 @@
 
 /* Section label */
 .sidebar-section-label {
-  padding: 8px 24px 4px;
+  padding: 14px 12px 4px;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-light);
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -93,24 +98,28 @@
   display: none;
 }
 
-/* Nav items */
+/* Nav items — pill style */
 .sidebar-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 13px 24px;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 1px 0;
   color: var(--text-muted);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13.5px;
   position: relative;
   transition: color var(--transition-fast), background-color var(--transition-fast);
   cursor: pointer;
-  border-radius: 0;
+  border-radius: var(--radius-md);
+  text-decoration: none;
 }
 
 .sidebar.collapsed .sidebar-item {
-  padding: 14px 0;
+  padding: 12px 0;
   justify-content: center;
+  border-radius: var(--radius-md);
+  margin: 1px 8px;
 }
 
 .sidebar-item-label {
@@ -124,15 +133,15 @@
 }
 
 .sidebar-item svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   transition: transform var(--transition-fast);
 }
 
 .sidebar-item:hover {
   color: var(--primary);
-  background-color: rgba(55, 114, 255, 0.04);
+  background-color: rgba(55, 114, 255, 0.07);
 }
 
 .sidebar-item:hover svg {
@@ -141,18 +150,13 @@
 
 .sidebar-item.active {
   color: var(--primary);
+  background-color: rgba(55, 114, 255, 0.1);
+  font-weight: 700;
 }
 
+/* Removed the old bar indicator in favour of pill highlight */
 .sidebar-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: var(--primary);
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  display: none;
 }
 
 /* Notification badge on item */
@@ -164,6 +168,7 @@
   padding: 2px 7px;
   border-radius: var(--radius-full);
   margin-left: auto;
+  line-height: 1.4;
 }
 
 .sidebar.collapsed .sidebar-item-badge {
@@ -172,28 +177,29 @@
 
 .sidebar-item-dot {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 7px;
-  height: 7px;
+  top: 10px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
   background-color: var(--primary);
   border-radius: 50%;
 }
 
-/* Footer (collapse button + logout) */
+/* Footer */
 .sidebar-footer {
-  padding: 16px 20px;
+  padding: 12px 8px;
   border-top: 1px solid var(--border-light);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
+  gap: 8px;
 }
 
 .sidebar.collapsed .sidebar-footer {
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 0;
+  gap: 8px;
+  padding: 12px 0;
   justify-content: center;
 }
 
@@ -208,6 +214,7 @@
   justify-content: center;
   border: 1px solid var(--border-light);
   transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .sidebar-collapse-btn:hover {
@@ -227,6 +234,7 @@
   justify-content: center;
   border: 1px solid var(--border-light);
   transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .sidebar-logout-btn:hover {
@@ -242,6 +250,7 @@
   justify-content: space-between;
   gap: 10px;
   width: 100%;
+  min-width: 0;
 }
 
 .sidebar-user-details {
@@ -249,18 +258,22 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1;
 }
 
 .sidebar-user-avatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-full);
-  background-color: var(--primary-bg);
+  background: linear-gradient(135deg, rgba(55, 114, 255, 0.2), rgba(138, 79, 255, 0.2));
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-weight: 700;
+  font-size: 13px;
+  border: 1px solid rgba(55, 114, 255, 0.2);
 }
 
 .sidebar-user-name {
@@ -283,17 +296,22 @@
 /* Dark-mode: use cyan as active/primary colour for nav items */
 [data-theme="dark"] .sidebar-item:hover {
   color: var(--brand-cyan);
-  background-color: rgba(1, 253, 246, 0.05);
+  background-color: rgba(1, 253, 246, 0.06);
 }
 
 [data-theme="dark"] .sidebar-item.active {
   color: var(--brand-cyan);
-  background-color: rgba(1, 253, 246, 0.06);
+  background-color: rgba(1, 253, 246, 0.08);
 }
 
-[data-theme="dark"] .sidebar-item.active::before {
-  background-color: var(--brand-cyan);
-  box-shadow: 0 0 10px rgba(1, 253, 246, 0.4);
+[data-theme="dark"] .sidebar-item.active svg {
+  filter: drop-shadow(0 0 6px rgba(1, 253, 246, 0.5));
+}
+
+[data-theme="dark"] .sidebar-user-avatar {
+  background: linear-gradient(135deg, rgba(1, 253, 246, 0.15), rgba(138, 79, 255, 0.15));
+  color: var(--brand-cyan);
+  border-color: rgba(1, 253, 246, 0.2);
 }
 
 [data-theme="dark"] .sidebar-collapse-btn:hover,
@@ -301,4 +319,9 @@
   background-color: rgba(1, 253, 246, 0.1);
   color: var(--brand-cyan);
   border-color: var(--brand-cyan);
+}
+
+[data-theme="dark"] .sidebar-item-badge {
+  background: rgba(1, 253, 246, 0.15);
+  color: var(--brand-cyan);
 }

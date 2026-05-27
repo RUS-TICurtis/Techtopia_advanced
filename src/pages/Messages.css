@@ -2,16 +2,32 @@
 .messages-layout {
   display: grid;
   grid-template-columns: 1fr;
-  height: 600px;
+  height: calc(100vh - 160px);
+  min-height: 500px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 @media (min-width: 1024px) {
   .messages-layout {
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: 320px 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .messages-layout {
+    height: calc(100vh - 140px);
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .messages-layout {
+    height: calc(100dvh - 130px);
+    border-radius: var(--radius-md);
   }
 }
 
@@ -40,8 +56,14 @@
   gap: 12px;
 }
 
-.message-thread:hover, .message-thread.active {
+.message-thread:hover,
+.message-thread.active {
   background-color: rgba(55, 114, 255, 0.05);
+}
+
+[data-theme="dark"] .message-thread:hover,
+[data-theme="dark"] .message-thread.active {
+  background-color: rgba(1, 253, 246, 0.04);
 }
 
 .message-thread-avatar {
@@ -245,9 +267,52 @@
   justify-content: center;
   padding: 8px;
   border-radius: 50%;
+  transition: all var(--transition-fast);
 }
 
 .messages-action-btn:hover {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(55, 114, 255, 0.08);
   color: var(--primary);
+}
+
+[data-theme="dark"] .message-bubble-wrapper.sent .message-bubble {
+  background-color: var(--brand-cyan);
+  color: #000;
+}
+
+[data-theme="dark"] .messages-main {
+  background-color: var(--bg-app);
+}
+
+[data-theme="dark"] .message-thread:hover,
+[data-theme="dark"] .message-thread.active {
+  background-color: rgba(1, 253, 246, 0.04);
+}
+
+[data-theme="dark"] .message-input-wrapper {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .messages-action-btn:hover {
+  background-color: rgba(1, 253, 246, 0.08);
+  color: var(--brand-cyan);
+}
+
+/* Mobile: messages sidebar */
+@media (max-width: 1023px) {
+  .messages-sidebar {
+    display: none;
+  }
+  
+  .messages-sidebar.mobile-visible {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: var(--bg-card);
+  }
 }
