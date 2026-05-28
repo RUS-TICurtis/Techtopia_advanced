@@ -5,7 +5,7 @@
 import axios from 'axios';
 
 // ─── Config ───────────────────────────────────────────────
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:1428';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://techtopia-crm-api.onrender.com/';
 
 export const apiClient = axios.create({
   baseURL: API_BASE,
