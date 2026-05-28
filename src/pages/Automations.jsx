@@ -1,215 +1,195 @@
-import React, { useState, useEffect } from 'react';
-import { mockApi } from '../lib/mockApi';
-import { ToggleLeft, ToggleRight, Sparkles, Plus, Zap } from 'lucide-react';
-import Modal from '../components/ui/Modal';
+import React, { useState } from 'react';
+import PageContainer from '../components/layout/PageContainer';
+import PageHeader from '../components/layout/PageHeader';
 import Badge from '../components/ui/Badge';
+import { 
+  Play, Plus, ArrowRight, Settings, Info, CheckCircle2, 
+  Trash2, ShieldCheck, Zap, ToggleLeft, ToggleRight,
+  TrendingUp, Clock, AlertTriangle, ShieldAlert
+} from 'lucide-react';
 import './Automations.css';
 
 export default function Automations() {
-  const [automations, setAutomations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newTrigger, setNewTrigger] = useState('Lead Created');
-  const [newCondition, setNewCondition] = useState('');
-  const [newAction, setNewAction] = useState('');
-
-  const fetchAutomations = async () => {
-    setLoading(true);
-    try {
-      const res = await mockApi.getAutomations();
-      setAutomations(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+  const [templates] = useState([
+    {
+      id: 'flow-1',
+      name: 'Onboard New Employee Workspace',
+      description: 'Automatically provisions checklists, calendars, and AI-led welcoming dispatches for new staff hires.',
+      trigger: 'employee.onboarded',
+      condition: 'Role == "Sales" OR Role == "Finance"',
+      actions: ['Provision workspace account', 'Draft AI Welcoming Email', 'Post announcement to Slack webhook'],
+      active: true,
+      executions: 124,
+    },
+    {
+      id: 'flow-2',
+      name: 'SLA Breach High-Risk Escalation',
+      description: 'Flags and escalates customer support tickets that violate standard response time clauses.',
+      trigger: 'ticket.unresolved',
+      condition: 'Time Open > 2 Hours AND Priority == "High"',
+      actions: ['Elevate priority to CRITICAL', 'Generate AI incident summary', 'SMS Dispatch to Support Team Lead'],
+      active: true,
+      executions: 48,
+    },
+    {
+      id: 'flow-3',
+      name: 'High-Value Opportunity Alert Room',
+      description: 'Instantiates custom deal spaces and alerts super administrators when enterprise contracts are created.',
+      trigger: 'deal.created',
+      condition: 'Deal Value > $50,000',
+      actions: ['Provision dedicated Deal Room', 'Send Super Admin Pager Alert', 'Trigger AI Opportunity Risk scan'],
+      active: true,
+      executions: 19,
+    },
+    {
+      id: 'flow-4',
+      name: 'Unpaid Collections Automation',
+      description: 'Initiates collection warnings, drafts follow-up demands, and revokes license rights for overdue entities.',
+      trigger: 'invoice.overdue',
+      condition: 'Days Overdue > 10 Days',
+      actions: ['Append alert to Client Portal', 'Queue Finance Agent draft (Approval Required)', 'Flag subscription as Restricted'],
+      active: false,
+      executions: 82,
     }
-  };
+  ]);
 
-  useEffect(() => {
-    fetchAutomations();
-  }, []);
+  const [activeFlow, setActiveFlow] = useState(null);
+  const [simulatedExecutions, setSimulatedExecutions] = useState(0);
 
-  const handleToggle = async (id) => {
-    try {
-      const updated = await mockApi.toggleAutomation(id);
-      if (updated) {
-        setAutomations(prev => prev.map(a => a.id === id ? updated : a));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    if (!newName || !newAction) return;
-    try {
-      const added = await mockApi.addAutomation({
-        name: newName,
-        trigger: newTrigger,
-        condition: newCondition || 'None (Always run)',
-        action: newAction,
-      });
-      if (added) {
-        setAutomations(prev => [...prev, added]);
-        setShowAddModal(false);
-        // Reset form
-        setNewName('');
-        setNewTrigger('Lead Created');
-        setNewCondition('');
-        setNewAction('');
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  const handleTestFlow = (flowName) => {
+    setSimulatedExecutions(prev => prev + 1);
+    alert(`⚙️ [Simulation Triggered] - Simulated dry-run event for "${flowName}". Successfully evaluated conditional branches and executed action chains.`);
   };
 
   return (
-    <div className="page-container automations-page">
-      <div className="page-header flex justify-between items-center mb-6">
-        <div>
-          <h1 className="page-title flex items-center gap-2">
-            <Sparkles className="text-[#01FDF6]" />
-            Workflow Automations
-          </h1>
-          <p className="page-subtitle">
-            Build AI-triggered workflows, auto-assign rules, and notification handlers.
-          </p>
-        </div>
-        <button onClick={() => setShowAddModal(true)} className="btn btn-primary flex items-center gap-2">
-          <Plus size={16} /> Create Automation
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="skeleton h-48 rounded-xl" style={{ borderRadius: 'var(--radius-xl)' }}></div>
-          ))}
-        </div>
-      ) : automations.length === 0 ? (
-        <div className="empty-state card">
-          <Zap size={48} className="empty-icon" />
-          <h3>No active workflow automations</h3>
-          <p>Create your first custom trigger workflow to initialize rules.</p>
-          <button onClick={() => setShowAddModal(true)} className="btn btn-primary flex items-center gap-2">
-            <Plus size={16} /> Create Automation
+    <PageContainer className="automations-page">
+      <PageHeader 
+        title="Visual Workflow Builder"
+        subtitle="Design and dispatch automated systems, conditional action branches, and multi-agent approval dispatches"
+        icon={<Zap className="text-[#01FDF6]" />}
+        actions={
+          <button className="btn btn-primary shadow-glow flex items-center gap-1.5" onClick={() => alert("Provisioning a new workflow blueprint...")}>
+            <Plus size={14} /> New Workflow
           </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {automations.map((a) => (
-            <div key={a.id} className={`card automation-card ${a.active ? 'active' : ''}`}>
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="automation-icon-wrapper" style={{ color: 'var(--brand-cyan)', background: 'rgba(1, 253, 246, 0.1)' }}>
-                    <Zap size={20} />
+        }
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+        {/* Left Side: Pre-seeded Templates List */}
+        <div className="flex flex-col gap-4">
+          <div className="section-title text-sm text-gray-500 font-bold uppercase tracking-wider px-1">Seeded Enterprise Blueprint Templates</div>
+          <div className="templates-list-panel flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-grow max-h-[calc(100vh - 280px)] pr-1">
+            {templates.map(flow => (
+              <div 
+                key={flow.id} 
+                className={`flow-template-card card bg-gray-900/35 border p-4 rounded-xl cursor-pointer transition-all duration-200 ${activeFlow?.id === flow.id ? 'active-border border-[#01FDF6]/60 bg-gray-900/60' : 'border-gray-850 hover:border-[#01FDF6]/30'}`}
+                onClick={() => setActiveFlow(flow)}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Zap size={14} className={flow.active ? 'text-[#01FDF6]' : 'text-gray-500'} />
+                    <h4 className="text-white text-xs font-bold font-display truncate max-w-[200px]">{flow.name}</h4>
                   </div>
-                  <button onClick={() => handleToggle(a.id)} className="btn-icon" style={{ padding: 0 }}>
-                    {a.active ? (
-                      <ToggleRight size={32} className="text-[#21FA90]" style={{ color: 'var(--brand-green)' }} />
-                    ) : (
-                      <ToggleLeft size={32} style={{ color: 'var(--text-light)' }} />
-                    )}
+                  <Badge variant={flow.active ? 'success' : 'neutral'}>{flow.active ? 'Active' : 'Hibernating'}</Badge>
+                </div>
+                
+                <p className="text-gray-400 text-[11px] leading-snug mb-3 min-h-[30px]">{flow.description}</p>
+                
+                <div className="flex justify-between items-center text-[10px] border-t border-gray-950 pt-2.5 mt-2">
+                  <span className="text-gray-500 font-mono">Dispatches: {flow.executions} runs</span>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTestFlow(flow.name);
+                    }}
+                    className="btn btn-secondary px-2.5 py-1 text-[9px] hover:text-[#01FDF6] flex items-center gap-1 border-gray-800"
+                  >
+                    <Play size={8} /> Dry Run
                   </button>
                 </div>
-                <h3 className="automation-title mb-2">{a.name}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Flow Blueprint Canvas & Details Inspector */}
+        <div className="lg:col-span-2 flex flex-col gap-4 flex-1">
+          <div className="section-title text-sm text-gray-500 font-bold uppercase tracking-wider px-1">Interactive Node Canvas Layout</div>
+          
+          <div className="blueprint-canvas-wrapper flex-grow bg-gray-950/40 border border-gray-850 rounded-xl flex flex-col relative overflow-hidden min-h-[400px]">
+            {activeFlow ? (
+              <div className="canvas-interactive-grid p-6 flex flex-col items-center justify-center gap-6 h-full relative overflow-y-auto">
                 
-                <div className="automation-fields-stack mt-4">
-                  <div className="automation-field-box">
-                    <span className="automation-field-label">Trigger</span>
-                    <span className="automation-field-val font-semibold">{a.trigger}</span>
+                {/* Node 1: Trigger */}
+                <div className="canvas-node trigger-node bg-gray-900 border border-[#01FDF6]/45 p-4 rounded-xl shadow-glow-cyan max-w-xs w-full">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-[9px] text-[#01FDF6] font-bold uppercase tracking-wider block">Trigger Block</span>
+                    <Clock size={12} className="text-[#01FDF6]" />
                   </div>
-                  <div className="automation-field-box">
-                    <span className="automation-field-label">Condition</span>
-                    <span className="automation-field-val italic" style={{ color: 'var(--text-muted)' }}>{a.condition}</span>
+                  <h4 className="text-white text-xs font-bold font-mono">{activeFlow.trigger}</h4>
+                  <p className="text-gray-500 text-[10px] mt-1">Fires immediately when operational event is detected.</p>
+                </div>
+
+                <ArrowRight size={16} className="text-gray-600 rotate-90" />
+
+                {/* Node 2: Condition */}
+                <div className="canvas-node condition-node bg-gray-900 border border-[#bd93f9]/45 p-4 rounded-xl shadow-glow-purple max-w-xs w-full">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-[9px] text-[#bd93f9] font-bold uppercase tracking-wider block">Conditional Branch</span>
+                    <Info size={12} className="text-[#bd93f9]" />
                   </div>
-                  <div className="automation-field-box">
-                    <span className="automation-field-label">Action</span>
-                    <span className="automation-field-val" style={{ color: 'var(--brand-cyan)', fontWeight: 700 }}>{a.action}</span>
+                  <h4 className="text-white text-xs font-bold font-mono">{activeFlow.condition}</h4>
+                  <p className="text-gray-500 text-[10px] mt-1">Evaluates parameters. Stops pipeline if claims return false.</p>
+                </div>
+
+                <ArrowRight size={16} className="text-gray-600 rotate-90" />
+
+                {/* Node 3: Actions Group */}
+                <div className="canvas-node actions-node bg-gray-900 border border-[#50fa7b]/45 p-4 rounded-xl shadow-glow-green max-w-xs w-full">
+                  <span className="text-[9px] text-[#50fa7b] font-bold uppercase tracking-wider block mb-2">Dispatched Operations</span>
+                  <div className="flex flex-col gap-2">
+                    {activeFlow.actions.map((act, idx) => (
+                      <div key={idx} className="flex items-start gap-2 bg-gray-950 p-2 rounded-lg border border-gray-900 text-[10px] text-gray-400 leading-snug">
+                        <CheckCircle2 size={12} className="text-[#50fa7b] flex-shrink-0 mt-0.5" />
+                        <span>{act}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
+
+                {/* Dry Run / Sync Control panel inside Canvas */}
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <button 
+                    onClick={() => handleTestFlow(activeFlow.name)}
+                    className="btn btn-primary py-1.5 px-3 text-[10px] flex items-center gap-1 shadow-glow"
+                  >
+                    <Play size={10} /> Dry Run
+                  </button>
+                  <button 
+                    onClick={() => setActiveFlow(null)}
+                    className="btn btn-secondary py-1.5 px-3 text-[10px] flex items-center gap-1 border-gray-800"
+                  >
+                    Close Canvas
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ) : (
+              <div className="canvas-empty-state flex flex-col items-center justify-center text-center p-20 flex-grow gap-3">
+                <div className="p-4 bg-gray-900/60 border border-gray-800 rounded-full flex items-center justify-center">
+                  <Zap size={30} className="text-gray-600" />
+                </div>
+                <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider">Empty Automation Canvas</h4>
+                <p className="text-gray-500 text-xs max-w-xs leading-relaxed">
+                  Select a workflow template folder from the sidebar blueprint panel or generate a new trigger-action node to illuminate this canvas.
+                </p>
+              </div>
+            )}
+            
+            {/* Grid Background overlay in CSS */}
+            <div className="grid-overlay-back"></div>
+          </div>
         </div>
-      )}
-
-      {/* Add Automation Modal */}
-      <Modal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        title="Create New Automation"
-        size="md"
-      >
-        <form onSubmit={handleAdd} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Automation Name *</label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Assign Inbound Tech Leads"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="form-input"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Trigger Event</label>
-            <select
-              value={newTrigger}
-              onChange={(e) => setNewTrigger(e.target.value)}
-              className="form-input"
-            >
-              <option value="Lead Created">Lead Created</option>
-              <option value="Deal Closed (Won)">Deal Closed (Won)</option>
-              <option value="Ticket Open">Support Ticket Opened</option>
-              <option value="Invoice Overdue">Invoice Overdue</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Condition Rule (optional)</label>
-            <input
-              type="text"
-              placeholder="e.g. Value > 50000"
-              value={newCondition}
-              onChange={(e) => setNewCondition(e.target.value)}
-              className="form-input"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Action to Execute *</label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Email Curtis Miller & Ping Slack"
-              value={newAction}
-              onChange={(e) => setNewAction(e.target.value)}
-              className="form-input"
-            />
-          </div>
-
-          <div className="modal-footer mt-4">
-            <button
-              type="button"
-              onClick={() => setShowAddModal(false)}
-              className="btn btn-secondary"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-            >
-              Save Automation
-            </button>
-          </div>
-        </form>
-      </Modal>
-    </div>
+      </div>
+    </PageContainer>
   );
 }

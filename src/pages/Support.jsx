@@ -26,6 +26,21 @@ import Badge from '../components/ui/Badge';
 import { showToast } from '../components/ui/Toast';
 import './Support.css';
 
+const getAccountLead = (clientName) => {
+  const client = String(clientName || '').toLowerCase();
+  if (client.includes('cloudscale') || client.includes('acme')) {
+    return { name: 'Curtis Tungsten', role: 'Super Admin', avatar: 'CT' };
+  } else if (client.includes('devflow')) {
+    return { name: 'Sarah Jenkins', role: 'Sales Executive', avatar: 'SJ' };
+  } else if (client.includes('biogen')) {
+    return { name: 'Faye Morgan', role: 'Finance Manager', avatar: 'FM' };
+  } else if (client.includes('futurelogic')) {
+    return { name: 'Patrick Mills', role: 'Project Manager', avatar: 'PM' };
+  } else {
+    return { name: 'Sam Porter', role: 'Support Agent', avatar: 'SP' };
+  }
+};
+
 const TABS = ['All', 'Open', 'In Progress', 'Resolved'];
 
 const emptyForm = {
@@ -40,6 +55,7 @@ export default function Support({ searchValue = '' }) {
   const [tickets, setTickets] = useState(() => mockDb.getTickets());
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [activeTab, setActiveTab] = useState('All');
+  const [categoryFilter, setCategoryFilter] = useState('All'); // 'All' | 'Support Ticket' | 'Feature Request'
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -181,7 +197,11 @@ export default function Support({ searchValue = '' }) {
     
     const matchesTab = activeTab === 'All' || t.status === activeTab;
 
-    return matchesSearch && matchesTab;
+    const matchesCategory = categoryFilter === 'All' || 
+      (categoryFilter === 'Support Ticket' && t.category !== 'Feature Request') ||
+      t.category === categoryFilter;
+
+    return matchesSearch && matchesTab && matchesCategory;
   });
 
   const getSLAIndicator = (ticket) => {
@@ -270,8 +290,15 @@ export default function Support({ searchValue = '' }) {
       cell: ({ row }) => {
         const ticket = row.original;
         return (
-          <div className="flex flex-col max-w-sm">
-            <span className="font-bold text-white text-sm truncate">{ticket.subject}</span>
+          <div className="flex flex-col max-w-sm gap-0.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-bold text-white text-sm truncate">{ticket.subject}</span>
+              {ticket.category === 'Feature Request' ? (
+                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-[#21FA90]/10 text-[#21FA90] border border-[#21FA90]/35 uppercase tracking-wider font-mono">Feature Request</span>
+              ) : (
+                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-[#01FDF6]/10 text-[#01FDF6] border border-[#01FDF6]/35 uppercase tracking-wider font-mono">Support</span>
+              )}
+            </div>
             <span className="text-[10px] text-gray-500 truncate">{ticket.message || 'No description recorded'}</span>
           </div>
         );
@@ -379,8 +406,20 @@ export default function Support({ searchValue = '' }) {
             </button>
           ))}
         </div>
-        <div className="text-xs text-gray-500 font-mono">
-          Commitment SLA target win rate: <span className="text-[#21FA90] font-black">98.2%</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Filter Category:</span>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="bg-[#0f1629]/60 border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#01FDF6] cursor-pointer"
+          >
+            <option value="All">All Categories</option>
+            <option value="Support Ticket">Support Escalations</option>
+            <option value="Feature Request">Feature Proposals</option>
+          </select>
+          <div className="text-xs text-gray-500 font-mono ml-2 hidden md:block">
+            SLA win rate: <span className="text-[#21FA90] font-black">98.2%</span>
+          </div>
         </div>
       </div>
 
@@ -444,6 +483,26 @@ export default function Support({ searchValue = '' }) {
                 <span className="font-mono text-gray-400">{selectedTicket.created || '2026-05-15'}</span>
               </div>
             </div>
+
+            {/* Designated Account Lead info box */}
+            {(() => {
+              const lead = getAccountLead(selectedTicket.client);
+              return (
+                <div className="flex flex-col gap-2.5 p-4 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl">
+                  <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Designated Account Lead</div>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-[#01FDF6]/15 border border-[#01FDF6]/35 text-[#01FDF6] flex items-center justify-center font-bold text-xs">
+                      {lead.avatar}
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white leading-tight">{lead.name}</div>
+                      <div className="text-[9px] text-gray-500">{lead.role}</div>
+                    </div>
+                    <span className="ml-auto text-[8px] px-1.5 py-0.5 rounded bg-gray-900 border border-gray-850 text-[#01FDF6] font-mono font-bold uppercase tracking-wider">Assigned SLA</span>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Ticket Message Section */}
             <div className="flex flex-col gap-1.5">

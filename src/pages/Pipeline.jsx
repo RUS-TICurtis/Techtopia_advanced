@@ -24,6 +24,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { mockDb } from '../utils/mockDb';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
+import PageContainer from '../components/layout/PageContainer';
+import PageHeader from '../components/layout/PageHeader';
 import './Pipeline.css';
 
 export default function Pipeline({ searchValue: externalSearchValue = '' }) {
@@ -272,24 +274,25 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
     },
   ];
 
+  const headerActions = (
+    <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => {
+      // Reset form to default for ADD
+      setTitle(''); setCompany(''); setValue(''); setStage('Lead');
+      setPriority('Medium'); setDate(''); setSelectedContactId(''); setNotes('');
+      setIsAddModalOpen(true);
+    }}>
+      <Plus size={18} /> New Deal
+    </button>
+  );
+
   return (
-    <div className="page-container pipeline-page">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#01FDF6]">⚡</span> Pipeline Manager
-          </h1>
-          <p className="page-subtitle">Interactive visual sales funnel with drag-and-drop orchestration</p>
-        </div>
-        <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => {
-          // Reset form to default for ADD
-          setTitle(''); setCompany(''); setValue(''); setStage('Lead');
-          setPriority('Medium'); setDate(''); setSelectedContactId(''); setNotes('');
-          setIsAddModalOpen(true);
-        }}>
-          <Plus size={18} /> New Deal
-        </button>
-      </div>
+    <PageContainer className="pipeline-page">
+      <PageHeader 
+        title="Pipeline Manager"
+        subtitle="Interactive visual sales funnel with drag-and-drop orchestration"
+        icon={<span className="text-[#01FDF6]">⚡</span>}
+        actions={headerActions}
+      />
 
       {/* Metrics Grid */}
       <div className="metrics-grid mb-6">
@@ -785,6 +788,6 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
           </div>
         </form>
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

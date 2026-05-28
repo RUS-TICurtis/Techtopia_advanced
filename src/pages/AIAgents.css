@@ -1,0 +1,107 @@
+/* ==========================================================================
+   AI Agent Operations Center Stylesheet
+   ========================================================================== */
+
+/* Agent Cards Grid */
+.agents-grid {
+  max-height: calc(100vh - 280px);
+}
+
+.agent-card.premium-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%), var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="light"] .agent-card.premium-card {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.agent-card.premium-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--agent-color);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(var(--primary-rgb), 0.02);
+}
+
+/* Hibernating State */
+.agent-card.hibernating {
+  opacity: 0.55;
+  filter: grayscale(0.5);
+  border-left-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.agent-card.hibernating:hover {
+  opacity: 0.8;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.agent-icon-box {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agent-card:hover .agent-icon-box {
+  transform: scale(1.05);
+}
+
+.agent-toggle-switch svg {
+  width: 28px;
+  height: 28px;
+  transition: transform 0.2s ease;
+}
+
+.agent-toggle-switch:hover svg {
+  transform: scale(1.08);
+}
+
+/* Throttle Range Sliders */
+.agent-slider-control input[type="range"] {
+  outline: none;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .agent-slider-control input[type="range"] {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.agent-slider-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #01FDF6;
+  box-shadow: 0 0 8px #01FDF6;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+[data-theme="light"] .agent-slider-control input[type="range"]::-webkit-slider-thumb {
+  background: var(--primary);
+  box-shadow: 0 0 8px var(--primary);
+}
+
+.agent-slider-control input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* SVG Chart Glow */
+.stroke-glow {
+  filter: drop-shadow(0 0 6px #01FDF6);
+}
+
+/* Core Logs panel */
+.log-line {
+  font-family: var(--font-mono);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.log-line p {
+  word-break: break-word;
+}

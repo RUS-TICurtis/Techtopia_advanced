@@ -105,14 +105,51 @@
   position: relative;
   width: 130px;
   height: 130px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.settings-avatar-wrapper img {
+.settings-avatar-wrapper.drag-active {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(1, 253, 246, 0.4);
+}
+
+.settings-avatar-wrapper.drag-active img,
+.settings-avatar-wrapper.drag-active .avatar-initials-fallback {
+  border-color: var(--brand-cyan) !important;
+  opacity: 0.8;
+}
+
+.uploaded-avatar {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--border-light);
+  transition: border-color var(--transition-fast);
+}
+
+.avatar-initials-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, rgba(1, 253, 246, 0.1), rgba(138, 79, 255, 0.2));
+  color: var(--brand-cyan);
+  border: 4px solid var(--border-light);
+  transition: border-color var(--transition-fast);
+}
+
+[data-theme="dark"] .uploaded-avatar {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .avatar-initials-fallback {
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .settings-avatar-upload {

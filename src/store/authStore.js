@@ -266,6 +266,10 @@ export const useAuthStore = create(
         user: state.user ? { ...state.user, role } : null
       })),
 
+      updateUserAvatar: (avatarUrl) => set(state => ({
+        user: state.user ? { ...state.user, avatarUrl } : null
+      })),
+
       // ─── Computed helpers ──────────────────────────────
       getUser: () => get().user,
       getRole: () => get().user?.role || ROLES.GUEST,

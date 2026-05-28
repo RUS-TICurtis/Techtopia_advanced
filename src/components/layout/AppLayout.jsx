@@ -3,6 +3,7 @@ import Sidebar from '../Sidebar';
 import Navbar from '../Navbar';
 import BottomNav from '../BottomNav';
 import CommandPalette from '../ui/CommandPalette';
+import AICopilot from '../ui/AICopilot';
 import NotificationCenter from './NotificationCenter';
 import { Toaster } from 'react-hot-toast';
 
@@ -22,6 +23,7 @@ export default function AppLayout({
 
       {/* Global Interactive Utilities */}
       <CommandPalette />
+      <AICopilot />
       <NotificationCenter />
 
       {mobileSidebarOpen && (

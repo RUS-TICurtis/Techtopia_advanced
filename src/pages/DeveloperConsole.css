@@ -1,0 +1,31 @@
+/* ==========================================================================
+   Developer API & Marketplace Console Stylesheet
+   ========================================================================== */
+
+/* Token list panel */
+.tokens-list-panel {
+  max-height: 300px;
+}
+
+/* Integrations grid height */
+.integrations-grid {
+  max-height: calc(100vh - 280px);
+}
+
+.integration-card.premium-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.integration-card.premium-card:hover {
+  transform: translateY(-2px);
+  border-color: #01FDF6;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.integration-card.premium-card svg {
+  transition: transform 0.2s ease;
+}
+
+.integration-card.premium-card:hover svg {
+  transform: scale(1.05);
+}

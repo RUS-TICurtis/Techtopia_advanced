@@ -24,6 +24,7 @@ export const useUIStore = create(
 
       // ─── Command Palette ─────────────────────────────────────
       commandPaletteOpen: false,
+      setCommandPaletteOpen: (v) => set({ commandPaletteOpen: v }),
       openCommandPalette: () => set({ commandPaletteOpen: true }),
       closeCommandPalette: () => set({ commandPaletteOpen: false }),
       toggleCommandPalette: () => set(s => ({ commandPaletteOpen: !s.commandPaletteOpen })),
@@ -43,6 +44,8 @@ export const useUIStore = create(
       clearSearch: () => set({ searchQuery: '', searchResults: [], isSearching: false }),
 
       // ─── Notifications Panel ─────────────────────────────────
+      notificationCenterOpen: false,
+      setNotificationCenterOpen: (v) => set({ notificationCenterOpen: v }),
       notificationPanelOpen: false,
       toggleNotificationPanel: () => set(s => ({ notificationPanelOpen: !s.notificationPanelOpen })),
       closeNotificationPanel: () => set({ notificationPanelOpen: false }),

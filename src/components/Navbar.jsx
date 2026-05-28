@@ -134,9 +134,17 @@ export default function Navbar({
         <Dropdown 
           trigger={
             <div className="nav-profile cursor-pointer" title="User Profile">
-              <span className="profile-initials font-bold text-xs bg-[#00e5ff]/20 text-[#00e5ff] w-8 h-8 rounded-full flex items-center justify-center border border-[#00e5ff]/35">
-                {user?.avatar || 'U'}
-              </span>
+              {user?.avatarUrl ? (
+                <img 
+                  src={user.avatarUrl} 
+                  alt="Avatar" 
+                  className="w-8 h-8 rounded-full object-cover border border-[#00e5ff]/35" 
+                />
+              ) : (
+                <span className="profile-initials font-bold text-xs bg-[#00e5ff]/20 text-[#00e5ff] w-8 h-8 rounded-full flex items-center justify-center border border-[#00e5ff]/35">
+                  {user?.avatar || 'U'}
+                </span>
+              )}
             </div>
           }
           items={profileDropdownItems}

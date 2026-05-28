@@ -1,0 +1,60 @@
+/* ==========================================================================
+   Executive Revenue & OCR Intelligence Stylesheet
+   ========================================================================== */
+
+/* Forecast Svg */
+.svg-forecast-wrapper {
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+.stroke-glow {
+  filter: drop-shadow(0 0 8px #01FDF6);
+}
+
+/* Health index table */
+.health-table {
+  width: 100%;
+}
+
+.health-table th {
+  padding: 12px 14px;
+}
+
+.health-table td {
+  padding: 10px 14px;
+  vertical-align: middle;
+}
+
+/* OCR scanner dropzone */
+.ocr-drop-zone {
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Glowing scanning laser bar */
+.scanner-laser-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #01FDF6;
+  box-shadow: 0 0 10px #01FDF6, 0 0 20px #01FDF6;
+  animation: scanLaser 2s linear infinite;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes scanLaser {
+  0% { top: 0%; opacity: 0.1; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { top: 100%; opacity: 0.1; }
+}
+
+/* Scanned Metadata Panel */
+.scanned-metadata-panel {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  animation: copilotSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}

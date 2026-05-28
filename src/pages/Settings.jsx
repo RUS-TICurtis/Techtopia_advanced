@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { 
   User, 
   Settings as SettingsIcon,
@@ -11,20 +11,84 @@ import {
   Palette
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
+import { useAuthStore } from '../store/authStore';
 import './Settings.css';
 
 export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [activeTab, setActiveTab] = useState('profile');
   
   // Profile form states
+  const { user: authUser, updateUserAvatar } = useAuthStore();
   const user = mockDb.getProfile() || {};
-  const [name, setName] = useState(user.name || '');
-  const [username, setUsername] = useState(user.username || '');
-  const [email, setEmail] = useState(user.email || '');
+  const [name, setName] = useState(user.name || authUser?.name || '');
+  const [username, setUsername] = useState(user.username || authUser?.email?.split('@')[0] || '');
+  const [email, setEmail] = useState(user.email || authUser?.email || '');
   const [phone, setPhone] = useState(user.phone || '');
-  const [role, setRole] = useState(user.role || '');
+  const [role, setRole] = useState(user.role || authUser?.roleLabel || '');
   const [location, setLocation] = useState(user.location || '');
-  const profilePic = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200';
+
+  // Avatar states
+  const [avatarUrl, setAvatarUrl] = useState(authUser?.avatarUrl || user.avatarUrl || '');
+  const [dragActive, setDragActive] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const processFile = (file) => {
+    if (!file) return;
+    
+    // Size check: max 2MB
+    const maxBytes = 2 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setErrorMsg('File too large. Maximum size is 2MB.');
+      setTimeout(() => setErrorMsg(''), 4000);
+      return;
+    }
+
+    // Mime type check: image only
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Invalid file type. Please upload an image.');
+      setTimeout(() => setErrorMsg(''), 4000);
+      return;
+    }
+
+    setErrorMsg('');
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64String = event.target.result;
+      setAvatarUrl(base64String);
+      // Sync with Zustand and MockDb
+      updateUserAvatar(base64String);
+      mockDb.updateUserProfile({ avatarUrl: base64String });
+      if (onProfileUpdate) onProfileUpdate({ avatarUrl: base64String });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      processFile(e.target.files[0]);
+    }
+  };
 
   // Company Settings
   const [companyName, setCompanyName] = useState('Techtopia Inc.');
@@ -103,13 +167,36 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                 <div className="settings-profile-layout">
                   {/* Avatar Panel */}
                   <div className="settings-avatar-panel">
-                    <div className="settings-avatar-wrapper">
-                      <img src={profilePic} alt="Avatar" />
+                    <div 
+                      className={`settings-avatar-wrapper ${dragActive ? 'drag-active' : ''}`}
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      title="Drag and drop or click to upload avatar"
+                    >
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        style={{ display: 'none' }} 
+                        accept="image/*" 
+                        onChange={handleFileChange} 
+                      />
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="Avatar" className="uploaded-avatar" />
+                      ) : (
+                        <div className="avatar-initials-fallback">
+                          {authUser?.avatar || user.avatar || 'CT'}
+                        </div>
+                      )}
                       <div className="settings-avatar-upload" title="Upload Avatar">
                         <Camera size={16} />
                       </div>
                     </div>
-                    <span className="settings-avatar-hint">Recommended: 200x200px PNG/JPG</span>
+                    <span className="settings-avatar-hint">Drag & drop image or click to browse</span>
+                    <span className="settings-avatar-hint text-[10px] text-gray-500" style={{ marginTop: '-4px', opacity: 0.7 }}>Max size 2MB (PNG/JPG)</span>
+                    {errorMsg && <div className="settings-error-msg text-red-500 text-xs mt-1 text-center font-semibold">{errorMsg}</div>}
                   </div>
 
                   {/* Form */}

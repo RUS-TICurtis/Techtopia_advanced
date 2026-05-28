@@ -6,6 +6,20 @@
 /* Page Level Layout */
 .pipeline-page {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  height: calc(100vh - var(--navbar-height));
+  max-height: calc(100vh - var(--navbar-height));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .pipeline-page {
+    /* Adjust for 64px BottomNav on mobile/tablet screens */
+    height: calc(100vh - var(--navbar-height) - 64px);
+    max-height: calc(100vh - var(--navbar-height) - 64px);
+  }
 }
 
 /* Premium Metrics Grid */
@@ -40,9 +54,12 @@
 .kanban-board-wrapper {
   width: 100%;
   overflow-x: auto;
-  padding-bottom: 20px;
+  overflow-y: hidden;
+  padding-bottom: 12px;
   scroll-snap-type: x mandatory;
   display: flex;
+  flex-grow: 1;
+  min-height: 0;
   cursor: grab;
 }
 
@@ -55,6 +72,8 @@
   gap: 20px;
   min-width: 100%;
   align-items: stretch;
+  flex-grow: 1;
+  min-height: 0;
 }
 
 /* Kanban Columns */
@@ -67,6 +86,8 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   scroll-snap-align: start;
 }
@@ -133,8 +154,7 @@
   gap: 12px;
   flex-grow: 1;
   overflow-y: auto;
-  max-height: calc(100vh - 350px);
-  min-height: 400px;
+  min-height: 0;
   padding: 6px 2px;
 }
 

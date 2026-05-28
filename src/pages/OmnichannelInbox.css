@@ -1,0 +1,51 @@
+/* ==========================================================================
+   Omnichannel Shared Inbox Stylesheet
+   ========================================================================== */
+
+/* Channels Side groups */
+.channels-group button {
+  font-family: var(--font-display);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Threads List Panel */
+.threads-list {
+  max-height: calc(100vh - 280px);
+}
+
+.thread-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.thread-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.thread-card.active-thread {
+  background-color: rgba(166, 226, 46, 0.04);
+  box-shadow: 0 0 15px rgba(166, 226, 46, 0.05);
+}
+
+.thread-avatar {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Chat timeline */
+.chat-history-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 350px);
+}
+
+/* Co-Drafter right side */
+.co-drafter-panel {
+  box-shadow: inset 0 0 20px rgba(1, 253, 246, 0.02);
+}
+
+.draft-preview {
+  font-family: var(--font-mono);
+  max-height: 250px;
+}

@@ -33,6 +33,13 @@ const Reports = lazy(() => import('../pages/Reports'));
 const Activities = lazy(() => import('../pages/Activities'));
 const Unauthorized = lazy(() => import('../pages/Unauthorized'));
 
+// Techtopia Evolved Enterprise Pages
+const AIAgents = lazy(() => import('../pages/AIAgents'));
+const SuperAdminOversight = lazy(() => import('../pages/SuperAdminOversight'));
+const OmnichannelInbox = lazy(() => import('../pages/OmnichannelInbox'));
+const ExecutiveIntelligence = lazy(() => import('../pages/ExecutiveIntelligence'));
+const DeveloperConsole = lazy(() => import('../pages/DeveloperConsole'));
+
 // Client Portal Pages
 const ClientDashboard = lazy(() => import('../pages/ClientPortal/ClientDashboard'));
 const ClientInvoices = lazy(() => import('../pages/ClientPortal/ClientInvoices'));
@@ -107,7 +114,8 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/activities" element={<Activities />} />
-          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages" element={<OmnichannelInbox />} />
+          <Route path="/inbox" element={<OmnichannelInbox />} />
 
           {/* Granular Permission-Guarded Staff Routes */}
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_LEADS} />}>
@@ -148,6 +156,7 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_ANALYTICS} />}>
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/intelligence" element={<ExecutiveIntelligence />} />
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.EXPORT_ANALYTICS} />}>
@@ -156,6 +165,7 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.AI_CHAT} />}>
             <Route path="/ai" element={<AiAssistant />} />
+            <Route path="/ai/agents" element={<AIAgents />} />
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_AUTOMATIONS} />}>
@@ -172,6 +182,11 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_SETTINGS} />}>
             <Route path="/settings" element={<LegacySettings theme={theme} toggleTheme={toggleTheme} onProfileUpdate={onProfileUpdate} />} />
+          </Route>
+
+          <Route element={<ProtectedRoute permission={PERMISSIONS.SECURITY_SETTINGS} />}>
+            <Route path="/admin/oversight" element={<SuperAdminOversight />} />
+            <Route path="/developer" element={<DeveloperConsole />} />
           </Route>
         </Route>
 

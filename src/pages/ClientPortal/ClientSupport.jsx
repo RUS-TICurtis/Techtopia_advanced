@@ -35,6 +35,9 @@ export default function ClientSupport() {
   const [subject, setSubject] = useState('');
   const [priority, setPriority] = useState('Medium');
   const [message, setMessage] = useState('');
+  const [category, setCategory] = useState('Support Ticket'); // 'Support Ticket' | 'Feature Request'
+  const [featureTemplate, setFeatureTemplate] = useState('stripe_billing');
+  const [customFeatureTitle, setCustomFeatureTitle] = useState('');
 
   const refreshTickets = () => {
     setTickets(mockDb.getTickets() || []);
@@ -42,17 +45,36 @@ export default function ClientSupport() {
 
   const handleAddSubmit = (e) => {
     e.preventDefault();
-    if (!subject) return;
+    
+    let finalSubject = subject;
+    if (category === 'Feature Request') {
+      if (featureTemplate === 'custom') {
+        if (!customFeatureTitle) return;
+        finalSubject = customFeatureTitle;
+      } else {
+        const templates = {
+          'stripe_billing': 'Stripe Billing Integration',
+          'automations_canvas': 'Visual Automations Canvas',
+          'omnichannel_chat': 'Omnichannel Chat Widgets',
+          'ocr_scanner': 'AI Contract OCR Scanner'
+        };
+        finalSubject = templates[featureTemplate] || 'Feature Request';
+      }
+    } else {
+      if (!subject) return;
+    }
 
     const allTickets = mockDb.getTickets() || [];
     const id = `TK-${String(allTickets.length + 1).padStart(4, '0')}`;
     const newTicket = {
       id,
-      subject,
+      subject: finalSubject,
       client: displayCompany,
-      priority,
+      priority: category === 'Feature Request' ? 'Low' : priority, // Feature requests default to Low/Medium priority
       status: 'Open',
       message,
+      category,
+      featureTemplate: category === 'Feature Request' ? featureTemplate : null,
       lastUpdated: 'Just now',
       created: new Date().toISOString().split('T')[0]
     };
@@ -63,11 +85,19 @@ export default function ClientSupport() {
 
     // Reset Form
     setSubject('');
+    setCustomFeatureTitle('');
+    setCategory('Support Ticket');
+    setFeatureTemplate('stripe_billing');
     setPriority('Medium');
     setMessage('');
     setIsAddModalOpen(false);
 
-    showToast('Ticket Opened', `Your issue ticket ${id} has been logged on the priority SLA pipeline.`, 'success');
+    const toastTitle = category === 'Feature Request' ? 'Feature Logged' : 'Ticket Opened';
+    const toastBody = category === 'Feature Request' 
+      ? `Your feature proposal ${id} has been registered and assigned to your Account Lead.`
+      : `Your issue ticket ${id} has been logged on the priority SLA pipeline.`;
+
+    showToast(toastTitle, toastBody, 'success');
   };
 
   const getSLAIndicator = (ticket) => {
@@ -112,8 +142,15 @@ export default function ClientSupport() {
       cell: ({ row }) => {
         const t = row.original;
         return (
-          <div className="flex flex-col max-w-xs">
-            <span className="font-bold text-xs truncate" style={{ color: 'var(--text-title)' }}>{t.subject}</span>
+          <div className="flex flex-col max-w-xs gap-0.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-bold text-xs truncate animate-pulse" style={{ color: 'var(--text-title)' }}>{t.subject}</span>
+              {t.category === 'Feature Request' ? (
+                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-emerald-950/60 text-emerald-400 border border-emerald-500/35 uppercase tracking-wider font-mono">Feature Request</span>
+              ) : (
+                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-sky-950/60 text-sky-400 border border-sky-500/35 uppercase tracking-wider font-mono">Support</span>
+              )}
+            </div>
             <span className="text-[9px] truncate" style={{ color: 'var(--text-muted)' }}>{t.message || 'No description provided'}</span>
           </div>
         );
@@ -281,42 +318,94 @@ export default function ClientSupport() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Open Support Ticket"
+        title={category === 'Feature Request' ? "Propose Feature Request" : "Open SLA Support Ticket"}
         size="md"
       >
         <form onSubmit={handleAddSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Issue Subject *</label>
-            <input 
-              type="text" 
-              className="form-input" 
-              placeholder="e.g. Inbound cloud replication sync delay" 
-              value={subject} 
-              onChange={e => setSubject(e.target.value)} 
-              required 
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>SLA Priority Severity</label>
+            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Ticket Category</label>
             <select 
               className="form-input" 
-              value={priority} 
-              onChange={e => setPriority(e.target.value)}
+              value={category} 
+              onChange={e => setCategory(e.target.value)}
             >
-              <option value="Low">Low Priority (48h SLA)</option>
-              <option value="Medium">Medium Priority (12h SLA)</option>
-              <option value="High">High Priority (2h SLA)</option>
+              <option value="Support Ticket">Support Ticket (SLA Escalation)</option>
+              <option value="Feature Request">Feature Request (Product Enhancement)</option>
             </select>
           </div>
 
+          {category === 'Support Ticket' ? (
+            <>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Issue Subject *</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. Inbound cloud replication sync delay" 
+                  value={subject} 
+                  onChange={e => setSubject(e.target.value)} 
+                  required 
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>SLA Priority Severity</label>
+                <select 
+                  className="form-input" 
+                  value={priority} 
+                  onChange={e => setPriority(e.target.value)}
+                >
+                  <option value="Low">Low Priority (48h SLA)</option>
+                  <option value="Medium">Medium Priority (12h SLA)</option>
+                  <option value="High">High Priority (2h SLA)</option>
+                </select>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Feature Template</label>
+                <select 
+                  className="form-input" 
+                  value={featureTemplate} 
+                  onChange={e => setFeatureTemplate(e.target.value)}
+                >
+                  <option value="stripe_billing">Stripe Billing Integration</option>
+                  <option value="automations_canvas">Visual Automations Canvas</option>
+                  <option value="omnichannel_chat">Omnichannel Chat Widgets</option>
+                  <option value="ocr_scanner">AI Contract OCR Scanner</option>
+                  <option value="custom">Custom user-generated request...</option>
+                </select>
+              </div>
+
+              {featureTemplate === 'custom' && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Custom Request Title *</label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    placeholder="e.g. Custom Slack notifications channel webhook" 
+                    value={customFeatureTitle} 
+                    onChange={e => setCustomFeatureTitle(e.target.value)} 
+                    required 
+                  />
+                </div>
+              )}
+            </>
+          )}
+
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Descriptive message</label>
+            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+              {category === 'Feature Request' ? 'Proposal Details / Business Rationale *' : 'Descriptive Message / Logs *'}
+            </label>
             <textarea 
               className="form-textarea" 
-              placeholder="State logs, indicators and details of client issues..." 
+              placeholder={category === 'Feature Request' 
+                ? "Describe the feature, why it is valuable to your team, and any technical constraints..." 
+                : "State logs, indicators and details of client issues..."}
               value={message} 
               onChange={e => setMessage(e.target.value)}
+              required
             />
           </div>
 
@@ -330,10 +419,13 @@ export default function ClientSupport() {
             </button>
             <button 
               type="submit" 
-              className="btn btn-primary px-5 py-2.5 rounded-lg text-sm"
-              style={{ background: 'var(--brand-magenta)', color: '#fff' }}
+              className="btn btn-primary px-5 py-2.5 rounded-lg text-sm font-bold"
+              style={{ 
+                background: category === 'Feature Request' ? 'var(--brand-chartreuse)' : 'var(--brand-magenta)', 
+                color: category === 'Feature Request' ? '#000' : '#fff' 
+              }}
             >
-              Submit Ticket
+              {category === 'Feature Request' ? 'Submit Proposal' : 'Log SLA Ticket'}
             </button>
           </div>
         </form>

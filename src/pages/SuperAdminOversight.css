@@ -1,0 +1,112 @@
+/* ==========================================================================
+   Super Admin Oversight Platform Stylesheet
+   ========================================================================== */
+
+/* Oversight Table */
+.oversight-table {
+  width: 100%;
+}
+
+.oversight-table th {
+  padding: 14px 16px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.oversight-table td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.shadow-green {
+  box-shadow: 0 0 10px #50fa7b;
+}
+
+.shadow-red {
+  box-shadow: 0 0 10px #ff5555;
+}
+
+/* Impersonation Banner */
+.impersonation-alert-banner {
+  background: linear-gradient(135deg, rgba(255, 0, 85, 0.25) 0%, rgba(12, 18, 36, 0.95) 100%);
+  border: 1px solid rgba(255, 0, 85, 0.4);
+  box-shadow: 0 4px 20px rgba(255, 0, 85, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.pulsing-red-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff0055;
+  box-shadow: 0 0 8px #ff0055;
+  animation: pulseDotRed 1.8s infinite ease-in-out;
+}
+
+.stop-impersonate-btn {
+  background-color: #ff0055;
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+}
+
+.stop-impersonate-btn:hover {
+  background-color: #e0004b;
+  transform: translateY(-1px);
+}
+
+@keyframes pulseDotRed {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+/* Diagnostic Monitor Card */
+.impersonation-workspace-monitor {
+  box-shadow: inset 0 0 30px rgba(255, 0, 85, 0.05);
+}
+
+.animate-pulse-border {
+  animation: pulseRedBorder 3s infinite ease-in-out;
+}
+
+@keyframes pulseRedBorder {
+  0%, 100% { border-color: rgba(255, 0, 85, 0.2); }
+  50% { border-color: rgba(255, 0, 85, 0.5); }
+}
+
+/* MFA Oversight Modal Overlay */
+.mfa-oversight-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.mfa-oversight-modal {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 30px rgba(255, 0, 85, 0.1);
+  animation: copilotSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shadow-red {
+  box-shadow: 0 4px 15px rgba(255, 0, 85, 0.35);
+}
