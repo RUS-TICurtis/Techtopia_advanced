@@ -1,10 +1,11 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { hasPermission } from '../services/auth/authService';
-import { ROLES, PERMISSIONS } from '../constants/permissions';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { PERMISSIONS } from '../constants/permissions';
+import ProtectedRoute from '../components/guards/ProtectedRoute';
+import ClientPortalRoute from '../components/guards/ClientPortalRoute';
+import PublicRoute from '../components/guards/PublicRoute';
 
-// ─── Lazy Load Pages ────────────────────────────────────────────────────────
+// ─── Core Pages ───────────────────────────────────────────────────────────
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Leads = lazy(() => import('../pages/Leads'));
 const Contacts = lazy(() => import('../pages/Contacts'));
@@ -14,16 +15,12 @@ const Clients = lazy(() => import('../pages/Clients'));
 const Tasks = lazy(() => import('../pages/Tasks'));
 const Calendar = lazy(() => import('../pages/Calendar'));
 const Support = lazy(() => import('../pages/Support'));
-const Messages = lazy(() => import('../pages/Messages'));
 const Billing = lazy(() => import('../pages/Billing'));
-const Invoices = lazy(() => import('../pages/Invoices'));
 const Contracts = lazy(() => import('../pages/Contracts'));
 const Analytics = lazy(() => import('../pages/Analytics'));
 const Team = lazy(() => import('../pages/Team'));
 const Settings = lazy(() => import('../pages/Settings'));
 const AiAssistant = lazy(() => import('../pages/AiAssistant'));
-
-// New Modules
 const Projects = lazy(() => import('../pages/Projects/Projects'));
 const ProjectBoard = lazy(() => import('../pages/Projects/ProjectBoard'));
 const ProjectTimeline = lazy(() => import('../pages/Projects/ProjectTimeline'));
@@ -32,27 +29,40 @@ const Automations = lazy(() => import('../pages/Automations'));
 const Reports = lazy(() => import('../pages/Reports'));
 const Activities = lazy(() => import('../pages/Activities'));
 const Unauthorized = lazy(() => import('../pages/Unauthorized'));
-
-// Techtopia Evolved Enterprise Pages
 const AIAgents = lazy(() => import('../pages/AIAgents'));
 const SuperAdminOversight = lazy(() => import('../pages/SuperAdminOversight'));
 const OmnichannelInbox = lazy(() => import('../pages/OmnichannelInbox'));
 const ExecutiveIntelligence = lazy(() => import('../pages/ExecutiveIntelligence'));
 const DeveloperConsole = lazy(() => import('../pages/DeveloperConsole'));
 
-// Client Portal Pages
+// ─── Finance Module Pages ─────────────────────────────────────────────────
+const FinanceOverview = lazy(() => import('../pages/Finance/FinanceOverview'));
+const FinanceInvoices = lazy(() => import('../pages/Finance/FinanceInvoices'));
+const FinancePayments = lazy(() => import('../pages/Finance/FinancePayments'));
+const FinanceSubscriptions = lazy(() => import('../pages/Finance/FinanceSubscriptions'));
+const FinanceExpenses = lazy(() => import('../pages/Finance/FinanceExpenses'));
+const FinanceVendors = lazy(() => import('../pages/Finance/FinanceVendors'));
+const FinanceProcurement = lazy(() => import('../pages/Finance/FinanceProcurement'));
+const FinanceBudgets = lazy(() => import('../pages/Finance/FinanceBudgets'));
+const FinanceRevenueAnalytics = lazy(() => import('../pages/Finance/FinanceRevenueAnalytics'));
+const FinancialReports = lazy(() => import('../pages/Finance/FinancialReports'));
+const FinanceSettlements = lazy(() => import('../pages/Finance/FinanceSettlements'));
+const FinanceTaxRecords = lazy(() => import('../pages/Finance/FinanceTaxRecords'));
+const AIFinanceAgent = lazy(() => import('../pages/Finance/AIFinanceAgent'));
+
+// ─── Client Portal Pages ──────────────────────────────────────────────────
 const ClientDashboard = lazy(() => import('../pages/ClientPortal/ClientDashboard'));
 const ClientInvoices = lazy(() => import('../pages/ClientPortal/ClientInvoices'));
 const ClientProjects = lazy(() => import('../pages/ClientPortal/ClientProjects'));
 const ClientContracts = lazy(() => import('../pages/ClientPortal/ClientContracts'));
 const ClientSupport = lazy(() => import('../pages/ClientPortal/ClientSupport'));
 
-// Auth Pages
+// ─── Auth Pages ───────────────────────────────────────────────────────────
 const AuthLogin = lazy(() => import('../pages/Auth/Login'));
 const MFA = lazy(() => import('../pages/Auth/MFA'));
 const DeviceTrust = lazy(() => import('../pages/Auth/DeviceTrust'));
 
-// ─── Loading / Suspense Fallback ──────────────────────────────────────────
+// ─── Loading Fallback ─────────────────────────────────────────────────────
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[50vh] w-full">
     <div className="flex flex-col items-center gap-4">
@@ -62,34 +72,18 @@ const PageLoader = () => (
   </div>
 );
 
-import ProtectedRoute from '../components/guards/ProtectedRoute';
-import ClientPortalRoute from '../components/guards/ClientPortalRoute';
-import PublicRoute from '../components/guards/PublicRoute';
-
-export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate, searchValue, setSearchValue }) {
-  // Navigation wrapper for legacy pages that use setCurrentTab prop
+export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchValue }) {
   const currentTabAdapter = (Component) => (props) => {
     const handleSetTab = (tab) => {
       const urlMap = {
-        'dashboard': '/',
-        'leads': '/leads',
-        'clients': '/clients',
-        'pipeline': '/pipeline',
-        'billing': '/billing',
-        'contracts': '/contracts',
-        'support': '/support',
-        'ai-assistant': '/ai',
-        'analytics': '/analytics',
-        'team': '/team',
-        'settings': '/settings',
-        'contacts': '/contacts',
-        'companies': '/companies',
-        'invoices': '/invoices',
-        'tasks': '/tasks',
-        'calendar': '/calendar',
-        'messages': '/messages',
+        'dashboard': '/', 'leads': '/leads', 'clients': '/clients',
+        'pipeline': '/pipeline', 'billing': '/billing', 'contracts': '/contracts',
+        'support': '/support', 'ai-assistant': '/ai', 'analytics': '/analytics',
+        'team': '/team', 'settings': '/settings', 'contacts': '/contacts',
+        'companies': '/companies', 'invoices': '/finance/invoices',
+        'tasks': '/tasks', 'calendar': '/calendar', 'messages': '/messages',
       };
-      window.location.hash = urlMap[tab] || '/';
+      window.location.href = urlMap[tab] || '/';
     };
     return <Component setCurrentTab={handleSetTab} {...props} />;
   };
@@ -100,16 +94,15 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* Public Routes */}
+        {/* ── Public Routes ─────────────────────────────────────────── */}
         <Route element={<PublicRoute />}>
           <Route path="/auth/login" element={<AuthLogin />} />
           <Route path="/auth/mfa" element={<MFA />} />
           <Route path="/auth/device-trust" element={<DeviceTrust />} />
         </Route>
 
-        {/* Protected App Routes (Internal Staff / Admins) */}
+        {/* ── Protected App Routes ──────────────────────────────────── */}
         <Route element={<ProtectedRoute />}>
-          {/* Base protected routes for internal staff */}
           <Route path="/" element={<LegacyDashboard />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/calendar" element={<Calendar />} />
@@ -117,7 +110,9 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
           <Route path="/messages" element={<OmnichannelInbox />} />
           <Route path="/inbox" element={<OmnichannelInbox />} />
 
-          {/* Granular Permission-Guarded Staff Routes */}
+          {/* Legacy redirects */}
+          <Route path="/invoices" element={<Navigate to="/finance/invoices" replace />} />
+
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_LEADS} />}>
             <Route path="/leads" element={<Leads searchValue={searchValue} />} />
           </Route>
@@ -147,7 +142,6 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_BILLING} />}>
             <Route path="/billing" element={<Billing searchValue={searchValue} />} />
-            <Route path="/invoices" element={<Invoices searchValue={searchValue} />} />
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_CONTRACTS} />}>
@@ -188,9 +182,26 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
             <Route path="/admin/oversight" element={<SuperAdminOversight />} />
             <Route path="/developer" element={<DeveloperConsole />} />
           </Route>
+
+          {/* ── Finance Module Routes ────────────────────────────────── */}
+          <Route element={<ProtectedRoute permission={PERMISSIONS.FINANCE_VIEW} />}>
+            <Route path="/finance" element={<FinanceOverview />} />
+            <Route path="/finance/invoices" element={<FinanceInvoices />} />
+            <Route path="/finance/payments" element={<FinancePayments />} />
+            <Route path="/finance/subscriptions" element={<FinanceSubscriptions />} />
+            <Route path="/finance/expenses" element={<FinanceExpenses />} />
+            <Route path="/finance/vendors" element={<FinanceVendors />} />
+            <Route path="/finance/procurement" element={<FinanceProcurement />} />
+            <Route path="/finance/budgets" element={<FinanceBudgets />} />
+            <Route path="/finance/revenue" element={<FinanceRevenueAnalytics />} />
+            <Route path="/finance/reports" element={<FinancialReports />} />
+            <Route path="/finance/settlements" element={<FinanceSettlements />} />
+            <Route path="/finance/tax" element={<FinanceTaxRecords />} />
+            <Route path="/finance/ai-agent" element={<AIFinanceAgent />} />
+          </Route>
         </Route>
 
-        {/* Client Portal subtree */}
+        {/* ── Client Portal ─────────────────────────────────────────── */}
         <Route path="/client" element={<ClientPortalRoute />}>
           <Route index element={<ClientDashboard />} />
           <Route path="invoices" element={<ClientInvoices />} />
@@ -199,7 +210,6 @@ export default function AppRoutes({ toggleTheme, theme, profile, onProfileUpdate
           <Route path="support" element={<ClientSupport />} />
         </Route>
 
-        {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

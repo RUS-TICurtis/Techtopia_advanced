@@ -67,8 +67,21 @@ export const WORKSPACE_ITEMS: WorkspaceItem[] = [
   { id: 'team', label: 'Employee Workspace', url: '/team', group: 'hr' },
 
   // Finance Group
-  { id: 'billing', label: 'Contracts & Billing', url: '/billing', group: 'finance' },
-  { id: 'invoices', label: 'Invoice Registry', url: '/invoices', group: 'finance' },
+  { id: 'finance-overview', label: 'Finance Overview', url: '/finance', group: 'finance' },
+  { id: 'finance-invoices', label: 'Invoices', url: '/finance/invoices', group: 'finance' },
+  { id: 'finance-payments', label: 'Payments', url: '/finance/payments', group: 'finance' },
+  { id: 'finance-subscriptions', label: 'Subscriptions', url: '/finance/subscriptions', group: 'finance' },
+  { id: 'finance-expenses', label: 'Expenses', url: '/finance/expenses', group: 'finance' },
+  { id: 'finance-vendors', label: 'Vendors', url: '/finance/vendors', group: 'finance' },
+  { id: 'finance-procurement', label: 'Procurement', url: '/finance/procurement', group: 'finance' },
+  { id: 'finance-budgets', label: 'Budgets', url: '/finance/budgets', group: 'finance' },
+  { id: 'finance-revenue', label: 'Revenue Analytics', url: '/finance/revenue', group: 'finance' },
+  { id: 'finance-reports', label: 'Financial Reports', url: '/finance/reports', group: 'finance' },
+  { id: 'finance-settlements', label: 'Settlements', url: '/finance/settlements', group: 'finance' },
+  { id: 'finance-tax', label: 'Tax Records', url: '/finance/tax', group: 'finance' },
+  { id: 'finance-ai-agent', label: 'AI Finance Assistant', url: '/finance/ai-agent', group: 'finance' },
+  
+  // Legacy routes kept for contracts
   { id: 'contracts', label: 'Signatures', url: '/contracts', group: 'finance' },
 
   // Communications Group
