@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { mockDb } from '../utils/mockDb';
+import { useDashboardSummary } from '../hooks/useCrmData';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar, Legend
@@ -58,13 +59,14 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }) => {
 export default function Dashboard({ setCurrentTab }) {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
+  const { summary } = useDashboardSummary();
   const [contacts] = useState(() => mockDb.getContacts());
   const [deals] = useState(() => mockDb.getDeals());
 
-  const totalValue = deals.reduce((acc, curr) => acc + curr.value, 0);
-  const activeDealsCount = deals.filter(d => d.stage !== 'Won' && d.stage !== 'Lost').length;
-  const wonDealsCount = deals.filter(d => d.stage === 'Won').length;
-  const totalLeads = contacts.length;
+  const totalValue = summary?.crm?.totalWonValue ?? deals.reduce((acc, curr) => acc + curr.value, 0);
+  const activeDealsCount = summary?.crm?.totalOpportunities ?? deals.filter(d => d.stage !== 'Won' && d.stage !== 'Lost').length;
+  const wonDealsCount = summary?.crm?.wonCount ?? deals.filter(d => d.stage === 'Won').length;
+  const totalLeads = summary?.crm?.totalLeads ?? contacts.length;
 
   const nav = (path) => {
     if (navigate) navigate(path);

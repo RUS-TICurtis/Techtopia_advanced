@@ -76,45 +76,45 @@ export const authApi = {
   revokeSession: (id) => apiClient.delete(`/auth/sessions/${id}`).then(r => r.data),
 };
 
-export const leadsApi = createResourceService('/leads');
-export const contactsApi = createResourceService('/contacts');
-export const companiesApi = createResourceService('/companies');
-export const dealsApi = createResourceService('/deals');
-export const clientsApi = createResourceService('/clients');
-export const projectsApi = createResourceService('/projects');
-export const tasksApi = createResourceService('/tasks');
-export const ticketsApi = createResourceService('/tickets');
-export const invoicesApi = createResourceService('/invoices');
-export const contractsApi = createResourceService('/contracts');
-export const teamApi = createResourceService('/team');
+export const leadsApi = createResourceService('/api/leads');
+export const contactsApi = createResourceService('/api/contacts');
+export const companiesApi = createResourceService('/api/companies');
+export const dealsApi = createResourceService('/api/opportunities');
+export const clientsApi = createResourceService('/api/contacts');
+export const projectsApi = createResourceService('/api/projects');
+export const tasksApi = createResourceService('/api/tasks');
+export const ticketsApi = createResourceService('/api/tickets');
+export const invoicesApi = createResourceService('/finance/invoices');
+export const contractsApi = createResourceService('/finance/contracts');
+export const teamApi = createResourceService('/api/hr/employees');
 export const auditApi = {
-  list: (params) => apiClient.get('/audit/logs', { params }).then(r => r.data),
-  export: (params) => apiClient.get('/audit/export', { params, responseType: 'blob' }).then(r => r.data),
+  list: (params) => apiClient.get('/api/audit/logs', { params }).then(r => r.data),
+  export: (params) => apiClient.get('/api/audit/export', { params, responseType: 'blob' }).then(r => r.data),
 };
 export const analyticsApi = {
-  summary: (params) => apiClient.get('/analytics/summary', { params }).then(r => r.data),
-  revenue: (params) => apiClient.get('/analytics/revenue', { params }).then(r => r.data),
-  sales: (params) => apiClient.get('/analytics/sales', { params }).then(r => r.data),
-  forecast: (params) => apiClient.get('/analytics/forecast', { params }).then(r => r.data),
+  summary: (params) => apiClient.get('/api/analytics/summary', { params }).then(r => r.data),
+  revenue: (params) => apiClient.get('/finance/reports/revenue-summary', { params }).then(r => r.data),
+  sales: (params) => apiClient.get('/finance/reports/sales', { params }).then(r => r.data),
+  forecast: (params) => apiClient.get('/finance/reports/forecast', { params }).then(r => r.data),
 };
 export const aiApi = {
-  chat: (payload) => apiClient.post('/ai/chat', payload).then(r => r.data),
-  generate: (payload) => apiClient.post('/ai/generate', payload).then(r => r.data),
-  summarize: (payload) => apiClient.post('/ai/summarize', payload).then(r => r.data),
+  chat: (payload) => apiClient.post('/api/ai/conversations', payload).then(r => r.data),
+  generate: (payload) => apiClient.post('/api/ai/generate', payload).then(r => r.data),
+  summarize: (payload) => apiClient.post('/api/ai/summarize', payload).then(r => r.data),
 };
 export const notificationsApi = {
-  list: (params) => apiClient.get('/notifications', { params }).then(r => r.data),
-  markRead: (id) => apiClient.patch(`/notifications/${id}/read`).then(r => r.data),
-  markAllRead: () => apiClient.patch('/notifications/read-all').then(r => r.data),
-  preferences: () => apiClient.get('/notifications/preferences').then(r => r.data),
-  updatePreferences: (prefs) => apiClient.patch('/notifications/preferences', prefs).then(r => r.data),
+  list: (params) => apiClient.get('/api/communications/notifications', { params }).then(r => r.data),
+  markRead: (id) => apiClient.patch(`/api/communications/notifications/${id}/read`).then(r => r.data),
+  markAllRead: () => apiClient.patch('/api/communications/notifications/read-all').then(r => r.data),
+  preferences: () => apiClient.get('/api/communications/notifications/preferences').then(r => r.data),
+  updatePreferences: (prefs) => apiClient.patch('/api/communications/notifications/preferences', prefs).then(r => r.data),
 };
-export const automationsApi = createResourceService('/automations');
+export const automationsApi = createResourceService('/api/automations');
 export const billingApi = {
-  invoices: createResourceService('/billing/invoices'),
-  subscriptions: createResourceService('/billing/subscriptions'),
-  plans: () => apiClient.get('/billing/plans').then(r => r.data),
-  usage: () => apiClient.get('/billing/usage').then(r => r.data),
+  invoices: createResourceService('/finance/invoices'),
+  subscriptions: createResourceService('/finance/subscriptions'),
+  plans: () => apiClient.get('/finance/subscriptions/plans').then(r => r.data),
+  usage: () => apiClient.get('/finance/subscriptions/usage').then(r => r.data),
 };
 export const filesApi = {
   upload: (formData, onProgress) => apiClient.post('/files/upload', formData, {

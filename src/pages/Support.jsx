@@ -20,6 +20,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { mockDb } from '../utils/mockDb';
+import { useTickets } from '../hooks/useCrmData';
 import DataTable from '../components/ui/DataTable';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
@@ -52,7 +53,7 @@ const emptyForm = {
 };
 
 export default function Support({ searchValue = '' }) {
-  const [tickets, setTickets] = useState(() => mockDb.getTickets());
+  const { tickets, createTicket, updateTicket, deleteTicket } = useTickets();
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [activeTab, setActiveTab] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('All'); // 'All' | 'Support Ticket' | 'Feature Request'
@@ -69,39 +70,31 @@ export default function Support({ searchValue = '' }) {
   const [message, setMessage] = useState('');
   const [editId, setEditId] = useState(null);
 
-  const refreshTickets = () => {
-    setTickets(mockDb.getTickets());
-  };
-
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault();
     if (!subject || !client) return;
 
-    const id = `TK-${String(tickets.length + 1).padStart(4, '0')}`;
-    const newTicket = {
-      id,
-      subject,
-      client,
-      priority,
-      status,
-      message,
-      lastUpdated: 'Just now',
-      created: new Date().toISOString().split('T')[0]
-    };
+    try {
+      await createTicket({
+        subject,
+        client,
+        priority,
+        status,
+        message,
+      });
 
-    const updated = [newTicket, ...tickets];
-    mockDb.saveTickets(updated);
-    refreshTickets();
+      // Reset Form
+      setSubject('');
+      setClient('');
+      setPriority('Medium');
+      setStatus('Open');
+      setMessage('');
+      setIsAddModalOpen(false);
 
-    // Reset Form
-    setSubject('');
-    setClient('');
-    setPriority('Medium');
-    setStatus('Open');
-    setMessage('');
-    setIsAddModalOpen(false);
-
-    showToast('Ticket Created', `Support ticket ${id} has been registered in the system.`, 'success');
+      showToast('Ticket Created', `Support ticket has been registered in the system.`, 'success');
+    } catch {
+      showToast('Error', 'Failed to register ticket.', 'error');
+    }
   };
 
   const openEditModal = (ticket, e) => {
@@ -115,78 +108,83 @@ export default function Support({ searchValue = '' }) {
     setIsEditModalOpen(true);
   };
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!subject || !client) return;
 
-    const existingTicket = tickets.find(t => t.id === editId);
-    const updated = tickets.map(t => {
-      if (t.id === editId) {
-        return {
-          ...t,
+    try {
+      await updateTicket({
+        id: editId,
+        data: {
           subject,
           client,
           priority,
           status,
           message,
-          lastUpdated: 'Just now'
-        };
+        }
+      });
+      setIsEditModalOpen(false);
+
+      if (selectedTicket && selectedTicket.id === editId) {
+        setSelectedTicket({
+          id: editId,
+          subject,
+          client,
+          priority,
+          status,
+          message,
+        });
       }
-      return t;
-    });
 
-    mockDb.saveTickets(updated);
-    refreshTickets();
-    setIsEditModalOpen(false);
-
-    if (selectedTicket && selectedTicket.id === editId) {
-      setSelectedTicket(mockDb.getTickets().find(t => t.id === editId));
+      showToast('Success', `Ticket details have been successfully modified.`, 'success');
+    } catch {
+      showToast('Error', 'Failed to modify ticket.', 'error');
     }
-
-    showToast('Success', `Ticket details have been successfully modified.`, 'success');
   };
 
-  const handleDeleteTicket = (id, e) => {
+  const handleDeleteTicket = async (id, e) => {
     if (e) e.stopPropagation();
     if (window.confirm(`Are you sure you want to delete ticket ${id}?`)) {
-      const filtered = tickets.filter(t => t.id !== id);
-      mockDb.saveTickets(filtered);
-      refreshTickets();
-      if (selectedTicket && selectedTicket.id === id) {
-        setSelectedTicket(null);
+      try {
+        await deleteTicket(id);
+        if (selectedTicket && selectedTicket.id === id) {
+          setSelectedTicket(null);
+        }
+        showToast('Deleted', `Ticket ${id} has been purged.`, 'error');
+      } catch {
+        showToast('Error', 'Failed to delete ticket.', 'error');
       }
-      showToast('Deleted', `Ticket ${id} has been purged.`, 'error');
     }
   };
 
-  const changeStatusQuick = (ticket, newStatus) => {
-    const updated = tickets.map(t => {
-      if (t.id === ticket.id) {
-        return { ...t, status: newStatus, lastUpdated: 'Just now' };
+  const changeStatusQuick = async (ticket, newStatus) => {
+    try {
+      await updateTicket({
+        id: ticket.id,
+        data: { status: newStatus }
+      });
+      if (selectedTicket && selectedTicket.id === ticket.id) {
+        setSelectedTicket({ ...selectedTicket, status: newStatus });
       }
-      return t;
-    });
-    mockDb.saveTickets(updated);
-    refreshTickets();
-    if (selectedTicket && selectedTicket.id === ticket.id) {
-      setSelectedTicket({ ...selectedTicket, status: newStatus, lastUpdated: 'Just now' });
+      showToast('Updated', `Ticket status set to ${newStatus}.`, 'success');
+    } catch {
+      showToast('Error', 'Failed to update status.', 'error');
     }
-    showToast('Updated', `Ticket status set to ${newStatus}.`, 'success');
   };
 
-  const changePriorityQuick = (ticket, newPriority) => {
-    const updated = tickets.map(t => {
-      if (t.id === ticket.id) {
-        return { ...t, priority: newPriority, lastUpdated: 'Just now' };
+  const changePriorityQuick = async (ticket, newPriority) => {
+    try {
+      await updateTicket({
+        id: ticket.id,
+        data: { priority: newPriority }
+      });
+      if (selectedTicket && selectedTicket.id === ticket.id) {
+        setSelectedTicket({ ...selectedTicket, priority: newPriority });
       }
-      return t;
-    });
-    mockDb.saveTickets(updated);
-    refreshTickets();
-    if (selectedTicket && selectedTicket.id === ticket.id) {
-      setSelectedTicket({ ...selectedTicket, priority: newPriority, lastUpdated: 'Just now' });
+      showToast('Updated', `Ticket priority set to ${newPriority}.`, 'success');
+    } catch {
+      showToast('Error', 'Failed to update priority.', 'error');
     }
-    showToast('Updated', `Ticket priority set to ${newPriority}.`, 'success');
   };
 
   const filteredTickets = tickets.filter(t => {
