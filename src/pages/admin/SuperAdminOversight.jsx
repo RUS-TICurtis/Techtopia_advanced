@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
-import Badge from '../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
+import Badge from '../../components/ui/Badge';
 import { 
   ShieldCheck, Building2, Users, HardDrive, Cpu, AlertTriangle,
   LogIn, Ban, Key, RefreshCw, X, Check, Lock, ShieldAlert,

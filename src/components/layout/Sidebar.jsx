@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { WORKSPACE_GROUPS, WORKSPACE_ITEMS } from '../sidebar/sidebar.workspace.config';
-import { hasPermission } from '../services/auth/authService';
+import { useAuthStore } from '../../store/authStore';
+import { WORKSPACE_GROUPS, WORKSPACE_ITEMS } from './config/sidebar.workspace.config';
+import { hasPermission } from '../../services/auth/authService';
 import { 
   LayoutDashboard, Users, Building2, FileText, GitBranch, 
   CheckSquare, Calendar, MessageSquare, LifeBuoy, BarChart3, 

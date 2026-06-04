@@ -17,9 +17,9 @@ import {
   CheckCircle,
   FileText
 } from 'lucide-react';
-import Modal from '../components/ui/Modal';
-import Badge from '../components/ui/Badge';
-import { showToast } from '../components/ui/Toast';
+import Modal from '../../components/ui/Modal';
+import Badge from '../../components/ui/Badge';
+import { showToast } from '../../components/ui/Toast';
 import './Activities.css';
 
 const MODULES = ['All', 'Pipeline', 'Leads', 'Billing', 'Support', 'Projects'];

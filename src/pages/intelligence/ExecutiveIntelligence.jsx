@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
-import Badge from '../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
+import Badge from '../../components/ui/Badge';
 import { 
   BarChart3, FileText, Upload, Sparkles, CheckCircle2, 
   TrendingUp, Activity, HardDrive, AlertTriangle, ShieldCheck,

@@ -3,8 +3,8 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { FileSpreadsheet, FileDown, Plus, Download, Mail } from 'lucide-react';
-import Modal from '../components/ui/Modal';
-import Badge from '../components/ui/Badge';
+import Modal from '../../components/ui/Modal';
+import Badge from '../../components/ui/Badge';
 import './Reports.css';
 
 const FINANCIAL_DATA = [

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Send, Paperclip, MoreVertical, Phone, Video, MessageSquare } from 'lucide-react';
-import { useCommunications, useConversationMessages } from '../hooks/useCrmData';
-import { useAuthStore } from '../store/authStore';
+import { useCommunications, useConversationMessages } from '../../hooks/useCrmData';
+import { useAuthStore } from '../../store/authStore';
 import './Messages.css';
 
 export default function Messages() {

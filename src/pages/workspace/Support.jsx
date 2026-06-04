@@ -19,11 +19,11 @@ import {
   Building2,
   AlertTriangle
 } from 'lucide-react';
-import { useTickets } from '../hooks/useCrmData';
-import DataTable from '../components/ui/DataTable';
-import Modal from '../components/ui/Modal';
-import Badge from '../components/ui/Badge';
-import { showToast } from '../components/ui/Toast';
+import { useTickets } from '../../hooks/useCrmData';
+import DataTable from '../../components/ui/DataTable';
+import Modal from '../../components/ui/Modal';
+import Badge from '../../components/ui/Badge';
+import { showToast } from '../../components/ui/Toast';
 import './Support.css';
 
 const getAccountLead = (clientName) => {

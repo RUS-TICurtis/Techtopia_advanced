@@ -18,13 +18,13 @@ import {
   Clock,
   Briefcase
 } from 'lucide-react';
-import { useLeads } from '../hooks/useCrmData';
-import { showToast } from '../components/ui/Toast';
-import DataTable from '../components/ui/DataTable';
-import Modal from '../components/ui/Modal';
-import Badge from '../components/ui/Badge';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
+import { useLeads } from '../../hooks/useCrmData';
+import { showToast } from '../../components/ui/Toast';
+import DataTable from '../../components/ui/DataTable';
+import Modal from '../../components/ui/Modal';
+import Badge from '../../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
 import './Leads.css';
 
 const STATUSES = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];

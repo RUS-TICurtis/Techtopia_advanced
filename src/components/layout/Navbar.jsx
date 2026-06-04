@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { useUIStore } from '../store/uiStore';
-import { useAuthStore } from '../store/authStore';
-import { useNotificationStore } from '../store/notificationStore';
+import { useUIStore } from '../../store/uiStore';
+import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/notificationStore';
 import { 
   Search, Bell, Settings, Sun, Moon, Menu, Sparkles, Command
 } from 'lucide-react';
-import Dropdown from './ui/Dropdown';
+import Dropdown from '../ui/Dropdown';
 import './Navbar.css';
 
 export default function Navbar({ 

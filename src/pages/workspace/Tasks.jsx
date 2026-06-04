@@ -6,7 +6,7 @@ import {
   Trash2,
   X
 } from 'lucide-react';
-import { useTasks, useContacts } from '../hooks/useCrmData';
+import { useTasks, useContacts } from '../../hooks/useCrmData';
 import './Tasks.css';
 
 export default function Tasks({ searchValue }) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
-import Badge from '../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
+import Badge from '../../components/ui/Badge';
 import { 
   Sparkles, ShieldCheck, TrendingUp, LifeBuoy, Users, 
   Receipt, ShieldAlert, BookOpen, ToggleLeft, ToggleRight,

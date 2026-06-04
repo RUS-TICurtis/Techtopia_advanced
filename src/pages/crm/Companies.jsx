@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, MoreVertical, MapPin, Globe, Users, X } from 'lucide-react';
-import { useCompanies } from '../hooks/useCrmData';
+import { useCompanies } from '../../hooks/useCrmData';
 import './Companies.css';
 
 export default function Companies({ searchValue }) {

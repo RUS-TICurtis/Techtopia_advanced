@@ -18,12 +18,12 @@ import {
   Building2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useOpportunities, useContacts } from '../hooks/useCrmData';
-import { showToast } from '../components/ui/Toast';
-import Modal from '../components/ui/Modal';
-import Badge from '../components/ui/Badge';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
+import { useOpportunities, useContacts } from '../../hooks/useCrmData';
+import { showToast } from '../../components/ui/Toast';
+import Modal from '../../components/ui/Modal';
+import Badge from '../../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
 import './Pipeline.css';
 
 export default function Pipeline({ searchValue: externalSearchValue = '' }) {

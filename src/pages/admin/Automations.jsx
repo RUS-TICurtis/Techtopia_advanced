@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
-import Badge from '../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
+import Badge from '../../components/ui/Badge';
 import { 
   Play, Plus, ArrowRight, Settings, Info, CheckCircle2, 
   Trash2, ShieldCheck, Zap, ToggleLeft, ToggleRight,

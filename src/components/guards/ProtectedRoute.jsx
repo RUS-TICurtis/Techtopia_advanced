@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { hasPermission } from '../../services/auth/authService';
-import Unauthorized from '../../pages/Unauthorized';
+import Unauthorized from '../../pages/admin/Unauthorized';
 import { ROLES } from '../../constants/permissions';
 
 export default function ProtectedRoute({ permission }) {

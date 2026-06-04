@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserCircle2, Plus, Search, X, ShieldAlert, Award, Briefcase, Activity } from 'lucide-react';
-import Badge from '../components/ui/Badge';
+import Badge from '../../components/ui/Badge';
 import './Clients.css';
 
 const TABS     = ['All', 'Active', 'Prospect', 'Inactive'];

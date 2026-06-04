@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
-import Badge from '../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
+import Badge from '../../components/ui/Badge';
 import { 
   KeyRound, Play, Plus, Trash2, CheckCircle, HelpCircle,
   Copy, RefreshCw, Send, ShieldAlert, Cpu, Check, AlertCircle,

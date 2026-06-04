@@ -7,33 +7,43 @@ import PublicRoute from '../components/guards/PublicRoute';
 
 // ─── Core Pages ───────────────────────────────────────────────────────────
 const Dashboard = lazy(() => import('../pages/Dashboard'));
-const Leads = lazy(() => import('../pages/Leads'));
-const Contacts = lazy(() => import('../pages/Contacts'));
-const Companies = lazy(() => import('../pages/Companies'));
-const Pipeline = lazy(() => import('../pages/Pipeline'));
-const Clients = lazy(() => import('../pages/Clients'));
-const Tasks = lazy(() => import('../pages/Tasks'));
-const Calendar = lazy(() => import('../pages/Calendar'));
-const Support = lazy(() => import('../pages/Support'));
-const Billing = lazy(() => import('../pages/Billing'));
-const Contracts = lazy(() => import('../pages/Contracts'));
-const Analytics = lazy(() => import('../pages/Analytics'));
-const Team = lazy(() => import('../pages/Team'));
-const Settings = lazy(() => import('../pages/Settings'));
-const AiAssistant = lazy(() => import('../pages/AiAssistant'));
+const Leads = lazy(() => import('../pages/crm/Leads'));
+const Contacts = lazy(() => import('../pages/crm/Contacts'));
+const Companies = lazy(() => import('../pages/crm/Companies'));
+const Pipeline = lazy(() => import('../pages/crm/Pipeline'));
+const Clients = lazy(() => import('../pages/crm/Clients'));
+const Billing = lazy(() => import('../pages/crm/Billing'));
+const Contracts = lazy(() => import('../pages/crm/Contracts'));
+
+// ─── Workspace Pages ──────────────────────────────────────────────────────
+const Tasks = lazy(() => import('../pages/workspace/Tasks'));
+const Calendar = lazy(() => import('../pages/workspace/Calendar'));
+const Support = lazy(() => import('../pages/workspace/Support'));
+const Activities = lazy(() => import('../pages/workspace/Activities'));
+const OmnichannelInbox = lazy(() => import('../pages/workspace/OmnichannelInbox'));
+
+// ─── Intelligence Pages ───────────────────────────────────────────────────
+const Analytics = lazy(() => import('../pages/intelligence/Analytics'));
+const Reports = lazy(() => import('../pages/intelligence/Reports'));
+const ExecutiveIntelligence = lazy(() => import('../pages/intelligence/ExecutiveIntelligence'));
+
+// ─── AI Pages ────────────────────────────────────────────────────────────
+const AiAssistant = lazy(() => import('../pages/ai/AiAssistant'));
+const AIAgents = lazy(() => import('../pages/ai/AIAgents'));
+
+// ─── Admin Pages ─────────────────────────────────────────────────────────
+const Team = lazy(() => import('../pages/admin/Team'));
+const Settings = lazy(() => import('../pages/admin/Settings'));
+const AuditLogs = lazy(() => import('../pages/admin/AuditLogs'));
+const Automations = lazy(() => import('../pages/admin/Automations'));
+const SuperAdminOversight = lazy(() => import('../pages/admin/SuperAdminOversight'));
+const DeveloperConsole = lazy(() => import('../pages/admin/DeveloperConsole'));
+const Unauthorized = lazy(() => import('../pages/admin/Unauthorized'));
+
+// ─── Projects Pages ───────────────────────────────────────────────────────
 const Projects = lazy(() => import('../pages/Projects/Projects'));
 const ProjectBoard = lazy(() => import('../pages/Projects/ProjectBoard'));
 const ProjectTimeline = lazy(() => import('../pages/Projects/ProjectTimeline'));
-const AuditLogs = lazy(() => import('../pages/AuditLogs'));
-const Automations = lazy(() => import('../pages/Automations'));
-const Reports = lazy(() => import('../pages/Reports'));
-const Activities = lazy(() => import('../pages/Activities'));
-const Unauthorized = lazy(() => import('../pages/Unauthorized'));
-const AIAgents = lazy(() => import('../pages/AIAgents'));
-const SuperAdminOversight = lazy(() => import('../pages/SuperAdminOversight'));
-const OmnichannelInbox = lazy(() => import('../pages/OmnichannelInbox'));
-const ExecutiveIntelligence = lazy(() => import('../pages/ExecutiveIntelligence'));
-const DeveloperConsole = lazy(() => import('../pages/DeveloperConsole'));
 
 // ─── Finance Module Pages ─────────────────────────────────────────────────
 const FinanceOverview = lazy(() => import('../pages/Finance/FinanceOverview'));

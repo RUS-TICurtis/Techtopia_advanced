@@ -28,8 +28,8 @@ import {
   Pie,
   Legend
 } from 'recharts';
-import { useOpportunities } from '../hooks/useCrmData';
-import Badge from '../components/ui/Badge';
+import { useOpportunities } from '../../hooks/useCrmData';
+import Badge from '../../components/ui/Badge';
 import './Analytics.css';
 
 export default function Analytics() {

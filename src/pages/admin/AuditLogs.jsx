@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAuditLogs } from '../hooks/useCrmData';
+import { useAuditLogs } from '../../hooks/useCrmData';
 import { Search, ShieldAlert, ArrowDownToLine, RefreshCw } from 'lucide-react';
-import Badge from '../components/ui/Badge';
+import Badge from '../../components/ui/Badge';
 import './AuditLogs.css';
 
 export default function AuditLogs() {

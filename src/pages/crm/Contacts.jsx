@@ -16,12 +16,12 @@ import {
   CheckCircle,
   MoreVertical
 } from 'lucide-react';
-import { useContacts } from '../hooks/useCrmData';
-import DataTable from '../components/ui/DataTable';
-import Modal from '../components/ui/Modal';
-import Badge from '../components/ui/Badge';
-import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/layout/PageHeader';
+import { useContacts } from '../../hooks/useCrmData';
+import DataTable from '../../components/ui/DataTable';
+import Modal from '../../components/ui/Modal';
+import Badge from '../../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
+import PageHeader from '../../components/layout/PageHeader';
 import './Contacts.css';
 
 export default function Contacts({ searchValue = '' }) {

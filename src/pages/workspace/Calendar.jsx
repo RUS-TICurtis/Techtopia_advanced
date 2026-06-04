@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock, Users, Video, X } from 'lucide-react';
-import { useTasks } from '../hooks/useCrmData';
-import { showToast } from '../components/ui/Toast';
+import { useTasks } from '../../hooks/useCrmData';
+import { showToast } from '../../components/ui/Toast';
 import './Calendar.css';
 
 export default function Calendar() {

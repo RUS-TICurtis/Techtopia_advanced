@@ -10,7 +10,7 @@ import {
   Building2,
   Palette
 } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import './Settings.css';
 
 export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
