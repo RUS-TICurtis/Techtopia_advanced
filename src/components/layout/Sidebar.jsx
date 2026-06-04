@@ -107,15 +107,15 @@ export default function Sidebar({
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
       {/* Brand Header */}
       <div className="sidebar-brand">
-        {isCollapsed ? (
-          <span className="logo-icon-only text-2xl text-[#01FDF6] font-bold">
+          {isCollapsed ? (
+            <span className="logo-icon-only text-2xl text-[#01FDF6] font-bold">
             <img className="logo" src="favicon.png" alt="T" />
-          </span>
-        ) : (
-          <div className="flex items-center justify-between w-full pr-1">
-            <span><img className="logo" src="logo-dark.png" alt="Techtopia OS" /></span>
-          </div>
-        )}
+            </span>
+          ) : (
+            <div className="flex items-center justify-between w-full pr-1">
+              <span><img className="logo" src={theme === 'dark' ? 'logo-dark.png' : 'logo-light.png'} alt="Techtopia OS" /></span>
+            </div>
+          )}
       </div>
 
       {/* Tenant Switcher Module */}
