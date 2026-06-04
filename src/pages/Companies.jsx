@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Filter, Plus, MoreVertical, MapPin, Globe, Users, X } from 'lucide-react';
-import { mockDb } from '../utils/mockDb';
+import { useCompanies } from '../hooks/useCrmData';
 import './Companies.css';
 
 export default function Companies({ searchValue }) {
-  const [companies, setCompanies] = useState([]);
+  const { companies = [], isLoading, createCompany } = useCompanies();
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCompany, setNewCompany] = useState({ name: '', industry: 'Technology', location: '', website: '', employees: '1-10', status: 'Prospect', value: 0 });
 
-  useEffect(() => {
-    setCompanies(mockDb.getCompanies());
-  }, []);
-
-  const handleAddCompany = (e) => {
+  const handleAddCompany = async (e) => {
     e.preventDefault();
-    const company = {
-      id: "comp_" + Date.now(),
-      ...newCompany
-    };
-    const updated = [...companies, company];
-    mockDb.saveCompanies(updated);
-    setCompanies(updated);
-    setShowAddModal(false);
-    setNewCompany({ name: '', industry: 'Technology', location: '', website: '', employees: '1-10', status: 'Prospect', value: 0 });
+    try {
+      await createCompany({
+        name: newCompany.name,
+        industry: newCompany.industry,
+        location: newCompany.location,
+        website: newCompany.website || '',
+        employees: newCompany.employees || '1-10',
+        status: newCompany.status,
+        value: parseFloat(newCompany.value) || 0
+      });
+      setShowAddModal(false);
+      setNewCompany({ name: '', industry: 'Technology', location: '', website: '', employees: '1-10', status: 'Prospect', value: 0 });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const filteredCompanies = companies.filter(company => 
-    company.name.toLowerCase().includes((searchValue || '').toLowerCase()) ||
-    company.industry.toLowerCase().includes((searchValue || '').toLowerCase())
+    (company.name || '').toLowerCase().includes((searchValue || '').toLowerCase()) ||
+    (company.industry || '').toLowerCase().includes((searchValue || '').toLowerCase())
   );
 
   return (
@@ -49,67 +51,73 @@ export default function Companies({ searchValue }) {
         </div>
       </div>
 
-      <div className="card table-container">
-        <table className="custom-table companies-table">
-          <thead>
-            <tr>
-              <th>Company Name</th>
-              <th>Industry</th>
-              <th>Location</th>
-              <th>Employees</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCompanies.map(company => (
-              <tr key={company.id}>
-                <td>
-                  <div className="company-name-cell">
-                    <div className="company-avatar">
-                      {company.name.charAt(0)}
-                    </div>
-                    <div className="company-details">
-                      <div className="company-title">{company.name}</div>
-                      <div className="company-meta">
-                        <Globe size={12} /> {company.website}
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[250px] bg-[#0f1629]/20 border border-gray-800 rounded-2xl">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        </div>
+      ) : (
+        <div className="card table-container">
+          <table className="custom-table companies-table">
+            <thead>
+              <tr>
+                <th>Company Name</th>
+                <th>Industry</th>
+                <th>Location</th>
+                <th>Employees</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCompanies.map(company => (
+                <tr key={company.id}>
+                  <td>
+                    <div className="company-name-cell">
+                      <div className="company-avatar">
+                        {(company.name || 'C').charAt(0)}
+                      </div>
+                      <div className="company-details">
+                        <div className="company-title">{company.name}</div>
+                        <div className="company-meta">
+                          <Globe size={12} /> {company.website || 'No website'}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </td>
-                <td>{company.industry}</td>
-                <td>
-                  <div className="cell-flex">
-                    <MapPin size={14} /> {company.location}
-                  </div>
-                </td>
-                <td>
-                  <div className="cell-flex">
-                    <Users size={14} /> {company.employees}
-                  </div>
-                </td>
-                <td>
-                  <span className={`badge ${company.status === 'Customer' ? 'badge-success' : company.status === 'Prospect' ? 'badge-warning' : 'badge-neutral'}`}>
-                    {company.status}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <button className="btn-icon">
-                    <MoreVertical size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {filteredCompanies.length === 0 && (
-              <tr>
-                <td colSpan="6" className="text-center py-8 text-secondary">
-                  No companies found matching "{searchValue}"
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </td>
+                  <td>{company.industry}</td>
+                  <td>
+                    <div className="cell-flex">
+                      <MapPin size={14} /> {company.location || 'Unknown'}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="cell-flex">
+                      <Users size={14} /> {company.employees || '1-10'}
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`badge ${company.status === 'Customer' ? 'badge-success' : company.status === 'Prospect' ? 'badge-warning' : 'badge-neutral'}`}>
+                      {company.status}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button className="btn-icon">
+                      <MoreVertical size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {filteredCompanies.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center py-8 text-secondary">
+                    No companies found matching "{searchValue || ''}"
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>

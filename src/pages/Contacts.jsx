@@ -16,7 +16,7 @@ import {
   CheckCircle,
   MoreVertical
 } from 'lucide-react';
-import { mockDb } from '../utils/mockDb';
+import { useContacts } from '../hooks/useCrmData';
 import DataTable from '../components/ui/DataTable';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
@@ -25,7 +25,7 @@ import PageHeader from '../components/layout/PageHeader';
 import './Contacts.css';
 
 export default function Contacts({ searchValue = '' }) {
-  const [contacts, setContacts] = useState(() => mockDb.getContacts());
+  const { contacts = [], isLoading, createContact, updateContact, deleteContact } = useContacts();
   const [selectedContact, setSelectedContact] = useState(null);
   const [activeFilter, setActiveFilter] = useState('All');
   
@@ -43,34 +43,38 @@ export default function Contacts({ searchValue = '' }) {
   const [notes, setNotes] = useState('');
   const [editId, setEditId] = useState(null);
 
-  const refreshContacts = () => {
-    setContacts(mockDb.getContacts());
-  };
+  // Sync selected contact with updated list data
+  const selectedContactDetails = selectedContact 
+    ? (contacts.find(c => c.id === selectedContact.id) || selectedContact)
+    : null;
 
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault();
     if (!name || !company) return;
 
-    mockDb.addContact({
-      name,
-      company,
-      email,
-      phone,
-      status,
-      value: parseFloat(value) || 0,
-      notes
-    });
+    try {
+      await createContact({
+        name,
+        company,
+        email,
+        phone,
+        status,
+        value: parseFloat(value) || 0,
+        notes
+      });
 
-    // Reset forms & close
-    setName('');
-    setCompany('');
-    setEmail('');
-    setPhone('');
-    setStatus('New');
-    setValue('');
-    setNotes('');
-    setIsAddModalOpen(false);
-    refreshContacts();
+      // Reset forms & close
+      setName('');
+      setCompany('');
+      setEmail('');
+      setPhone('');
+      setStatus('New');
+      setValue('');
+      setNotes('');
+      setIsAddModalOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleEditClick = (contact, e) => {
@@ -81,58 +85,59 @@ export default function Contacts({ searchValue = '' }) {
     setEmail(contact.email);
     setPhone(contact.phone);
     setStatus(contact.status);
-    setValue(contact.value.toString());
+    setValue(contact.value ? contact.value.toString() : '0');
     setNotes(contact.notes || '');
     setIsEditModalOpen(true);
   };
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!name || !company) return;
 
-    const existingContact = contacts.find(c => c.id === editId);
+    try {
+      await updateContact({
+        id: editId,
+        data: {
+          name,
+          company,
+          email,
+          phone,
+          status,
+          value: parseFloat(value) || 0,
+          notes
+        }
+      });
 
-    mockDb.updateContact({
-      id: editId,
-      name,
-      company,
-      email,
-      phone,
-      status,
-      value: parseFloat(value) || 0,
-      notes,
-      created: existingContact?.created || new Date().toISOString().split('T')[0],
-      owner: existingContact?.owner || "Curtis Miller"
-    });
-
-    setIsEditModalOpen(false);
-    refreshContacts();
-    
-    // Update selected contact if open
-    if (selectedContact && selectedContact.id === editId) {
-      setSelectedContact(mockDb.getContacts().find(c => c.id === editId));
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const handleDeleteClick = (id, e) => {
+  const handleDeleteClick = async (id, e) => {
     if (e) e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this contact?")) {
-      mockDb.deleteContact(id);
-      refreshContacts();
-      if (selectedContact && selectedContact.id === id) {
-        setSelectedContact(null);
+      try {
+        await deleteContact(id);
+        if (selectedContact && selectedContact.id === id) {
+          setSelectedContact(null);
+        }
+      } catch (err) {
+        console.error(err);
       }
     }
   };
 
-  const changeStatusQuick = (contact, newStatus) => {
-    mockDb.updateContact({
-      ...contact,
-      status: newStatus
-    });
-    refreshContacts();
-    if (selectedContact && selectedContact.id === contact.id) {
-      setSelectedContact({ ...selectedContact, status: newStatus });
+  const changeStatusQuick = async (contact, newStatus) => {
+    try {
+      await updateContact({
+        id: contact.id,
+        data: {
+          status: newStatus
+        }
+      });
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -302,7 +307,7 @@ export default function Contacts({ searchValue = '' }) {
         </div>
 
         {/* Sliding Panel / Drawer style card when contact selected */}
-        {selectedContact && (
+        {selectedContactDetails && (
           <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#0f1629]/80 backdrop-blur-lg">
             <div className="flex justify-between items-center border-b border-gray-850 pb-4">
               <h3 className="card-title text-white font-black font-display text-base tracking-wide m-0">Client Dossier</h3>
@@ -317,13 +322,13 @@ export default function Contacts({ searchValue = '' }) {
             {/* Profile Avatar & Title */}
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-[#8A4FFF]/20 border border-[#8A4FFF]/40 text-[#8A4FFF] flex items-center justify-center font-display font-black text-xl shadow-glow">
-                {selectedContact.name.charAt(0)}
+                {selectedContactDetails.name.charAt(0)}
               </div>
               <div className="min-w-0 flex-1">
-                <h4 className="text-white font-extrabold text-base tracking-tight truncate">{selectedContact.name}</h4>
+                <h4 className="text-white font-extrabold text-base tracking-tight truncate">{selectedContactDetails.name}</h4>
                 <p className="text-gray-400 text-xs font-semibold flex items-center gap-1.5 mt-0.5 truncate">
                   <Building2 size={12} className="text-gray-500" />
-                  {selectedContact.company}
+                  {selectedContactDetails.company}
                 </p>
               </div>
             </div>
@@ -332,28 +337,28 @@ export default function Contacts({ searchValue = '' }) {
             <div className="flex flex-col gap-2.5 p-4 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl">
               <div className="flex items-center gap-3 text-xs text-gray-300">
                 <Mail size={14} className="text-gray-500 w-4" />
-                <span className="truncate">{selectedContact.email || '—'}</span>
+                <span className="truncate">{selectedContactDetails.email || '—'}</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-gray-300">
                 <Phone size={14} className="text-gray-500 w-4" />
-                <span className="font-mono">{selectedContact.phone || '—'}</span>
+                <span className="font-mono">{selectedContactDetails.phone || '—'}</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-gray-300 border-t border-gray-850/50 pt-2.5 mt-1">
                 <Briefcase size={14} className="text-gray-500 w-4" />
                 <span>
                   Deal Value:{' '}
                   <strong className="text-[#01FDF6] font-display font-black ml-1">
-                    ${selectedContact.value.toLocaleString()}
+                    ${(selectedContactDetails.value || 0).toLocaleString()}
                   </strong>
                 </span>
               </div>
               <div className="flex items-center gap-3 text-xs text-gray-300">
                 <User size={14} className="text-gray-500 w-4" />
-                <span>Account Manager: <span className="font-semibold">{selectedContact.owner}</span></span>
+                <span>Account Manager: <span className="font-semibold">{selectedContactDetails.owner || 'Curtis Miller'}</span></span>
               </div>
               <div className="flex items-center gap-3 text-xs text-gray-300">
                 <FileText size={14} className="text-gray-500 w-4" />
-                <span>First Contact: <span className="font-mono">{selectedContact.created}</span></span>
+                <span>First Contact: <span className="font-mono">{selectedContactDetails.created || 'Just now'}</span></span>
               </div>
             </div>
 
@@ -361,7 +366,7 @@ export default function Contacts({ searchValue = '' }) {
             <div className="flex flex-col gap-1.5">
               <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Administrative Dossier Notes</h5>
               <div className="p-3 bg-[#E4FF1A]/5 border-l-4 border-[#E4FF1A] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
-                {selectedContact.notes || "No administrative intelligence records filed for this customer."}
+                {selectedContactDetails.notes || "No administrative intelligence records filed for this customer."}
               </div>
             </div>
 
@@ -369,13 +374,13 @@ export default function Contacts({ searchValue = '' }) {
             <div className="mt-auto border-t border-gray-850 pt-4 flex gap-3">
               <button 
                 className="btn btn-primary flex-1 py-3 text-xs" 
-                onClick={(e) => handleEditClick(selectedContact, e)}
+                onClick={(e) => handleEditClick(selectedContactDetails, e)}
               >
                 Edit Dossier
               </button>
               <button 
                 className="btn btn-outline text-red-500 hover:text-white hover:bg-red-950/20 border-red-950/60 hover:border-red-800 flex items-center justify-center p-3"
-                onClick={(e) => handleDeleteClick(selectedContact.id, e)}
+                onClick={(e) => handleDeleteClick(selectedContactDetails.id, e)}
                 title="Delete Lead"
               >
                 <Trash2 size={16} />

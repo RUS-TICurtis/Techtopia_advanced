@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { mockDb } from '../../utils/mockDb';
+import { useTickets } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
@@ -24,9 +24,7 @@ export default function ClientSupport() {
   const companyName = user?.clientCompany || 'CloudScale Inc.';
   const displayCompany = companyName === 'ACME Corp' ? 'CloudScale Inc.' : companyName;
 
-  const [tickets, setTickets] = useState(() => {
-    return mockDb.getTickets() || [];
-  });
+  const { tickets = [], isLoading, createTicket } = useTickets();
 
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -39,11 +37,7 @@ export default function ClientSupport() {
   const [featureTemplate, setFeatureTemplate] = useState('stripe_billing');
   const [customFeatureTitle, setCustomFeatureTitle] = useState('');
 
-  const refreshTickets = () => {
-    setTickets(mockDb.getTickets() || []);
-  };
-
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault();
     
     let finalSubject = subject;
@@ -64,40 +58,36 @@ export default function ClientSupport() {
       if (!subject) return;
     }
 
-    const allTickets = mockDb.getTickets() || [];
-    const id = `TK-${String(allTickets.length + 1).padStart(4, '0')}`;
-    const newTicket = {
-      id,
-      subject: finalSubject,
-      client: displayCompany,
-      priority: category === 'Feature Request' ? 'Low' : priority, // Feature requests default to Low/Medium priority
-      status: 'Open',
-      message,
-      category,
-      featureTemplate: category === 'Feature Request' ? featureTemplate : null,
-      lastUpdated: 'Just now',
-      created: new Date().toISOString().split('T')[0]
-    };
+    try {
+      await createTicket({
+        subject: finalSubject,
+        client: displayCompany,
+        priority: category === 'Feature Request' ? 'Low' : priority,
+        status: 'Open',
+        message,
+        category,
+        featureTemplate: category === 'Feature Request' ? featureTemplate : null,
+      });
 
-    const updated = [newTicket, ...allTickets];
-    mockDb.saveTickets(updated);
-    refreshTickets();
+      // Reset Form
+      setSubject('');
+      setCustomFeatureTitle('');
+      setCategory('Support Ticket');
+      setFeatureTemplate('stripe_billing');
+      setPriority('Medium');
+      setMessage('');
+      setIsAddModalOpen(false);
 
-    // Reset Form
-    setSubject('');
-    setCustomFeatureTitle('');
-    setCategory('Support Ticket');
-    setFeatureTemplate('stripe_billing');
-    setPriority('Medium');
-    setMessage('');
-    setIsAddModalOpen(false);
+      const toastTitle = category === 'Feature Request' ? 'Feature Logged' : 'Ticket Opened';
+      const toastBody = category === 'Feature Request' 
+        ? `Your feature proposal has been registered and assigned to your Account Lead.`
+        : `Your issue ticket has been logged on the priority SLA pipeline.`;
 
-    const toastTitle = category === 'Feature Request' ? 'Feature Logged' : 'Ticket Opened';
-    const toastBody = category === 'Feature Request' 
-      ? `Your feature proposal ${id} has been registered and assigned to your Account Lead.`
-      : `Your issue ticket ${id} has been logged on the priority SLA pipeline.`;
-
-    showToast(toastTitle, toastBody, 'success');
+      showToast(toastTitle, toastBody, 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Error', 'Failed to submit ticket.', 'error');
+    }
   };
 
   const getSLAIndicator = (ticket) => {
@@ -192,7 +182,7 @@ export default function ClientSupport() {
     {
       accessorKey: 'lastUpdated',
       header: 'Activity Log',
-      cell: ({ getValue }) => <span className="text-[10px] font-mono font-medium" style={{ color: 'var(--text-muted)' }}>{getValue()}</span>
+      cell: ({ getValue }) => <span className="text-[10px] font-mono font-medium" style={{ color: 'var(--text-muted)' }}>{getValue() || 'Just now'}</span>
     }
   ];
 
@@ -395,7 +385,7 @@ export default function ClientSupport() {
           )}
 
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+            <label className="text-xs font-bold uppercase tracking-wider">
               {category === 'Feature Request' ? 'Proposal Details / Business Rationale *' : 'Descriptive Message / Logs *'}
             </label>
             <textarea 

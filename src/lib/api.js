@@ -72,11 +72,15 @@ export const authApi = {
   verifyMfa: (code, tempToken) => apiClient.post('/auth/mfa/verify', { code, tempToken }).then(r => r.data),
   refresh: (refreshToken) => apiClient.post('/auth/refresh', { refreshToken }).then(r => r.data),
   me: () => apiClient.get('/auth/me').then(r => r.data),
+  updateProfile: (data) => apiClient.patch('/auth/profile', data).then(r => r.data),
   sessions: () => apiClient.get('/auth/sessions').then(r => r.data),
   revokeSession: (id) => apiClient.delete(`/auth/sessions/${id}`).then(r => r.data),
 };
 
-export const leadsApi = createResourceService('/api/leads');
+export const leadsApi = {
+  ...createResourceService('/api/leads'),
+  convert: (id) => apiClient.post(`/api/leads/${id}/convert`).then(r => r.data),
+};
 export const contactsApi = createResourceService('/api/contacts');
 export const companiesApi = createResourceService('/api/companies');
 export const dealsApi = createResourceService('/api/opportunities');
@@ -84,7 +88,12 @@ export const clientsApi = createResourceService('/api/contacts');
 export const projectsApi = createResourceService('/api/projects');
 export const tasksApi = createResourceService('/api/tasks');
 export const ticketsApi = createResourceService('/api/tickets');
-export const invoicesApi = createResourceService('/finance/invoices');
+export const invoicesApi = {
+  ...createResourceService('/finance/invoices'),
+  send: (id) => apiClient.post(`/finance/invoices/${id}/send`).then(r => r.data),
+  approve: (id) => apiClient.post(`/finance/invoices/${id}/approve`).then(r => r.data),
+  duplicate: (id) => apiClient.post(`/finance/invoices/${id}/duplicate`).then(r => r.data),
+};
 export const contractsApi = createResourceService('/finance/contracts');
 export const teamApi = createResourceService('/api/hr/employees');
 export const auditApi = {
@@ -104,7 +113,7 @@ export const aiApi = {
 };
 export const notificationsApi = {
   list: (params) => apiClient.get('/api/communications/notifications', { params }).then(r => r.data),
-  markRead: (id) => apiClient.patch(`/api/communications/notifications/${id}/read`).then(r => r.data),
+  markRead: (id) => apiClient.post(`/api/communications/notifications/${id}/read`).then(r => r.data),
   markAllRead: () => apiClient.patch('/api/communications/notifications/read-all').then(r => r.data),
   preferences: () => apiClient.get('/api/communications/notifications/preferences').then(r => r.data),
   updatePreferences: (prefs) => apiClient.patch('/api/communications/notifications/preferences', prefs).then(r => r.data),

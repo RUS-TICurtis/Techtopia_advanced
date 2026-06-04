@@ -13,7 +13,7 @@ export const DEMO_USERS = [
     roleLabel: 'Super Admin',
     avatar: 'CT',
     department: 'Executive',
-    tenantId: 'tenant_techtopia',
+    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   },
   {
     id: 'u2',
@@ -24,7 +24,7 @@ export const DEMO_USERS = [
     roleLabel: 'Sales Executive',
     avatar: 'SJ',
     department: 'Sales',
-    tenantId: 'tenant_techtopia',
+    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   },
   {
     id: 'u3',
@@ -35,7 +35,7 @@ export const DEMO_USERS = [
     roleLabel: 'Support Agent',
     avatar: 'SP',
     department: 'Support',
-    tenantId: 'tenant_techtopia',
+    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   },
   {
     id: 'u4',
@@ -46,7 +46,7 @@ export const DEMO_USERS = [
     roleLabel: 'Finance Manager',
     avatar: 'FM',
     department: 'Finance',
-    tenantId: 'tenant_techtopia',
+    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   },
   {
     id: 'u5',
@@ -57,7 +57,7 @@ export const DEMO_USERS = [
     roleLabel: 'Project Manager',
     avatar: 'PM',
     department: 'Delivery',
-    tenantId: 'tenant_techtopia',
+    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
   },
   {
     id: 'u6',
@@ -68,7 +68,7 @@ export const DEMO_USERS = [
     roleLabel: 'Client',
     avatar: 'AC',
     department: 'External',
-    tenantId: 'tenant_techtopia',
+    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     clientCompany: 'ACME Corp',
   },
 ];
@@ -266,9 +266,34 @@ export const useAuthStore = create(
         user: state.user ? { ...state.user, role } : null
       })),
 
-      updateUserAvatar: (avatarUrl) => set(state => ({
-        user: state.user ? { ...state.user, avatarUrl } : null
-      })),
+      updateProfile: async (data) => {
+        set({ isLoading: true });
+        try {
+          const updatedUser = await authApi.updateProfile(data);
+          set(state => ({
+            user: state.user ? { ...state.user, ...updatedUser } : updatedUser,
+            isLoading: false,
+          }));
+          return { success: true, user: updatedUser };
+        } catch (err) {
+          set({ isLoading: false });
+          return {
+            success: false,
+            error: err.response?.data?.message || 'Failed to update profile.',
+          };
+        }
+      },
+
+      updateUserAvatar: async (avatarUrl) => {
+        try {
+          await authApi.updateProfile({ avatarUrl });
+          set(state => ({
+            user: state.user ? { ...state.user, avatarUrl } : null
+          }));
+        } catch (err) {
+          console.error('Failed to update avatar on backend', err);
+        }
+      },
 
       // ─── Computed helpers ──────────────────────────────
       getUser: () => get().user,

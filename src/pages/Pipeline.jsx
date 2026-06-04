@@ -10,18 +10,16 @@ import {
   DollarSign,
   Target,
   Search,
-  Filter,
   SlidersHorizontal,
   ArrowUpDown,
   Edit2,
-  AlertCircle,
   Clock,
   Sparkles,
-  Building2,
-  CheckCircle2
+  Building2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mockDb } from '../utils/mockDb';
+import { useOpportunities, useContacts } from '../hooks/useCrmData';
+import { showToast } from '../components/ui/Toast';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
 import PageContainer from '../components/layout/PageContainer';
@@ -29,8 +27,9 @@ import PageHeader from '../components/layout/PageHeader';
 import './Pipeline.css';
 
 export default function Pipeline({ searchValue: externalSearchValue = '' }) {
-  const [deals, setDeals] = useState(() => mockDb.getDeals());
-  const [contacts] = useState(() => mockDb.getContacts());
+  // Database API hooks
+  const { opportunities, isLoading: isLoadingDeals, createOpportunity, updateOpportunity, deleteOpportunity } = useOpportunities();
+  const { contacts, isLoading: isLoadingContacts } = useContacts();
   
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -48,10 +47,9 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
 
   // Form states
   const [title, setTitle] = useState('');
-  const [company, setCompany] = useState('');
+  const [companyNameStr, setCompanyNameStr] = useState('');
   const [value, setValue] = useState('');
   const [stage, setStage] = useState('Lead');
-  const [priority, setPriority] = useState('Medium');
   const [date, setDate] = useState('');
   const [selectedContactId, setSelectedContactId] = useState('');
   const [notes, setNotes] = useState('');
@@ -74,10 +72,6 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
     'Won': 100
   };
 
-  const refreshDeals = () => {
-    setDeals(mockDb.getDeals());
-  };
-
   // Drag and Drop handlers
   const handleDragStart = (dealId) => {
     setDraggingDealId(dealId);
@@ -95,122 +89,127 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
     }
   };
 
-  const handleDrop = (e, targetStage) => {
+  const handleDrop = async (e, targetStage) => {
     e.preventDefault();
     const dealId = draggingDealId || e.dataTransfer.getData('text/plain');
     if (!dealId) return;
 
-    const allDeals = mockDb.getDeals();
-    const deal = allDeals.find(d => d.id === dealId);
-    if (deal && deal.stage !== targetStage) {
-      deal.stage = targetStage;
-      mockDb.updateDeal(deal);
-      
-      const allContacts = mockDb.getContacts();
-      const contact = allContacts.find(c => c.id === deal.contactId);
-      if (contact) {
-        contact.status = targetStage === 'Lead' ? 'New' : targetStage;
-        mockDb.updateContact(contact);
-      }
-      refreshDeals();
+    try {
+      await updateOpportunity({
+        id: parseInt(dealId, 10),
+        data: { stage: targetStage }
+      });
+      showToast('Success', 'Deal stage transitioned successfully.', 'success');
+    } catch (err) {
+      showToast('Error', 'Failed to update deal stage.', 'error');
     }
     handleDragEnd();
   };
 
-  const moveDealManual = (deal, direction) => {
+  const moveDealManual = async (deal, direction) => {
     const currentIdx = stages.indexOf(deal.stage);
     let nextIdx = currentIdx + direction;
     if (nextIdx >= 0 && nextIdx < stages.length) {
       const nextStage = stages[nextIdx];
-      deal.stage = nextStage;
-      mockDb.updateDeal(deal);
-
-      const allContacts = mockDb.getContacts();
-      const contact = allContacts.find(c => c.id === deal.contactId);
-      if (contact) {
-        contact.status = nextStage === 'Lead' ? 'New' : nextStage;
-        mockDb.updateContact(contact);
+      try {
+        await updateOpportunity({
+          id: deal.id,
+          data: { stage: nextStage }
+        });
+        showToast('Success', 'Deal stage transitioned manually.', 'success');
+      } catch (err) {
+        showToast('Error', 'Failed to change stage.', 'error');
       }
-      refreshDeals();
     }
   };
 
-  const handleDeleteDeal = (id, e) => {
-    e.stopPropagation();
+  const handleDeleteDeal = async (id, e) => {
+    if (e) e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this deal?")) {
-      mockDb.deleteDeal(id);
-      refreshDeals();
+      try {
+        await deleteOpportunity(id);
+        showToast('Deleted', 'Deal has been successfully purged.', 'error');
+      } catch (err) {
+        showToast('Error', 'Failed to delete deal.', 'error');
+      }
     }
   };
 
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault();
     if (!title) return;
 
-    let finalCompany = company;
-    if (selectedContactId) {
-      const contact = contacts.find(c => c.id === selectedContactId);
-      if (contact) finalCompany = contact.company;
+    try {
+      const payload = {
+        name: title,
+        amount: parseFloat(value) || 0,
+        stage,
+        closeDate: date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      };
+
+      if (selectedContactId) {
+        const contactObj = contacts.find(c => c.id === parseInt(selectedContactId, 10));
+        payload.contact = { id: parseInt(selectedContactId, 10) };
+        if (contactObj?.company) {
+          payload.company = { id: contactObj.company.id };
+        }
+      }
+
+      await createOpportunity(payload);
+
+      // Reset Form
+      setTitle(''); setCompanyNameStr(''); setValue(''); setStage('Lead');
+      setDate(''); setSelectedContactId(''); setNotes('');
+      setIsAddModalOpen(false);
+      showToast('Created', 'New sales opportunity has been added.', 'success');
+    } catch (err) {
+      showToast('Error', err.response?.data?.message || 'Failed to create opportunity.', 'error');
     }
-
-    mockDb.addDeal({
-      title,
-      company: finalCompany || "TechCorp Labs",
-      value: parseFloat(value) || 0,
-      stage,
-      priority,
-      contactId: selectedContactId || null,
-      notes: notes || '',
-      date: date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-    });
-
-    // Reset Form
-    setTitle(''); setCompany(''); setValue(''); setStage('Lead');
-    setPriority('Medium'); setDate(''); setSelectedContactId(''); setNotes('');
-    setIsAddModalOpen(false);
-    refreshDeals();
   };
 
   const openEditModal = (deal, e) => {
     e.stopPropagation();
     setSelectedDeal(deal);
-    setTitle(deal.title);
-    setCompany(deal.company);
-    setValue(deal.value.toString());
+    setTitle(deal.name);
+    setCompanyNameStr(deal.company?.name || '');
+    setValue(deal.amount.toString());
     setStage(deal.stage);
-    setPriority(deal.priority);
-    setDate(deal.date);
-    setSelectedContactId(deal.contactId || '');
-    setNotes(deal.notes || '');
+    setDate(deal.closeDate || '');
+    setSelectedContactId(deal.contact?.id?.toString() || '');
     setIsEditModalOpen(true);
   };
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDeal || !title) return;
 
-    let finalCompany = company;
-    if (selectedContactId) {
-      const contact = contacts.find(c => c.id === selectedContactId);
-      if (contact) finalCompany = contact.company;
+    try {
+      const payload = {
+        name: title,
+        amount: parseFloat(value) || 0,
+        stage,
+        closeDate: date
+      };
+
+      if (selectedContactId) {
+        const contactObj = contacts.find(c => c.id === parseInt(selectedContactId, 10));
+        payload.contact = { id: parseInt(selectedContactId, 10) };
+        if (contactObj?.company) {
+          payload.company = { id: contactObj.company.id };
+        }
+      }
+
+      await updateOpportunity({
+        id: selectedDeal.id,
+        data: payload
+      });
+
+      setIsEditModalOpen(false);
+      setSelectedDeal(null);
+      showToast('Success', 'Opportunity details modified.', 'success');
+    } catch (err) {
+      showToast('Error', err.response?.data?.message || 'Failed to update opportunity.', 'error');
     }
-
-    const updatedDeal = {
-      ...selectedDeal,
-      title,
-      company: finalCompany,
-      value: parseFloat(value) || 0,
-      stage,
-      priority,
-      contactId: selectedContactId || null,
-      notes,
-      date
-    };
-
-    mockDb.updateDeal(updatedDeal);
-    setIsEditModalOpen(false);
-    setSelectedDeal(null);
-    refreshDeals();
   };
 
   const clearFilters = () => {
@@ -223,10 +222,14 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
   const activeSearch = localSearch || externalSearchValue;
 
   // Filter and Sort deals
-  let filteredDeals = deals.filter(deal => {
+  let filteredDeals = opportunities.map(deal => {
+    // Dynamic high-fidelity priority based on deal amount
+    const computedPriority = deal.amount >= 100000 ? 'High' : deal.amount >= 30000 ? 'Medium' : 'Low';
+    return { ...deal, priority: computedPriority };
+  }).filter(deal => {
     const matchesSearch = 
-      deal.title.toLowerCase().includes(activeSearch.toLowerCase()) ||
-      deal.company.toLowerCase().includes(activeSearch.toLowerCase());
+      deal.name.toLowerCase().includes(activeSearch.toLowerCase()) ||
+      (deal.company?.name || '').toLowerCase().includes(activeSearch.toLowerCase());
     
     const matchesPriority = 
       priorityFilter === 'All' || deal.priority === priorityFilter;
@@ -235,20 +238,20 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
   });
 
   if (sortOrder === 'value-asc') {
-    filteredDeals.sort((a, b) => a.value - b.value);
+    filteredDeals.sort((a, b) => a.amount - b.amount);
   } else if (sortOrder === 'value-desc') {
-    filteredDeals.sort((a, b) => b.value - a.value);
+    filteredDeals.sort((a, b) => b.amount - a.amount);
   }
 
   const getStageStats = (stageName) => {
     const stageDeals = filteredDeals.filter(d => d.stage === stageName);
-    const sum = stageDeals.reduce((acc, curr) => acc + curr.value, 0);
+    const sum = stageDeals.reduce((acc, curr) => acc + curr.amount, 0);
     return { count: stageDeals.length, value: sum };
   };
 
-  const activePipelineDeals = deals.filter(d => d.stage !== 'Won' && d.stage !== 'Lost');
-  const totalPipelineValue = activePipelineDeals.reduce((acc, curr) => acc + curr.value, 0);
-  const totalWonValue = deals.filter(d => d.stage === 'Won').reduce((acc, curr) => acc + curr.value, 0);
+  const activePipelineDeals = opportunities.filter(d => d.stage !== 'Won' && d.stage !== 'Lost');
+  const totalPipelineValue = activePipelineDeals.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalWonValue = opportunities.filter(d => d.stage === 'Won').reduce((acc, curr) => acc + curr.amount, 0);
 
   const metrics = [
     { 
@@ -276,9 +279,8 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
 
   const headerActions = (
     <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => {
-      // Reset form to default for ADD
-      setTitle(''); setCompany(''); setValue(''); setStage('Lead');
-      setPriority('Medium'); setDate(''); setSelectedContactId(''); setNotes('');
+      setTitle(''); setCompanyNameStr(''); setValue(''); setStage('Lead');
+      setDate(''); setSelectedContactId(''); setNotes('');
       setIsAddModalOpen(true);
     }}>
       <Plus size={18} /> New Deal
@@ -367,158 +369,158 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
 
       {/* Kanban Board */}
       <div className="kanban-board-wrapper">
-        <div className="kanban-board">
-          {stages.map(colStage => {
-            const { count, value } = getStageStats(colStage);
-            const colDeals = filteredDeals.filter(d => d.stage === colStage);
-            const isOver = activeDropStage === colStage;
-            const stageColor = stageColors[colStage];
+        {isLoadingDeals ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'var(--text-muted)' }}>
+            <span>Loading pipeline deals...</span>
+          </div>
+        ) : (
+          <div className="kanban-board">
+            {stages.map(colStage => {
+              const { count, value } = getStageStats(colStage);
+              const colDeals = filteredDeals.filter(d => d.stage === colStage);
+              const isOver = activeDropStage === colStage;
+              const stageColor = stageColors[colStage];
 
-            return (
-              <div 
-                key={colStage}
-                className={`kanban-column ${isOver ? 'drag-over' : ''}`}
-                onDragOver={(e) => handleDragOver(e, colStage)}
-                onDrop={(e) => handleDrop(e, colStage)}
-                onDragLeave={() => setActiveDropStage(null)}
-                style={{
-                  '--stage-color': stageColor,
-                  borderColor: isOver ? stageColor : 'var(--border-light)'
-                }}
-              >
-                {/* Column Header */}
-                <div className="kanban-column-header" style={{ borderBottomColor: `${stageColor}33` }}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageColor, boxShadow: `0 0 8px ${stageColor}` }} />
-                    <span className="kanban-column-title">{colStage}</span>
-                    <span className="kanban-column-count">{count}</span>
+              return (
+                <div 
+                  key={colStage}
+                  className={`kanban-column ${isOver ? 'drag-over' : ''}`}
+                  onDragOver={(e) => handleDragOver(e, colStage)}
+                  onDrop={(e) => handleDrop(e, colStage)}
+                  onDragLeave={() => setActiveDropStage(null)}
+                  style={{
+                    '--stage-color': stageColor,
+                    borderColor: isOver ? stageColor : 'var(--border-light)'
+                  }}
+                >
+                  {/* Column Header */}
+                  <div className="kanban-column-header" style={{ borderBottomColor: `${stageColor}33` }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageColor, boxShadow: `0 0 8px ${stageColor}` }} />
+                      <span className="kanban-column-title">{colStage}</span>
+                      <span className="kanban-column-count">{count}</span>
+                    </div>
+                    <span className="kanban-column-value">
+                      ${value.toLocaleString()}
+                    </span>
                   </div>
-                  <span className="kanban-column-value">
-                    ${value.toLocaleString()}
-                  </span>
-                </div>
 
-                {/* Cards Wrapper */}
-                <div className="kanban-cards-wrapper custom-scrollbar mt-3">
-                  <AnimatePresence mode="popLayout">
-                    {colDeals.map(deal => {
-                      const prob = stageProbabilities[deal.stage] || 50;
-                      return (
-                        <motion.div
-                          layout
-                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                          transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                          key={deal.id}
-                          className="kanban-card premium-card"
-                          draggable="true"
-                          onDragStart={() => handleDragStart(deal.id)}
-                          onDragEnd={handleDragEnd}
-                          onClick={(e) => openEditModal(deal, e)}
-                        >
-                          <div className="flex justify-between items-start gap-2 mb-2">
-                            <h4 className="kanban-card-title">{deal.title}</h4>
-                            <div className="kanban-card-actions">
-                              <button 
-                                onClick={(e) => openEditModal(deal, e)} 
-                                className="kanban-card-action-btn"
-                                title="Edit Deal"
+                  {/* Cards Wrapper */}
+                  <div className="kanban-cards-wrapper custom-scrollbar mt-3">
+                    <AnimatePresence mode="popLayout">
+                      {colDeals.map(deal => {
+                        const prob = stageProbabilities[deal.stage] || 50;
+                        return (
+                          <motion.div
+                            layout
+                            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                            key={deal.id}
+                            className="kanban-card premium-card"
+                            draggable="true"
+                            onDragStart={() => handleDragStart(deal.id)}
+                            onDragEnd={handleDragEnd}
+                            onClick={(e) => openEditModal(deal, e)}
+                          >
+                            <div className="flex justify-between items-start gap-2 mb-2">
+                              <h4 className="kanban-card-title">{deal.name}</h4>
+                              <div className="kanban-card-actions">
+                                <button 
+                                  onClick={(e) => openEditModal(deal, e)} 
+                                  className="kanban-card-action-btn"
+                                  title="Edit Deal"
+                                >
+                                  <Edit2 size={10} />
+                                </button>
+                                <button 
+                                  onClick={(e) => handleDeleteDeal(deal.id, e)} 
+                                  className="kanban-card-action-btn delete"
+                                  title="Delete Deal"
+                                >
+                                  <Trash2 size={10} />
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="kanban-card-company-row">
+                              <Building2 size={12} />
+                              <span className="kanban-card-company-name">{deal.company?.name || 'Independent'}</span>
+                            </div>
+
+                            <div className="kanban-card-meta-row">
+                              <div className="flex items-center gap-1">
+                                <Calendar size={11} />
+                                <span>{deal.closeDate || 'No close date'}</span>
+                              </div>
+                              <div className="kanban-card-probability">
+                                <Sparkles size={9} />
+                                <span>Prob: {prob}%</span>
+                              </div>
+                            </div>
+
+                            <div className="kanban-card-footer">
+                              <span className="kanban-card-value">
+                                ${deal.amount.toLocaleString()}
+                              </span>
+                              <Badge 
+                                variant={
+                                  deal.priority === 'High' ? 'error' : 
+                                  deal.priority === 'Medium' ? 'warning' : 'neutral'
+                                }
                               >
-                                <Edit2 size={10} />
-                              </button>
+                                {deal.priority}
+                              </Badge>
+                            </div>
+
+                            {/* Quick manual navigation shortcuts */}
+                            <div className="kanban-card-movers" onClick={e => e.stopPropagation()}>
                               <button 
-                                onClick={(e) => handleDeleteDeal(deal.id, e)} 
-                                className="kanban-card-action-btn delete"
-                                title="Delete Deal"
+                                className="mover-btn"
+                                disabled={colStage === stages[0]}
+                                onClick={() => moveDealManual(deal, -1)}
+                                title="Move back stage"
                               >
-                                <Trash2 size={10} />
+                                <ChevronLeft size={14} />
+                              </button>
+                              <span className="mover-label">STAGE TUNER</span>
+                              <button 
+                                className="mover-btn"
+                                disabled={colStage === stages[stages.length - 1]}
+                                onClick={() => moveDealManual(deal, 1)}
+                                title="Move next stage"
+                              >
+                                <ChevronRight size={14} />
                               </button>
                             </div>
-                          </div>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
 
-                          <div className="kanban-card-company-row">
-                            <Building2 size={12} />
-                            <span className="kanban-card-company-name">{deal.company}</span>
-                          </div>
-
-                          {deal.notes && (
-                            <p className="kanban-card-notes">
-                              "{deal.notes}"
-                            </p>
-                          )}
-
-                          <div className="kanban-card-meta-row">
-                            <div className="flex items-center gap-1">
-                              <Calendar size={11} />
-                              <span>{deal.date}</span>
-                            </div>
-                            <div className="kanban-card-probability">
-                              <Sparkles size={9} />
-                              <span>Prob: {prob}%</span>
-                            </div>
-                          </div>
-
-                          <div className="kanban-card-footer">
-                            <span className="kanban-card-value">
-                              ${deal.value.toLocaleString()}
-                            </span>
-                            <Badge 
-                              variant={
-                                deal.priority === 'High' ? 'error' : 
-                                deal.priority === 'Medium' ? 'warning' : 'neutral'
-                              }
-                            >
-                              {deal.priority}
-                            </Badge>
-                          </div>
-
-                          {/* Quick manual navigation shortcuts */}
-                          <div className="kanban-card-movers" onClick={e => e.stopPropagation()}>
-                            <button 
-                              className="mover-btn"
-                              disabled={colStage === stages[0]}
-                              onClick={() => moveDealManual(deal, -1)}
-                              title="Move back stage"
-                            >
-                              <ChevronLeft size={14} />
-                            </button>
-                            <span className="mover-label">STAGE TUNER</span>
-                            <button 
-                              className="mover-btn"
-                              disabled={colStage === stages[stages.length - 1]}
-                              onClick={() => moveDealManual(deal, 1)}
-                              title="Move next stage"
-                            >
-                              <ChevronRight size={14} />
-                            </button>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-
-                  {colDeals.length === 0 && (
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="kanban-drop-zone flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-xl p-6 text-gray-500 text-center gap-2 bg-[#090f1e]/40 min-h-[150px] transition-colors"
-                      style={{
-                        borderColor: isOver ? stageColor : 'rgba(255,255,255,0.03)'
-                      }}
-                    >
-                      <div className="w-8 h-8 rounded-full bg-gray-900/60 border border-gray-850 flex items-center justify-center mb-1">
-                        <Clock size={14} className="text-gray-600" />
-                      </div>
-                      <span className="text-xs font-semibold">Stage Empty</span>
-                      <span className="text-[10px] text-gray-600">Drag a deal card here</span>
-                    </motion.div>
-                  )}
+                    {colDeals.length === 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="kanban-drop-zone flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-xl p-6 text-gray-500 text-center gap-2 bg-[#090f1e]/40 min-h-[150px] transition-colors"
+                        style={{
+                          borderColor: isOver ? stageColor : 'rgba(255,255,255,0.03)'
+                        }}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-gray-900/60 border border-gray-850 flex items-center justify-center mb-1">
+                          <Clock size={14} className="text-gray-600" />
+                        </div>
+                        <span className="text-xs font-semibold">Stage Empty</span>
+                        <span className="text-[10px] text-gray-600">Drag a deal card here</span>
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Add Deal Modal using custom Modal primitive */}
@@ -546,33 +548,19 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <select 
               className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
               value={selectedContactId} 
-              onChange={e => {
-                setSelectedContactId(e.target.value);
-                const contact = contacts.find(c => c.id === e.target.value);
-                if (contact) setCompany(contact.company);
-              }}
+              onChange={e => setSelectedContactId(e.target.value)}
             >
               <option value="">-- Associate Contact --</option>
-              {contacts.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name} ({c.company})
-                </option>
-              ))}
+              {contacts.map(c => {
+                const contactName = `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.email;
+                return (
+                  <option key={c.id} value={c.id}>
+                    {contactName} {c.company ? `(${c.company.name})` : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
-
-          {!selectedContactId && (
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company / Entity Name</label>
-              <input 
-                type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
-                placeholder="e.g. Acme Innovations"
-                value={company} 
-                onChange={e => setCompany(e.target.value)} 
-              />
-            </div>
-          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
@@ -607,28 +595,6 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
                 {stages.map(stg => <option key={stg} value={stg}>{stg}</option>)}
               </select>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deal Priority</label>
-              <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
-                value={priority} 
-                onChange={e => setPriority(e.target.value)}
-              >
-                <option value="Low">Low Priority</option>
-                <option value="Medium">Medium Priority</option>
-                <option value="High">High Priority</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Opportunity Notes</label>
-            <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6] h-20 resize-none" 
-              placeholder="Provide strategic intelligence about this deal..."
-              value={notes} 
-              onChange={e => setNotes(e.target.value)} 
-            />
           </div>
 
           <div className="flex justify-end gap-3 mt-4">
@@ -676,29 +642,18 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <select 
               className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
               value={selectedContactId} 
-              onChange={e => {
-                setSelectedContactId(e.target.value);
-                const contact = contacts.find(c => c.id === e.target.value);
-                if (contact) setCompany(contact.company);
-              }}
+              onChange={e => setSelectedContactId(e.target.value)}
             >
               <option value="">-- Associate Contact --</option>
-              {contacts.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name} ({c.company})
-                </option>
-              ))}
+              {contacts.map(c => {
+                const contactName = `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.email;
+                return (
+                  <option key={c.id} value={c.id}>
+                    {contactName} {c.company ? `(${c.company.name})` : ''}
+                  </option>
+                );
+              })}
             </select>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company / Entity Name</label>
-            <input 
-              type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
-              value={company} 
-              onChange={e => setCompany(e.target.value)} 
-            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -733,27 +688,6 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
                 {stages.map(stg => <option key={stg} value={stg}>{stg}</option>)}
               </select>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deal Priority</label>
-              <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
-                value={priority} 
-                onChange={e => setPriority(e.target.value)}
-              >
-                <option value="Low">Low Priority</option>
-                <option value="Medium">Medium Priority</option>
-                <option value="High">High Priority</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Opportunity Notes</label>
-            <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6] h-20 resize-none" 
-              value={notes} 
-              onChange={e => setNotes(e.target.value)} 
-            />
           </div>
 
           <div className="flex justify-between items-center mt-4">

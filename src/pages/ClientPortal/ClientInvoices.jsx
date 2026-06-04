@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   CreditCard, 
   ArrowLeft, 
@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { mockDb } from '../../utils/mockDb';
+import { useInvoices } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
@@ -19,10 +19,7 @@ export default function ClientInvoices() {
   const companyName = user?.clientCompany || 'CloudScale Inc.';
   const displayCompany = companyName === 'ACME Corp' ? 'CloudScale Inc.' : companyName;
 
-  const [invoices, setInvoices] = useState(() => {
-    // Read directly from mockDb
-    return mockDb.getInvoices() || [];
-  });
+  const { invoices = [], isLoading, updateInvoice } = useInvoices();
 
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -33,35 +30,25 @@ export default function ClientInvoices() {
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCVC, setCardCVC] = useState('');
 
-  const refreshInvoices = () => {
-    setInvoices(mockDb.getInvoices() || []);
-  };
-
   const handlePayClick = (invoice, e) => {
     e.stopPropagation();
     setSelectedInvoice(invoice);
     setIsPayModalOpen(true);
   };
 
-  const handlePaySubmit = (e) => {
+  const handlePaySubmit = async (e) => {
     e.preventDefault();
     if (!cardNumber || !cardExpiry || !cardCVC) return;
 
     setIsPaying(true);
     showToast('Payment Processing', 'Connecting to secure Stripe API gateway...', 'info');
 
-    setTimeout(() => {
-      // Find and update invoice status to Paid
-      const allInvoices = mockDb.getInvoices() || [];
-      const updated = allInvoices.map(inv => {
-        if (inv.id === selectedInvoice.id) {
-          return { ...inv, status: 'Paid' };
-        }
-        return inv;
+    try {
+      // Settle invoice payment via API
+      await updateInvoice({
+        id: selectedInvoice.id,
+        data: { status: 'Paid', paid: selectedInvoice.amount }
       });
-
-      mockDb.saveInvoices(updated);
-      refreshInvoices();
 
       setIsPaying(false);
       setIsPayModalOpen(false);
@@ -69,7 +56,11 @@ export default function ClientInvoices() {
       setCardNumber(''); setCardExpiry(''); setCardCVC('');
 
       showToast('Payment Completed', 'Invoice was successfully settled and marked as Paid!', 'success');
-    }, 1800);
+    } catch (err) {
+      console.error(err);
+      setIsPaying(false);
+      showToast('Payment Failed', 'Transaction declined by gateway.', 'error');
+    }
   };
 
   const getStatusVariant = (stat) => {
@@ -88,7 +79,7 @@ export default function ClientInvoices() {
   // TanStack Columns
   const columns = [
     {
-      accessorKey: 'id',
+      accessorKey: 'invoiceNumber',
       header: 'Invoice ID',
       cell: ({ getValue }) => <span className="font-mono text-xs font-bold" style={{ color: 'var(--text-title)' }}>{getValue()}</span>
     },
@@ -179,7 +170,7 @@ export default function ClientInvoices() {
             <div className="portal-modal-header-panel mb-2">
               <div className="flex flex-col gap-0.5">
                 <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>SECURE INVOICE TRANSACTION</span>
-                <span className="font-mono font-extrabold text-sm" style={{ color: 'var(--text-title)' }}>{selectedInvoice.id}</span>
+                <span className="font-mono font-extrabold text-sm" style={{ color: 'var(--text-title)' }}>{selectedInvoice.invoiceNumber}</span>
               </div>
               <div className="text-right">
                 <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>AMOUNT DUE</span>

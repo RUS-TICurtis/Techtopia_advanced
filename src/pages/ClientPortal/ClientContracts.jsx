@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   CheckCircle, 
   ShieldCheck, 
@@ -8,48 +8,19 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
+import { useContracts } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import './ClientPortal.css';
 
-const INITIAL_CONTRACTS = [
-  {
-    id: "CTR-8921-A",
-    title: "Master Services Agreement (MSA)",
-    client: "CloudScale Inc.",
-    value: 120000,
-    status: "Active",
-    startDate: "2026-05-01",
-    endDate: "2027-05-01",
-    slaTerms: "99.9% API uptime, 2h High-Priority response SLA"
-  },
-  {
-    id: "CTR-8921-B",
-    title: "Quantum Cloud Migration SLA Rider",
-    client: "CloudScale Inc.",
-    value: 45000,
-    status: "Pending Signature",
-    startDate: "2026-05-15",
-    endDate: "2026-07-15",
-    slaTerms: "Database cutover integrity verification, 200ms latency validation"
-  }
-];
-
 export default function ClientContracts() {
   const user = useAuthStore(state => state.user);
   const companyName = user?.clientCompany || 'CloudScale Inc.';
   const displayCompany = companyName === 'ACME Corp' ? 'CloudScale Inc.' : companyName;
 
-  const [contracts, setContracts] = useState(() => {
-    const saved = localStorage.getItem('crm_contracts');
-    return saved ? JSON.parse(saved) : INITIAL_CONTRACTS;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('crm_contracts', JSON.stringify(contracts));
-  }, [contracts]);
+  const { contracts = [], isLoading, updateContract } = useContracts();
 
   const [selectedContract, setSelectedContract] = useState(null);
   const [isSignModalOpen, setIsSignModalOpen] = useState(false);
@@ -62,20 +33,18 @@ export default function ClientContracts() {
     setIsSignModalOpen(true);
   };
 
-  const handleSignSubmit = (e) => {
+  const handleSignSubmit = async (e) => {
     e.preventDefault();
     if (!acceptTerms) return;
 
     setIsSigning(true);
     showToast('Executing Cryptographic Signature', 'Registering secure transaction on audit ledger...', 'info');
 
-    setTimeout(() => {
-      setContracts(prev => prev.map(c => {
-        if (c.id === selectedContract.id) {
-          return { ...c, status: 'Active' };
-        }
-        return c;
-      }));
+    try {
+      await updateContract({
+        id: selectedContract.id,
+        data: { status: 'Active' }
+      });
 
       setIsSigning(false);
       setIsSignModalOpen(false);
@@ -83,7 +52,11 @@ export default function ClientContracts() {
       setAcceptTerms(false);
 
       showToast('Agreement Active', 'Contract signature verified and stored in compliance system!', 'success');
-    }, 1800);
+    } catch (err) {
+      console.error(err);
+      setIsSigning(false);
+      showToast('Error', 'Failed to execute signature.', 'error');
+    }
   };
 
   const getStatusVariant = (stat) => {
@@ -98,7 +71,7 @@ export default function ClientContracts() {
 
   const columns = [
     {
-      accessorKey: 'id',
+      accessorKey: 'contractNumber',
       header: 'Contract ID',
       cell: ({ getValue }) => <span className="font-mono text-xs font-bold" style={{ color: 'var(--text-title)' }}>{getValue()}</span>
     },
@@ -112,14 +85,14 @@ export default function ClientContracts() {
       header: 'Contract Value',
       cell: ({ getValue }) => (
         <span className="font-display font-extrabold text-xs" style={{ color: 'var(--brand-cyan)' }}>
-          ${getValue().toLocaleString()}
+          ${getValue()?.toLocaleString() || 0}
         </span>
       )
     },
     {
       accessorKey: 'startDate',
       header: 'Effective Date',
-      cell: ({ getValue }) => <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{getValue()}</span>
+      cell: ({ getValue }) => <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{getValue() || '—'}</span>
     },
     {
       accessorKey: 'status',
@@ -190,11 +163,11 @@ export default function ClientContracts() {
               <div className="portal-modal-header-panel">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>CRYPTOGRAPHIC AGREEMENT</span>
-                  <span className="font-mono font-extrabold text-sm" style={{ color: 'var(--text-title)' }}>{selectedContract.title} ({selectedContract.id})</span>
+                  <span className="font-mono font-extrabold text-sm" style={{ color: 'var(--text-title)' }}>{selectedContract.title} ({selectedContract.contractNumber})</span>
                 </div>
                 <div className="text-right">
                   <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>ANNUAL CONTRACT VALUE</span>
-                  <span className="font-display font-black text-base block" style={{ color: 'var(--brand-cyan)' }}>${selectedContract.value.toLocaleString()}</span>
+                  <span className="font-display font-black text-base block" style={{ color: 'var(--brand-cyan)' }}>${selectedContract.value?.toLocaleString() || 0}</span>
                 </div>
               </div>
 
@@ -204,7 +177,7 @@ export default function ClientContracts() {
                   <ShieldCheck size={12} style={{ color: 'var(--brand-cyan)' }} /> Binding SLA Commitments & Terms
                 </span>
                 <p className="text-xs leading-relaxed italic" style={{ color: 'var(--text-main)' }}>
-                  "{selectedContract.slaTerms}"
+                  "{selectedContract.slaTerms || 'No specific SLA terms defined'}"
                 </p>
               </div>
 
@@ -213,7 +186,7 @@ export default function ClientContracts() {
                 <span className="portal-document-section-title">SECTION 1. SERVICE STANDARDS</span>
                 Techtopia CRM Hub agrees to provide technical and Innovation cloud dashboard services to {displayCompany} in compliance with standard SaaS parameters. High-Priority diagnostic items must be resolved within two (2) hours of receipt, or be subject to appropriate credit parameters.
                 <span className="portal-document-section-title">SECTION 2. COMPLIANCE & LEGAL</span>
-                This document acts as a Master Services Agreement and carries cryptographic transaction markers that represent standard AES-256 e-signature execution regulations.
+                This document acts as a Master Services Agreement and carries cryptographic transaction markers that represent standard e-signature execution regulations.
               </div>
 
               <div className="portal-alert-cyan my-1">
@@ -231,7 +204,7 @@ export default function ClientContracts() {
                   disabled={isSigning}
                 />
                 <span className="text-xs font-semibold leading-normal" style={{ color: 'var(--text-main)' }}>
-                  I accept all binding SLA terms, standards and legal parameters described in CTR-8921.
+                  I accept all binding SLA terms, standards and legal parameters described in {selectedContract.contractNumber}.
                 </span>
               </label>
             </div>

@@ -10,7 +10,6 @@ import {
   Building2,
   Palette
 } from 'lucide-react';
-import { mockDb } from '../utils/mockDb';
 import { useAuthStore } from '../store/authStore';
 import './Settings.css';
 
@@ -18,17 +17,16 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [activeTab, setActiveTab] = useState('profile');
   
   // Profile form states
-  const { user: authUser, updateUserAvatar } = useAuthStore();
-  const user = mockDb.getProfile() || {};
-  const [name, setName] = useState(user.name || authUser?.name || '');
-  const [username, setUsername] = useState(user.username || authUser?.email?.split('@')[0] || '');
-  const [email, setEmail] = useState(user.email || authUser?.email || '');
-  const [phone, setPhone] = useState(user.phone || '');
-  const [role, setRole] = useState(user.role || authUser?.roleLabel || '');
-  const [location, setLocation] = useState(user.location || '');
+  const { user: authUser, updateUserAvatar, updateProfile } = useAuthStore();
+  const [name, setName] = useState(authUser?.name || '');
+  const [username, setUsername] = useState(authUser?.username || authUser?.email?.split('@')[0] || '');
+  const [email, setEmail] = useState(authUser?.email || '');
+  const [phone, setPhone] = useState(authUser?.phone || '');
+  const [role, setRole] = useState(authUser?.roleLabel || authUser?.role || '');
+  const [location, setLocation] = useState(authUser?.location || '');
 
   // Avatar states
-  const [avatarUrl, setAvatarUrl] = useState(authUser?.avatarUrl || user.avatarUrl || '');
+  const [avatarUrl, setAvatarUrl] = useState(authUser?.avatarUrl || '');
   const [dragActive, setDragActive] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const fileInputRef = useRef(null);
@@ -66,9 +64,8 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     reader.onload = (event) => {
       const base64String = event.target.result;
       setAvatarUrl(base64String);
-      // Sync with Zustand and MockDb
+      // Sync with Zustand
       updateUserAvatar(base64String);
-      mockDb.updateUserProfile({ avatarUrl: base64String });
       if (onProfileUpdate) onProfileUpdate({ avatarUrl: base64String });
     };
     reader.readAsDataURL(file);
@@ -103,13 +100,20 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [profileSuccess, setProfileSuccess] = useState('');
   const [securitySuccess, setSecuritySuccess] = useState('');
 
-  const handleProfileSubmit = (e) => {
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
     const updated = { name, username, email, phone, role, location };
-    mockDb.updateUserProfile(updated);
-    if (onProfileUpdate) onProfileUpdate(updated);
-    setProfileSuccess('Profile successfully updated!');
-    setTimeout(() => setProfileSuccess(''), 3000);
+    const res = await updateProfile(updated);
+    if (res.success) {
+      if (onProfileUpdate) onProfileUpdate(updated);
+      setProfileSuccess('Profile successfully updated!');
+    } else {
+      setErrorMsg(res.error || 'Failed to update profile.');
+    }
+    setTimeout(() => {
+      setProfileSuccess('');
+      setErrorMsg('');
+    }, 3000);
   };
 
   const handleSecuritySubmit = (e) => {
@@ -187,7 +191,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                         <img src={avatarUrl} alt="Avatar" className="uploaded-avatar" />
                       ) : (
                         <div className="avatar-initials-fallback">
-                          {authUser?.avatar || user.avatar || 'CT'}
+                          {authUser?.avatar || 'CT'}
                         </div>
                       )}
                       <div className="settings-avatar-upload" title="Upload Avatar">

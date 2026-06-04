@@ -19,7 +19,6 @@ import {
   Building2,
   AlertTriangle
 } from 'lucide-react';
-import { mockDb } from '../utils/mockDb';
 import { useTickets } from '../hooks/useCrmData';
 import DataTable from '../components/ui/DataTable';
 import Modal from '../components/ui/Modal';

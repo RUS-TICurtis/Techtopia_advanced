@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { mockDb } from '../utils/mockDb';
-import { useDashboardSummary } from '../hooks/useCrmData';
+import { 
+  useDashboardSummary, 
+  useLeads, 
+  useOpportunities, 
+  useFinanceSummary, 
+  useAuditLogs 
+} from '../hooks/useCrmData';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar, Legend
@@ -13,29 +18,6 @@ import {
   ArrowRight, AlertTriangle, Activity
 } from 'lucide-react';
 import './Dashboard.css';
-
-const AREA_DATA = [
-  { month: 'Jan', Revenue: 42000, Leads: 18 },
-  { month: 'Feb', Revenue: 58000, Leads: 25 },
-  { month: 'Mar', Revenue: 75000, Leads: 31 },
-  { month: 'Apr', Revenue: 61000, Leads: 22 },
-  { month: 'May', Revenue: 93000, Leads: 40 },
-  { month: 'Jun', Revenue: 120000, Leads: 52 },
-];
-
-const PIE_DATA = [
-  { name: 'Won', value: 1, color: '#21FA90' },
-  { name: 'In Progress', value: 2, color: '#01FDF6' },
-  { name: 'Proposal', value: 1, color: '#8A4FFF' },
-  { name: 'Lead', value: 1, color: '#E4FF1A' },
-];
-
-const ACTIVITY_FEED = [
-  { id: 1, type: 'success', icon: CheckCircle, title: 'Contract Signed', desc: 'CyberPulse Security finalized Enterprise Support tier.', time: 'May 18, 2026' },
-  { id: 2, type: 'info', icon: Clock, title: 'API SLA Proposal Sent', desc: 'SLA draft dispatched to Catherine Song at BioGen Lab.', time: 'May 15, 2026' },
-  { id: 3, type: 'warning', icon: AlertTriangle, title: 'Ticket Escalated', desc: 'High-priority ticket TK-001 escalated to Tier-3 support.', time: 'May 14, 2026' },
-  { id: 4, type: 'ai', icon: Sparkles, title: 'AI Lead Score Updated', desc: 'Alice Vance scored 92/100 — recommend immediate follow-up.', time: 'May 13, 2026' },
-];
 
 const CUSTOM_TOOLTIP = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -59,14 +41,18 @@ const CUSTOM_TOOLTIP = ({ active, payload, label }) => {
 export default function Dashboard({ setCurrentTab }) {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
-  const { summary } = useDashboardSummary();
-  const [contacts] = useState(() => mockDb.getContacts());
-  const [deals] = useState(() => mockDb.getDeals());
+  
+  // Real database query hooks
+  const { summary, isLoading: isLoadingSummary } = useDashboardSummary();
+  const { leads, isLoading: isLoadingLeads } = useLeads();
+  const { opportunities, isLoading: isLoadingOpps } = useOpportunities();
+  const { payments = [], isLoading: isLoadingFinance } = useFinanceSummary();
+  const { logs = [], isLoading: isLoadingLogs } = useAuditLogs();
 
-  const totalValue = summary?.crm?.totalWonValue ?? deals.reduce((acc, curr) => acc + curr.value, 0);
-  const activeDealsCount = summary?.crm?.totalOpportunities ?? deals.filter(d => d.stage !== 'Won' && d.stage !== 'Lost').length;
-  const wonDealsCount = summary?.crm?.wonCount ?? deals.filter(d => d.stage === 'Won').length;
-  const totalLeads = summary?.crm?.totalLeads ?? contacts.length;
+  const totalValue = summary?.crm?.totalWonValue ?? 0;
+  const activeDealsCount = summary?.crm?.totalOpportunities ?? 0;
+  const wonDealsCount = summary?.crm?.wonCount ?? 0;
+  const totalLeads = summary?.crm?.totalLeads ?? 0;
 
   const nav = (path) => {
     if (navigate) navigate(path);
@@ -93,6 +79,113 @@ export default function Dashboard({ setCurrentTab }) {
     if (h < 17) return 'Good afternoon';
     return 'Good evening';
   };
+
+  // Compile monthly data dynamically
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const getMonthlyData = () => {
+    const last6Months = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      last6Months.push({
+        month: months[d.getMonth()],
+        year: d.getFullYear(),
+        Revenue: 0,
+        Leads: 0
+      });
+    }
+
+    if (Array.isArray(payments)) {
+      payments.forEach(p => {
+        if (p.status === 'completed' && p.time) {
+          const pDate = new Date(p.time);
+          const pMonth = months[pDate.getMonth()];
+          const pYear = pDate.getFullYear();
+          const bucket = last6Months.find(m => m.month === pMonth && m.year === pYear);
+          if (bucket) {
+            bucket.Revenue += (p.amount || 0);
+          }
+        }
+      });
+    }
+
+    if (Array.isArray(leads)) {
+      leads.forEach(l => {
+        if (l.createdAt) {
+          const lDate = new Date(l.createdAt);
+          const lMonth = months[lDate.getMonth()];
+          const lYear = lDate.getFullYear();
+          const bucket = last6Months.find(m => m.month === lMonth && m.year === lYear);
+          if (bucket) {
+            bucket.Leads += 1;
+          }
+        }
+      });
+    }
+
+    return last6Months;
+  };
+
+  const chartData = getMonthlyData();
+
+  // Compile pie chart data dynamically
+  const getPieData = () => {
+    const stageCounts = {};
+    if (Array.isArray(opportunities)) {
+      opportunities.forEach(opp => {
+        stageCounts[opp.stage] = (stageCounts[opp.stage] || 0) + 1;
+      });
+    }
+
+    const colors = {
+      'Qualification': '#01FDF6',
+      'Proposal': '#8A4FFF',
+      'Negotiation': '#FF47DA',
+      'Closed Won': '#21FA90',
+      'Closed Lost': '#FF4B4B'
+    };
+
+    const data = Object.entries(stageCounts).map(([name, value]) => ({
+      name,
+      value,
+      color: colors[name] || '#627496'
+    }));
+
+    return data.length > 0 ? data : [{ name: 'No Deals', value: 0, color: '#627496' }];
+  };
+
+  const pieData = getPieData();
+
+  // Compile recent activities from dynamic audit logs
+  const getRecentActivities = () => {
+    if (!Array.isArray(logs) || logs.length === 0) return [];
+    
+    return logs.slice(0, 4).map((log, idx) => {
+      let icon = Activity;
+      let type = 'info';
+      if (log.action.includes('CREATE') || log.action.includes('WON') || log.action.includes('SIGN')) {
+        icon = CheckCircle;
+        type = 'success';
+      } else if (log.action.includes('DELETE') || log.action.includes('ERROR') || log.action.includes('FAIL')) {
+        icon = AlertTriangle;
+        type = 'warning';
+      } else if (log.action.includes('UPDATE')) {
+        icon = Clock;
+        type = 'info';
+      }
+
+      return {
+        id: log.id || idx,
+        type,
+        icon,
+        title: log.action.replace(/_/g, ' '),
+        desc: `${log.actor || 'System'} modified ${log.module || 'Resource'}.`,
+        time: new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+      };
+    });
+  };
+
+  const activityFeed = getRecentActivities();
 
   return (
     <div className="page-container">
@@ -148,26 +241,32 @@ export default function Dashboard({ setCurrentTab }) {
           <div className="card">
             <div className="card-title">Revenue & Lead Acquisition (6 Months)</div>
             <div style={{ height: 240 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={AREA_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#01FDF6" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#01FDF6" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#21FA90" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#21FA90" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 12 }} />
-                  <YAxis stroke="#3d4e6b" tick={{ fontSize: 12 }} />
-                  <Tooltip content={<CUSTOM_TOOLTIP />} />
-                  <Area type="monotone" dataKey="Revenue" stroke="#01FDF6" strokeWidth={2} fill="url(#gradRevenue)" />
-                  <Area type="monotone" dataKey="Leads" stroke="#21FA90" strokeWidth={2} fill="url(#gradLeads)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              {leads.length === 0 && payments.length === 0 ? (
+                <div className="empty-state-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
+                  <span>No data recorded for the selected period.</span>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#01FDF6" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="#01FDF6" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#21FA90" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#21FA90" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 12 }} />
+                    <YAxis stroke="#3d4e6b" tick={{ fontSize: 12 }} />
+                    <Tooltip content={<CUSTOM_TOOLTIP />} />
+                    <Area type="monotone" dataKey="Revenue" stroke="#01FDF6" strokeWidth={2} fill="url(#gradRevenue)" />
+                    <Area type="monotone" dataKey="Leads" stroke="#21FA90" strokeWidth={2} fill="url(#gradLeads)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -176,40 +275,52 @@ export default function Dashboard({ setCurrentTab }) {
             <div className="card">
               <div className="card-title">Deal Pipeline Stages</div>
               <div style={{ height: 210, display: 'flex', alignItems: 'center' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={PIE_DATA}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={45}
-                      outerRadius={75}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {PIE_DATA.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(v, name) => [v, name]} contentStyle={{ backgroundColor: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
-                    <Legend iconSize={10} formatter={(val) => <span style={{ color: '#c8d6ef', fontSize: 12 }}>{val}</span>} />
-                  </PieChart>
-                </ResponsiveContainer>
+                {opportunities.length === 0 ? (
+                  <div className="empty-state-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
+                    <span>0 opportunities in pipeline</span>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={45}
+                        outerRadius={75}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(v, name) => [v, name]} contentStyle={{ backgroundColor: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
+                      <Legend iconSize={10} formatter={(val) => <span style={{ color: '#c8d6ef', fontSize: 12 }}>{val}</span>} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </div>
 
             <div className="card">
               <div className="card-title">Monthly Conversion Trend</div>
               <div style={{ height: 180 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={AREA_DATA.slice(-4)} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 12 }} />
-                    <YAxis stroke="#3d4e6b" tick={{ fontSize: 12 }} />
-                    <Tooltip contentStyle={{ backgroundColor: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
-                    <Bar dataKey="Leads" fill="#8A4FFF" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                {leads.length === 0 ? (
+                  <div className="empty-state-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
+                    <span>0 leads converted</span>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData.slice(-4)} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 12 }} />
+                      <YAxis stroke="#3d4e6b" tick={{ fontSize: 12 }} />
+                      <Tooltip contentStyle={{ backgroundColor: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
+                      <Bar dataKey="Leads" fill="#8A4FFF" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </div>
           </div>
@@ -247,21 +358,27 @@ export default function Dashboard({ setCurrentTab }) {
               </span>
             </div>
             <div className="activity-feed">
-              {ACTIVITY_FEED.map(item => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.id} className="activity-item">
-                    <div className={`activity-icon ${item.type}`}>
-                      <Icon size={17} />
+              {activityFeed.length === 0 ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '120px', color: 'var(--text-muted)', fontSize: 13 }}>
+                  <span>No recent activity found.</span>
+                </div>
+              ) : (
+                activityFeed.map(item => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.id} className="activity-item">
+                      <div className={`activity-icon ${item.type}`}>
+                        <Icon size={17} />
+                      </div>
+                      <div className="activity-content">
+                        <h4>{item.title}</h4>
+                        <p>{item.desc}</p>
+                        <span className="activity-time">{item.time}</span>
+                      </div>
                     </div>
-                    <div className="activity-content">
-                      <h4>{item.title}</h4>
-                      <p>{item.desc}</p>
-                      <span className="activity-time">{item.time}</span>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

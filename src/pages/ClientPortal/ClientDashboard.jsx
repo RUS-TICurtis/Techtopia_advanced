@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Building2, 
@@ -10,7 +10,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { mockDb } from '../../utils/mockDb';
+import { useProjects, useInvoices, useTickets } from '../../hooks/useCrmData';
 import Badge from '../../components/ui/Badge';
 import './ClientPortal.css';
 
@@ -19,36 +19,37 @@ export default function ClientDashboard() {
   const companyName = user?.clientCompany || 'CloudScale Inc.';
   const displayCompany = companyName === 'ACME Corp' ? 'CloudScale Inc.' : companyName; // Demowise mapping
 
-  const [projects, setProjects] = useState([]);
-  const [invoices, setInvoices] = useState([]);
-  const [tickets, setTickets] = useState([]);
+  const { projects: allProjects = [] } = useProjects();
+  const { invoices: allInvoices = [] } = useInvoices();
+  const { tickets: allTickets = [] } = useTickets();
 
-  useEffect(() => {
-    // Load projects, invoices, tickets
-    const allProjects = JSON.parse(localStorage.getItem('crm_projects')) || [];
-    const clientProjects = allProjects.filter(p => p.company === displayCompany);
-    setProjects(clientProjects);
-
-    const allInvoices = mockDb.getInvoices() || [];
-    const clientInvoices = allInvoices.filter(inv => inv.client === displayCompany);
-    setInvoices(clientInvoices);
-
-    const allTickets = mockDb.getTickets() || [];
-    const clientTickets = allTickets.filter(t => t.client === displayCompany);
-    setTickets(clientTickets);
-  }, [displayCompany]);
+  // Filter projects, invoices, tickets for the company
+  const projects = allProjects; // projects are scoped to organization (tenant)
+  const invoices = allInvoices.filter(inv => inv.client === displayCompany);
+  const tickets = allTickets.filter(t => t.client === displayCompany);
 
   // Calculations
-  const activeProject = projects[0] || { title: 'No active project', progress: 0, health: 'On Track' };
+  const activeProject = useMemo(() => {
+    if (projects.length === 0) return { name: 'No active project', progress: 0, status: 'Not Started', description: '' };
+    const proj = projects[0];
+    const completedMilestones = proj.milestones ? proj.milestones.filter(m => m.completed).length : 0;
+    const totalMilestones = proj.milestones ? proj.milestones.length : 0;
+    const progressPercent = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : (proj.status === 'Completed' ? 100 : 0);
+    return {
+      ...proj,
+      progress: progressPercent,
+    };
+  }, [projects]);
+
   const unpaidInvoices = invoices.filter(inv => inv.status !== 'Paid');
-  const unpaidTotal = unpaidInvoices.reduce((acc, curr) => acc + (curr.amount || curr.value || 0), 0);
+  const unpaidTotal = unpaidInvoices.reduce((acc, curr) => acc + (curr.amount || 0), 0);
   const activeTickets = tickets.filter(t => t.status !== 'Resolved' && t.status !== 'Closed');
 
   const metrics = [
     { 
       label: 'Deliverable Progress', 
-      value: `${activeProject.progress}%`, 
-      sub: activeProject.title, 
+      value: projects.length > 0 ? `${activeProject.progress}%` : '0%', 
+      sub: projects.length > 0 ? activeProject.name : 'No active project', 
       icon: Briefcase, 
       color: 'var(--brand-cyan)', 
       link: '/client/projects' 
@@ -92,7 +93,7 @@ export default function ClientDashboard() {
         </div>
       </div>
 
-      {/* Roster Metrics - Using premium unified cards-grid-3 */}
+      {/* Roster Metrics */}
       <div className="cards-grid-3 mb-6">
         {metrics.map(m => {
           const Icon = m.icon;
@@ -134,11 +135,11 @@ export default function ClientDashboard() {
                 <h3 className="portal-panel-title">
                   <Briefcase size={16} style={{ color: 'var(--brand-cyan)' }} /> Ongoing Project Status
                 </h3>
-                <Badge variant="success">{activeProject.health}</Badge>
+                <Badge variant="success">On Track</Badge>
               </div>
 
               <h4 className="portal-text-title text-base tracking-tight mb-2">
-                {activeProject.title}
+                {activeProject.name}
               </h4>
               <p className="text-xs portal-text-muted leading-relaxed mb-4">
                 {activeProject.description || "Active deliverables cataloged under your corporate workspace."}
@@ -159,17 +160,19 @@ export default function ClientDashboard() {
               </div>
 
               {/* Milestones checklist */}
-              <div className="flex flex-col gap-3 border-t border-light pt-4" style={{ borderTop: '1px solid var(--border-light)' }}>
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Project Milestones</span>
-                <div className="flex flex-col gap-2">
-                  {activeProject.milestones && activeProject.milestones.map((ms, idx) => (
-                    <div key={idx} className="portal-bullet-item">
-                      <div className="portal-bullet-dot" />
-                      <span>{ms}</span>
-                    </div>
-                  ))}
+              {activeProject.milestones && activeProject.milestones.length > 0 && (
+                <div className="flex flex-col gap-3 border-t border-light pt-4" style={{ borderTop: '1px solid var(--border-light)' }}>
+                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Project Milestones</span>
+                  <div className="flex flex-col gap-2">
+                    {activeProject.milestones.map((ms, idx) => (
+                      <div key={idx} className="portal-bullet-item">
+                        <div className="portal-bullet-dot" />
+                        <span>{ms.name} {ms.completed ? '(✓ Completed)' : ''}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ) : (
             <div className="portal-panel text-center text-gray-500 py-12">

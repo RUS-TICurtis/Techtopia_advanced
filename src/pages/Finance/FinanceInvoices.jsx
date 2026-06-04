@@ -4,6 +4,7 @@ import {
   FileText, MoreVertical, X, Eye, Copy, Trash2, ChevronDown, RefreshCw
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
+import { useInvoices } from '../../hooks/useCrmData';
 import './Finance.css';
 
 // ── Status Config ─────────────────────────────────────────────────────────
@@ -39,7 +40,17 @@ const EMPTY_INVOICE = {
 };
 
 export default function FinanceInvoices() {
-  const [invoices, setInvoices] = useState(MOCK_INVOICES);
+  const { 
+    invoices = [], 
+    isLoading, 
+    createInvoice, 
+    updateInvoice, 
+    deleteInvoice, 
+    sendInvoice, 
+    approveInvoice, 
+    duplicateInvoice 
+  } = useInvoices();
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -47,19 +58,25 @@ export default function FinanceInvoices() {
   const [newInvoice, setNewInvoice] = useState(EMPTY_INVOICE);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
+  // Sync selectedInvoice when invoices list updates
+  const activeSelectedInvoice = useMemo(() => {
+    if (!selectedInvoice) return null;
+    return invoices.find(inv => inv.id === selectedInvoice.id) || selectedInvoice;
+  }, [invoices, selectedInvoice]);
+
   // ── Derived metrics ──────────────────────────────────────────────────────
   const metrics = useMemo(() => ({
-    total: invoices.reduce((s, inv) => s + inv.amount, 0),
-    paid: invoices.filter(i => i.status === 'Paid').reduce((s, inv) => s + inv.amount, 0),
-    overdue: invoices.filter(i => i.status === 'Overdue').reduce((s, inv) => s + inv.amount, 0),
+    total: invoices.reduce((s, inv) => s + (inv.amount || 0), 0),
+    paid: invoices.filter(i => i.status === 'Paid').reduce((s, inv) => s + (inv.amount || 0), 0),
+    overdue: invoices.filter(i => i.status === 'Overdue').reduce((s, inv) => s + (inv.amount || 0), 0),
     draft: invoices.filter(i => i.status === 'Draft').length,
-    outstanding: invoices.filter(i => !['Paid', 'Cancelled', 'Draft'].includes(i.status)).reduce((s, inv) => s + (inv.amount - inv.paid), 0),
+    outstanding: invoices.filter(i => !['Paid', 'Cancelled', 'Draft'].includes(i.status)).reduce((s, inv) => s + ((inv.amount || 0) - (inv.paid || 0)), 0),
   }), [invoices]);
 
   // ── Filtered invoices ────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     return invoices.filter(inv => {
-      const matchSearch = !search || inv.client.toLowerCase().includes(search.toLowerCase()) || inv.id.toLowerCase().includes(search.toLowerCase());
+      const matchSearch = !search || inv.client.toLowerCase().includes(search.toLowerCase()) || (inv.invoiceNumber || '').toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === 'All' || inv.status === statusFilter;
       return matchSearch && matchStatus;
     });
@@ -78,20 +95,44 @@ export default function FinanceInvoices() {
   const total = subtotal + taxAmt - discountAmt;
 
   // ── Create Invoice ────────────────────────────────────────────────────────
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
-    const inv = {
-      id: `INV-2026-${String(invoices.length + 1).padStart(3, '0')}`,
-      ...newInvoice, amount: total, paid: 0, status: 'Draft',
-    };
-    setInvoices(prev => [inv, ...prev]);
-    setShowCreateModal(false);
-    setNewInvoice(EMPTY_INVOICE);
+    try {
+      await createInvoice({
+        client: newInvoice.client,
+        project: newInvoice.project,
+        email: newInvoice.email,
+        phone: newInvoice.phone,
+        address: newInvoice.address,
+        currency: newInvoice.currency,
+        issueDate: newInvoice.issueDate,
+        dueDate: newInvoice.dueDate,
+        notes: newInvoice.notes,
+        taxRate: parseFloat(newInvoice.taxRate) || 0,
+        discount: parseFloat(newInvoice.discount) || 0,
+        items: newInvoice.items,
+        amount: total,
+      });
+      setShowCreateModal(false);
+      setNewInvoice(EMPTY_INVOICE);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleStatusChange = (id, newStatus) => {
-    setInvoices(prev => prev.map(inv => inv.id === id ? { ...inv, status: newStatus } : inv));
-    setActiveDropdown(null);
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      if (newStatus === 'Sent') {
+        await sendInvoice(id);
+      } else if (newStatus === 'Approved') {
+        await approveInvoice(id);
+      } else {
+        await updateInvoice({ id, data: { status: newStatus } });
+      }
+      setActiveDropdown(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -173,7 +214,7 @@ export default function FinanceInvoices() {
               return (
                 <tr key={inv.id} style={{ cursor: 'pointer' }} onClick={() => setSelectedInvoice(inv)}>
                   <td>
-                    <span className="font-mono text-xs" style={{ color: 'var(--brand-cyan)' }}>{inv.id}</span>
+                    <span className="font-mono text-xs" style={{ color: 'var(--brand-cyan)' }}>{inv.invoiceNumber}</span>
                   </td>
                   <td className="font-semibold">{inv.client}</td>
                   <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{inv.project}</td>
@@ -191,7 +232,7 @@ export default function FinanceInvoices() {
                   <td style={{ textAlign: 'right' }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end', position: 'relative' }}>
                       <button className="btn-icon" title="Download PDF"><Download size={15} /></button>
-                      <button className="btn-icon" title="Send"><Send size={15} /></button>
+                      <button className="btn-icon" title="Send" onClick={() => handleStatusChange(inv.id, 'Sent')}><Send size={15} /></button>
                       <button className="btn-icon" title="More" onClick={() => setActiveDropdown(activeDropdown === inv.id ? null : inv.id)}>
                         <MoreVertical size={15} />
                       </button>
@@ -210,10 +251,10 @@ export default function FinanceInvoices() {
                             >Mark as {s}</button>
                           ))}
                           <hr style={{ margin: '4px 0', borderColor: 'var(--border-light)' }} />
-                          <button onClick={() => {}} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--text-muted)', borderRadius: 6, background: 'transparent' }}>
+                          <button onClick={() => { duplicateInvoice(inv.id); setActiveDropdown(null); }} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--text-muted)', borderRadius: 6, background: 'transparent' }}>
                             <Copy size={12} /> Duplicate
                           </button>
-                          <button style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--error)', borderRadius: 6, background: 'transparent' }}>
+                          <button onClick={() => { if(window.confirm('Delete this invoice?')) deleteInvoice(inv.id); setActiveDropdown(null); }} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--error)', borderRadius: 6, background: 'transparent' }}>
                             <Trash2 size={12} /> Delete
                           </button>
                         </div>
@@ -237,13 +278,13 @@ export default function FinanceInvoices() {
       </div>
 
       {/* ── Invoice Detail Drawer ───────────────────────────────────────── */}
-      {selectedInvoice && (
+      {activeSelectedInvoice && (
         <div className="finance-drawer-overlay" onClick={() => setSelectedInvoice(null)}>
           <div className="finance-drawer" onClick={e => e.stopPropagation()}>
             <div className="finance-drawer-header">
               <div>
                 <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-muted)', marginBottom: 4 }}>Invoice</p>
-                <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-title)' }}>{selectedInvoice.id}</h2>
+                <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-title)' }}>{activeSelectedInvoice.invoiceNumber}</h2>
               </div>
               <button className="btn-icon" onClick={() => setSelectedInvoice(null)}><X size={18} /></button>
             </div>
@@ -251,42 +292,42 @@ export default function FinanceInvoices() {
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
                 <div>
                   <p className="text-xs text-muted mb-1">Client</p>
-                  <p className="font-semibold">{selectedInvoice.client}</p>
-                  <p className="text-xs text-muted mt-1">{selectedInvoice.project}</p>
+                  <p className="font-semibold">{activeSelectedInvoice.client}</p>
+                  <p className="text-xs text-muted mt-1">{activeSelectedInvoice.project}</p>
                 </div>
-                <span className={`badge ${STATUS_CONFIG[selectedInvoice.status]?.class}`} style={{ height: 'fit-content' }}>
-                  {selectedInvoice.status}
+                <span className={`badge ${STATUS_CONFIG[activeSelectedInvoice.status]?.class}`} style={{ height: 'fit-content' }}>
+                  {activeSelectedInvoice.status}
                 </span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
                 <div>
                   <p className="text-xs text-muted mb-1">Issue Date</p>
-                  <p className="font-semibold text-sm">{selectedInvoice.issueDate}</p>
+                  <p className="font-semibold text-sm">{activeSelectedInvoice.issueDate}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted mb-1">Due Date</p>
-                  <p className="font-semibold text-sm">{selectedInvoice.dueDate}</p>
+                  <p className="font-semibold text-sm">{activeSelectedInvoice.dueDate}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted mb-1">Invoice Total</p>
-                  <p className="font-semibold text-lg" style={{ color: 'var(--text-title)' }}>{formatCurrency(selectedInvoice.amount)}</p>
+                  <p className="font-semibold text-lg" style={{ color: 'var(--text-title)' }}>{formatCurrency(activeSelectedInvoice.amount)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted mb-1">Amount Paid</p>
-                  <p className="font-semibold text-lg" style={{ color: 'var(--success)' }}>{formatCurrency(selectedInvoice.paid)}</p>
+                  <p className="font-semibold text-lg" style={{ color: 'var(--success)' }}>{formatCurrency(activeSelectedInvoice.paid)}</p>
                 </div>
               </div>
               <div style={{ background: 'var(--bg-app)', borderRadius: 'var(--radius-md)', padding: 16, marginBottom: 16 }}>
                 <p className="text-xs text-muted mb-2 font-semibold uppercase tracking-wider">Balance Due</p>
-                <p style={{ fontSize: 28, fontWeight: 900, color: selectedInvoice.amount - selectedInvoice.paid > 0 ? 'var(--error)' : 'var(--success)' }}>
-                  {formatCurrency(selectedInvoice.amount - selectedInvoice.paid)}
+                <p style={{ fontSize: 28, fontWeight: 900, color: activeSelectedInvoice.amount - activeSelectedInvoice.paid > 0 ? 'var(--error)' : 'var(--success)' }}>
+                  {formatCurrency(activeSelectedInvoice.amount - activeSelectedInvoice.paid)}
                 </p>
               </div>
               <div className="finance-timeline">
                 {[
-                  { label: 'Invoice Created', time: selectedInvoice.issueDate, color: '#8A4FFF' },
-                  { label: 'Invoice Sent to Client', time: selectedInvoice.issueDate, color: '#01FDF6' },
-                  { label: selectedInvoice.status === 'Paid' ? 'Payment Received' : 'Awaiting Payment', time: selectedInvoice.dueDate, color: selectedInvoice.status === 'Paid' ? '#21FA90' : '#E4FF1A' },
+                  { label: 'Invoice Created', time: activeSelectedInvoice.issueDate, color: '#8A4FFF' },
+                  { label: 'Invoice Sent to Client', time: activeSelectedInvoice.issueDate, color: '#01FDF6' },
+                  { label: activeSelectedInvoice.status === 'Paid' ? 'Payment Received' : 'Awaiting Payment', time: activeSelectedInvoice.dueDate, color: activeSelectedInvoice.status === 'Paid' ? '#21FA90' : '#E4FF1A' },
                 ].map((evt, i) => (
                   <div key={i} className="finance-timeline-item">
                     <div className="finance-timeline-dot" style={{ background: `${evt.color}20`, color: evt.color, fontSize: 12, fontWeight: 700 }}>
@@ -302,8 +343,8 @@ export default function FinanceInvoices() {
             </div>
             <div className="finance-drawer-footer">
               <button className="btn btn-secondary"><Download size={15} /> PDF</button>
-              <button className="btn btn-secondary"><Send size={15} /> Send</button>
-              <button className="btn btn-primary" onClick={() => handleStatusChange(selectedInvoice.id, 'Paid')}>
+              <button className="btn btn-secondary" onClick={() => sendInvoice(activeSelectedInvoice.id)}><Send size={15} /> Send</button>
+              <button className="btn btn-primary" onClick={() => handleStatusChange(activeSelectedInvoice.id, 'Paid')}>
                 <CheckCircle size={15} /> Mark Paid
               </button>
             </div>

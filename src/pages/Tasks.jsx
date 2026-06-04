@@ -6,12 +6,12 @@ import {
   Trash2,
   X
 } from 'lucide-react';
-import { mockDb } from '../utils/mockDb';
+import { useTasks, useContacts } from '../hooks/useCrmData';
 import './Tasks.css';
 
 export default function Tasks({ searchValue }) {
-  const [tasks, setTasks] = useState(() => mockDb.getTasks());
-  const [contacts] = useState(() => mockDb.getContacts());
+  const { tasks = [], isLoading: isLoadingTasks, createTask, updateTask, deleteTask } = useTasks();
+  const { contacts = [], isLoading: isLoadingContacts } = useContacts();
   const [activeFilter, setActiveFilter] = useState('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -21,39 +21,33 @@ export default function Tasks({ searchValue }) {
   const [date, setDate] = useState('');
   const [priority, setPriority] = useState('Medium');
 
-  const refreshTasks = () => {
-    setTasks(mockDb.getTasks());
+  const handleToggleTaskStatus = async (task) => {
+    const isCompleted = task.status === 'Completed' || task.status === 'Done';
+    await updateTask({
+      id: task.id,
+      data: { status: isCompleted ? 'Todo' : 'Done' }
+    });
   };
 
-  const handleToggleTaskStatus = (task) => {
-    const updated = {
-      ...task,
-      status: task.status === 'Completed' ? 'Pending' : 'Completed'
-    };
-    mockDb.updateTask(updated);
-    refreshTasks();
-  };
-
-  const handleDeleteTask = (id) => {
+  const handleDeleteTask = async (id) => {
     if (window.confirm("Delete this task?")) {
-      mockDb.deleteTask(id);
-      refreshTasks();
+      await deleteTask(id);
     }
   };
 
-  const handleAddTaskSubmit = (e) => {
+  const handleAddTaskSubmit = async (e) => {
     e.preventDefault();
     if (!title) return;
 
     let contactName = "";
     if (selectedContactId) {
-      const c = contacts.find(contact => contact.id === selectedContactId);
-      if (c) contactName = c.name;
+      const c = contacts.find(contact => String(contact.id) === String(selectedContactId));
+      if (c) contactName = `${c.firstName} ${c.lastName}`;
     }
 
-    mockDb.addTask({
+    await createTask({
       title,
-      contactId: selectedContactId || null,
+      contactId: selectedContactId ? Number(selectedContactId) : null,
       contactName,
       date: date || new Date().toISOString().split('T')[0],
       priority
@@ -64,13 +58,13 @@ export default function Tasks({ searchValue }) {
     setDate('');
     setPriority('Medium');
     setIsAddModalOpen(false);
-    refreshTasks();
   };
 
   // Filter tasks
   const filteredTasks = tasks.filter(t => {
-    if (activeFilter === 'Pending') return t.status === 'Pending';
-    if (activeFilter === 'Completed') return t.status === 'Completed';
+    const isCompleted = t.status === 'Completed' || t.status === 'Done';
+    if (activeFilter === 'Pending') return !isCompleted;
+    if (activeFilter === 'Completed') return isCompleted;
     return true; // All
   });
 
@@ -95,7 +89,7 @@ export default function Tasks({ searchValue }) {
   const getTasksForDay = (dayNum) => {
     if (!dayNum) return [];
     const dateString = `${currentYear}-05-${dayNum.toString().padStart(2, '0')}`;
-    return tasks.filter(t => t.date === dateString);
+    return tasks.filter(t => (t.date || t.dueDate) === dateString);
   };
 
   return (
@@ -138,48 +132,51 @@ export default function Tasks({ searchValue }) {
           
           <div className="tasks-list">
             {filteredTasks.length > 0 ? (
-              filteredTasks.map(task => (
-                <div key={task.id} className={`task-item ${task.status === 'Completed' ? 'completed' : ''}`}>
-                  <div className="task-item-left">
-                    <div className="task-checkbox-wrapper">
-                      <input 
-                        type="checkbox" 
-                        className="task-checkbox" 
-                        checked={task.status === 'Completed'}
-                        onChange={() => handleToggleTaskStatus(task)}
-                      />
-                    </div>
+              filteredTasks.map(task => {
+                const isCompleted = task.status === 'Completed' || task.status === 'Done';
+                return (
+                  <div key={task.id} className={`task-item ${isCompleted ? 'completed' : ''}`}>
+                    <div className="task-item-left">
+                      <div className="task-checkbox-wrapper">
+                        <input 
+                          type="checkbox" 
+                          className="task-checkbox" 
+                          checked={isCompleted}
+                          onChange={() => handleToggleTaskStatus(task)}
+                        />
+                      </div>
 
-                    <div className="task-details">
-                      <span className="task-title">{task.title}</span>
-                      <div className="task-meta">
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <CalendarIcon size={12} /> {task.date}
-                        </span>
-                        {task.contactName && (
+                      <div className="task-details">
+                        <span className="task-title">{task.title || task.name}</span>
+                        <div className="task-meta">
                           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <User size={12} /> {task.contactName}
+                            <CalendarIcon size={12} /> {task.date || task.dueDate}
                           </span>
-                        )}
+                          {task.contactName && (
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <User size={12} /> {task.contactName}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="task-item-right">
-                    <span className={`kanban-card-priority priority-${task.priority.toLowerCase()}`} style={{ fontSize: '11px' }}>
-                      {task.priority}
-                    </span>
-                    <button 
-                      className="nav-icon-btn" 
-                      style={{ width: '32px', height: '32px', color: 'var(--text-light)', borderRadius: 'var(--radius-sm)' }}
-                      onClick={() => handleDeleteTask(task.id)}
-                      title="Delete Task"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    <div className="task-item-right">
+                      <span className={`kanban-card-priority priority-${task.priority.toLowerCase()}`} style={{ fontSize: '11px' }}>
+                        {task.priority}
+                      </span>
+                      <button 
+                        className="nav-icon-btn" 
+                        style={{ width: '32px', height: '32px', color: 'var(--text-light)', borderRadius: 'var(--radius-sm)' }}
+                        onClick={() => handleDeleteTask(task.id)}
+                        title="Delete Task"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                 No tasks to display. All caught up!
