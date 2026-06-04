@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore, DEMO_USERS } from '../../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import { Sparkles, ArrowRight, ShieldCheck, Mail, Lock } from 'lucide-react';
 import './Login.css';
 
@@ -31,19 +31,13 @@ export default function AuthLogin() {
           }
         }
       } else {
-        setError(res.error || 'Invalid credentials. Select a demo role below.');
+        setError(res.error || 'Invalid credentials. Please try again.');
       }
     } catch (err) {
       setError('An error occurred during sign in.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const autoFill = (user) => {
-    setEmail(user.email);
-    setPassword(user.password);
-    setError('');
   };
 
   return (
@@ -133,26 +127,6 @@ export default function AuthLogin() {
               {!isLoading && <ArrowRight size={18} />}
             </button>
           </form>
-
-          {/* Demo Roles Panel */}
-          <div className="demo-roles">
-            <div className="demo-roles-divider">
-              <span>Quick Login (Demo Roles)</span>
-            </div>
-            <div className="demo-roles-grid">
-              {DEMO_USERS.map(user => (
-                <button 
-                  key={user.id} 
-                  className="demo-role-btn"
-                  onClick={() => autoFill(user)}
-                  type="button"
-                >
-                  <span className="demo-role-name">{user.name}</span>
-                  <span className="demo-role-title">{user.roleLabel}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

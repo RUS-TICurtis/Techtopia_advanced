@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { ShieldCheck, ArrowRight, RefreshCw, KeyRound } from 'lucide-react';
+import { ShieldCheck, ArrowRight, RefreshCw } from 'lucide-react';
 import './MFA.css';
 
 export default function MFA() {
@@ -65,7 +65,7 @@ export default function MFA() {
         navigate('/');
       }
     } else {
-      setError(res.error || 'Invalid verification code. Use demo code 123456.');
+      setError(res.error || 'Invalid verification code.');
       setLoading(false);
     }
   };
@@ -129,13 +129,6 @@ export default function MFA() {
               <RefreshCw size={14} /> Resend Code
             </button>
           )}
-
-          <div className="demo-bypass">
-            <div className="flex items-center gap-1">
-              <KeyRound size={12} className="text-gray-500" />
-              <span>Demo Bypass Code: <strong className="demo-bypass-code">123456</strong></span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

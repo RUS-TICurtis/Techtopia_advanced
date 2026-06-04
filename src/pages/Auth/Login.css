@@ -213,69 +213,6 @@
   justify-content: space-between;
 }
 
-/* Demo Roles Selector */
-.demo-roles {
-  margin-top: 40px;
-}
-
-.demo-roles-divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.demo-roles-divider::before,
-.demo-roles-divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.demo-roles-divider span {
-  padding: 0 16px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-light);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.demo-roles-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.demo-role-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 12px 16px;
-  background-color: var(--bg-app);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.demo-role-btn:hover {
-  border-color: var(--primary);
-  background-color: rgba(55, 114, 255, 0.05);
-  transform: translateY(-1px);
-}
-
-.demo-role-name {
-  font-weight: 600;
-  color: var(--text-title);
-  font-size: 14px;
-}
-
-.demo-role-title {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
 
 @media (max-width: 900px) {
   .login-container {
@@ -359,10 +296,6 @@
   box-shadow: 0 0 0 4px rgba(1, 253, 246, 0.15), 0 4px 12px rgba(1, 253, 246, 0.05);
 }
 
-[data-theme="dark"] .demo-role-btn:hover {
-  border-color: var(--brand-cyan);
-  background-color: rgba(1, 253, 246, 0.06);
-}
 
 [data-theme="dark"] .forgot-password {
   color: var(--brand-cyan);

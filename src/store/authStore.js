@@ -3,76 +3,6 @@ import { persist } from 'zustand/middleware';
 import { authApi } from '../lib/api';
 import { ROLES } from '../constants/permissions';
 
-export const DEMO_USERS = [
-  {
-    id: 'u1',
-    email: 'admin@techtopia.crm',
-    password: 'password123',
-    name: 'Curtis Tungsten',
-    role: ROLES.SUPER_ADMIN,
-    roleLabel: 'Super Admin',
-    avatar: 'CT',
-    department: 'Executive',
-    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  },
-  {
-    id: 'u2',
-    email: 'sales@techtopia.crm',
-    password: 'password123',
-    name: 'Sarah Jenkins',
-    role: ROLES.SALES,
-    roleLabel: 'Sales Executive',
-    avatar: 'SJ',
-    department: 'Sales',
-    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  },
-  {
-    id: 'u3',
-    email: 'support@techtopia.crm',
-    password: 'password123',
-    name: 'Sam Porter',
-    role: ROLES.SUPPORT,
-    roleLabel: 'Support Agent',
-    avatar: 'SP',
-    department: 'Support',
-    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  },
-  {
-    id: 'u4',
-    email: 'finance@techtopia.crm',
-    password: 'password123',
-    name: 'Faye Morgan',
-    role: ROLES.FINANCE,
-    roleLabel: 'Finance Manager',
-    avatar: 'FM',
-    department: 'Finance',
-    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  },
-  {
-    id: 'u5',
-    email: 'pm@techtopia.crm',
-    password: 'password123',
-    name: 'Patrick Mills',
-    role: ROLES.PROJECT_MANAGER,
-    roleLabel: 'Project Manager',
-    avatar: 'PM',
-    department: 'Delivery',
-    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  },
-  {
-    id: 'u6',
-    email: 'client@acme.com',
-    password: 'password123',
-    name: 'Alex Client',
-    role: ROLES.CLIENT,
-    roleLabel: 'Client',
-    avatar: 'AC',
-    department: 'External',
-    tenantId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-    clientCompany: 'ACME Corp',
-  },
-];
-
 export const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -129,7 +59,7 @@ export const useAuthStore = create(
           });
           return {
             success: false,
-            error: err.response?.data?.message || 'Invalid credentials. Select a demo role below.',
+            error: err.response?.data?.message || 'Invalid credentials. Please try again.',
           };
         }
       },
@@ -203,7 +133,7 @@ export const useAuthStore = create(
             authStatus: profile.mfaVerified ? 'AUTHENTICATED' : 'MFA_REQUIRED',
             lastActivity: Date.now(),
           });
-        } catch (err) {
+        } catch {
           // Token might be expired, try refreshing
           const refreshToken = localStorage.getItem('crm_refresh_token');
           if (refreshToken) {
@@ -260,11 +190,6 @@ export const useAuthStore = create(
       },
 
       updateActivity: () => set({ lastActivity: Date.now() }),
-
-      // Switch role (demo only — for testing permission views)
-      switchDemoRole: (role) => set(state => ({
-        user: state.user ? { ...state.user, role } : null
-      })),
 
       updateProfile: async (data) => {
         set({ isLoading: true });
