@@ -14,10 +14,6 @@ export default function ClientPortalRoute() {
     return <Navigate to="/auth/login" replace />;
   }
 
-  if (authStatus === 'MFA_REQUIRED') {
-    return <Navigate to="/auth/mfa" replace />;
-  }
-
   // Permit only CLIENT role or SUPER_ADMIN role for support debug actions
   if (user?.role !== ROLES.CLIENT && user?.role !== ROLES.SUPER_ADMIN) {
     return <Navigate to="/" replace />;

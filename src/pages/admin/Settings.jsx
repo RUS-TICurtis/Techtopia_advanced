@@ -102,10 +102,20 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    const updated = { name, username, email, phone, role, location };
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    const updated = { 
+      firstName, 
+      lastName, 
+      phoneNumber: phone 
+    };
     const res = await updateProfile(updated);
     if (res.success) {
-      if (onProfileUpdate) onProfileUpdate(updated);
+      if (onProfileUpdate) onProfileUpdate({ 
+        name: `${firstName} ${lastName}`.trim(), 
+        phone 
+      });
       setProfileSuccess('Profile successfully updated!');
     } else {
       setErrorMsg(res.error || 'Failed to update profile.');

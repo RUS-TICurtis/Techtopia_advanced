@@ -17,11 +17,6 @@ export default function ProtectedRoute({ permission }) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  // Enforce MFA checks first
-  if (authStatus === 'MFA_REQUIRED') {
-    return <Navigate to="/auth/mfa" replace />;
-  }
-
   // Client role users must be kept in the Client Portal subtree
   if (user?.role === ROLES.CLIENT) {
     return <Navigate to="/client" replace />;

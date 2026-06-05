@@ -21,14 +21,10 @@ export default function AuthLogin() {
     try {
       const res = await login(email, password);
       if (res.success) {
-        if (res.mfaRequired) {
-          navigate('/auth/mfa');
+        if (res.user?.role === 'client') {
+          navigate('/client');
         } else {
-          if (res.user?.role === 'client') {
-            navigate('/client');
-          } else {
-            navigate('/');
-          }
+          navigate('/');
         }
       } else {
         setError(res.error || 'Invalid credentials. Please try again.');

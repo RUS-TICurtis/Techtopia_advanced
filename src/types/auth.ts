@@ -23,13 +23,16 @@ export interface User {
   department: string | null;
   tenantId: string;
   clientCompany?: string;
+  roles?: string[];
+  permissions?: string[];
+  phone?: string | null;
+  avatarUrl?: string | null;
+  location?: string | null;
 }
 
 export interface UserSession {
   user: User | null;
   isAuthenticated: boolean;
-  mfaRequired: boolean;
-  mfaVerified: boolean;
   lastActivity: number | null;
 }
 

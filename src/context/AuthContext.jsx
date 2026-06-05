@@ -7,12 +7,9 @@ export const AuthProvider = ({ children }) => {
   const { 
     user, 
     isAuthenticated, 
-    mfaRequired, 
-    mfaVerified, 
     authStatus, 
     login, 
     logout, 
-    verifyMfa, 
     hydrateAuth 
   } = useAuthStore();
 
@@ -25,12 +22,9 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{ 
       user, 
       isAuthenticated, 
-      mfaRequired, 
-      mfaVerified, 
       authStatus, 
       login, 
-      logout, 
-      verifyMfa 
+      logout 
     }}>
       {children}
     </AuthContext.Provider>

@@ -11,9 +11,6 @@ export default function PublicRoute() {
   }
 
   if (isAuthenticated) {
-    if (authStatus === 'MFA_REQUIRED') {
-      return <Navigate to="/auth/mfa" replace />;
-    }
     if (user?.role === ROLES.CLIENT) {
       return <Navigate to="/client" replace />;
     }

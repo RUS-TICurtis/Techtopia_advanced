@@ -69,8 +69,6 @@ const ClientSupport = lazy(() => import('../pages/ClientPortal/ClientSupport'));
 
 // ─── Auth Pages ───────────────────────────────────────────────────────────
 const AuthLogin = lazy(() => import('../pages/Auth/Login'));
-const MFA = lazy(() => import('../pages/Auth/MFA'));
-const DeviceTrust = lazy(() => import('../pages/Auth/DeviceTrust'));
 
 // ─── Loading Fallback ─────────────────────────────────────────────────────
 const PageLoader = () => (
@@ -107,8 +105,6 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
         {/* ── Public Routes ─────────────────────────────────────────── */}
         <Route element={<PublicRoute />}>
           <Route path="/auth/login" element={<AuthLogin />} />
-          <Route path="/auth/mfa" element={<MFA />} />
-          <Route path="/auth/device-trust" element={<DeviceTrust />} />
         </Route>
 
         {/* ── Protected App Routes ──────────────────────────────────── */}

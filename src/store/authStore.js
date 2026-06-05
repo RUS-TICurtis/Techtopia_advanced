@@ -3,6 +3,38 @@ import { persist } from 'zustand/middleware';
 import { authApi } from '../lib/api';
 import { ROLES } from '../constants/permissions';
 
+function mapBackendRoleToFrontend(backendRole) {
+  if (!backendRole) return 'guest';
+  const roleLower = backendRole.toLowerCase();
+  if (roleLower.includes('super_admin') || roleLower.includes('super admin') || roleLower === 'administrator') return 'super_admin';
+  if (roleLower.includes('platform_owner') || roleLower.includes('platform owner')) return 'platform_owner';
+  if (roleLower.includes('tenant_admin') || roleLower.includes('tenant admin')) return 'tenant_admin';
+  if (roleLower === 'client') return 'client';
+  if (roleLower === 'support') return 'support';
+  if (roleLower === 'sales' || roleLower.includes('sales')) return 'sales';
+  if (roleLower === 'developer') return 'developer';
+  if (roleLower === 'ai_operator' || roleLower.includes('ai operator') || roleLower.includes('ai_operator')) return 'ai_operator';
+  if (roleLower === 'hr') return 'hr';
+  if (roleLower === 'finance') return 'finance';
+  if (roleLower === 'project_manager' || roleLower.includes('project manager') || roleLower.includes('project_manager')) return 'project_manager';
+  if (roleLower === 'operations') return 'operations';
+  return backendRole;
+}
+
+const mapUser = (u) => {
+  if (!u) return null;
+  return {
+    ...u,
+    name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.username || u.email,
+    role: u.role || (u.roles && u.roles[0] ? mapBackendRoleToFrontend(u.roles[0]) : 'guest'),
+    roleLabel: u.roleLabel || (u.roles && u.roles[0] ? u.roles[0] : 'Guest'),
+    avatar: u.avatar || (u.firstName ? u.firstName.charAt(0) + (u.lastName ? u.lastName.charAt(0) : '') : 'CT'),
+    phone: u.phoneNumber || u.phone,
+    avatarUrl: u.profileImageUrl || u.avatarUrl,
+    location: u.location || '',
+  };
+};
+
 export const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -10,9 +42,7 @@ export const useAuthStore = create(
       user: null,
       isAuthenticated: false,
       isLoading: false,
-      mfaRequired: false,
-      mfaVerified: false,
-      authStatus: 'INITIALIZING', // INITIALIZING | AUTHENTICATED | UNAUTHENTICATED | MFA_REQUIRED | SESSION_EXPIRED
+      authStatus: 'INITIALIZING', // INITIALIZING | AUTHENTICATED | UNAUTHENTICATED | SESSION_EXPIRED
       lastActivity: null,
 
       // ─── Actions ───────────────────────────────────────
@@ -21,40 +51,24 @@ export const useAuthStore = create(
         try {
           const res = await authApi.login({ email, password });
           
-          if (res.mfaRequired) {
-            localStorage.setItem('crm_temp_mfa_token', res.tempToken);
-            set({
-              user: res.user,
-              isAuthenticated: false,
-              isLoading: false,
-              mfaRequired: true,
-              mfaVerified: false,
-              authStatus: 'MFA_REQUIRED',
-            });
-            return { success: true, mfaRequired: true };
-          }
-
           localStorage.setItem('crm_access_token', res.accessToken);
           localStorage.setItem('crm_refresh_token', res.refreshToken);
-          localStorage.removeItem('crm_temp_mfa_token');
+
+          const mappedUser = mapUser(res.user);
 
           set({
-            user: res.user,
+            user: mappedUser,
             isAuthenticated: true,
             isLoading: false,
-            mfaRequired: false,
-            mfaVerified: true,
             authStatus: 'AUTHENTICATED',
             lastActivity: Date.now(),
           });
-          return { success: true, user: res.user, mfaRequired: false };
+          return { success: true, user: mappedUser };
         } catch (err) {
           set({
             isLoading: false,
             isAuthenticated: false,
             user: null,
-            mfaRequired: false,
-            mfaVerified: false,
             authStatus: 'UNAUTHENTICATED',
           });
           return {
@@ -64,73 +78,25 @@ export const useAuthStore = create(
         }
       },
 
-      verifyMfa: async (code) => {
-        set({ isLoading: true });
-        try {
-          const tempToken = localStorage.getItem('crm_temp_mfa_token');
-          if (!tempToken) {
-            throw new Error('Temporary session token not found');
-          }
-
-          const res = await authApi.verifyMfa(code, tempToken);
-          
-          localStorage.setItem('crm_access_token', res.accessToken);
-          localStorage.setItem('crm_refresh_token', res.refreshToken);
-          localStorage.removeItem('crm_temp_mfa_token');
-
-          set({
-            user: res.user,
-            isAuthenticated: true,
-            isLoading: false,
-            mfaRequired: false,
-            mfaVerified: true,
-            authStatus: 'AUTHENTICATED',
-            lastActivity: Date.now(),
-          });
-          return { success: true, user: res.user };
-        } catch (err) {
-          set({ isLoading: false });
-          return {
-            success: false,
-            error: err.response?.data?.message || err.message || 'MFA Verification failed.',
-          };
-        }
-      },
-
       hydrateAuth: async () => {
         const accessToken = localStorage.getItem('crm_access_token');
-        const tempToken = localStorage.getItem('crm_temp_mfa_token');
-
-        if (tempToken && !accessToken) {
-          set({
-            authStatus: 'MFA_REQUIRED',
-            mfaRequired: true,
-            mfaVerified: false,
-            isAuthenticated: false,
-            user: null,
-          });
-          return;
-        }
 
         if (!accessToken) {
           set({
             authStatus: 'UNAUTHENTICATED',
             isAuthenticated: false,
             user: null,
-            mfaRequired: false,
-            mfaVerified: false,
           });
           return;
         }
 
         try {
           const profile = await authApi.me();
+          const mappedUser = mapUser(profile);
           set({
-            user: profile,
+            user: mappedUser,
             isAuthenticated: true,
-            mfaRequired: false,
-            mfaVerified: profile.mfaVerified,
-            authStatus: profile.mfaVerified ? 'AUTHENTICATED' : 'MFA_REQUIRED',
+            authStatus: 'AUTHENTICATED',
             lastActivity: Date.now(),
           });
         } catch {
@@ -138,16 +104,16 @@ export const useAuthStore = create(
           const refreshToken = localStorage.getItem('crm_refresh_token');
           if (refreshToken) {
             try {
-              const refreshRes = await authApi.refresh(refreshToken);
+              const refreshRes = await authApi.refresh(accessToken, refreshToken);
               localStorage.setItem('crm_access_token', refreshRes.accessToken);
               localStorage.setItem('crm_refresh_token', refreshRes.refreshToken);
 
+              const mappedUser = mapUser(refreshRes.user);
+
               set({
-                user: refreshRes.user,
+                user: mappedUser,
                 isAuthenticated: true,
-                mfaRequired: false,
-                mfaVerified: refreshRes.mfaVerified,
-                authStatus: refreshRes.mfaVerified ? 'AUTHENTICATED' : 'MFA_REQUIRED',
+                authStatus: 'AUTHENTICATED',
                 lastActivity: Date.now(),
               });
               return;
@@ -159,12 +125,9 @@ export const useAuthStore = create(
           // Clean up on failure
           localStorage.removeItem('crm_access_token');
           localStorage.removeItem('crm_refresh_token');
-          localStorage.removeItem('crm_temp_mfa_token');
           set({
             user: null,
             isAuthenticated: false,
-            mfaRequired: false,
-            mfaVerified: false,
             authStatus: 'UNAUTHENTICATED',
           });
         }
@@ -178,12 +141,9 @@ export const useAuthStore = create(
         }
         localStorage.removeItem('crm_access_token');
         localStorage.removeItem('crm_refresh_token');
-        localStorage.removeItem('crm_temp_mfa_token');
         set({
           user: null,
           isAuthenticated: false,
-          mfaRequired: false,
-          mfaVerified: false,
           authStatus: 'UNAUTHENTICATED',
           lastActivity: null,
         });
@@ -195,11 +155,12 @@ export const useAuthStore = create(
         set({ isLoading: true });
         try {
           const updatedUser = await authApi.updateProfile(data);
+          const mappedUser = mapUser(updatedUser);
           set(state => ({
-            user: state.user ? { ...state.user, ...updatedUser } : updatedUser,
+            user: state.user ? { ...state.user, ...mappedUser } : mappedUser,
             isLoading: false,
           }));
-          return { success: true, user: updatedUser };
+          return { success: true, user: mappedUser };
         } catch (err) {
           set({ isLoading: false });
           return {

@@ -5,7 +5,7 @@
 import axios from 'axios';
 
 // ─── Config ───────────────────────────────────────────────
-const API_BASE = import.meta.env.VITE_API_URL || 'https://techtopia-crm-api.onrender.com/';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://techtopiagh-crm.onrender.com/';
 
 export const apiClient = axios.create({
   baseURL: API_BASE,
@@ -17,9 +17,9 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('crm_access_token');
-    const tenantId = localStorage.getItem('crm_tenant_id');
+    const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
     if (token) config.headers.Authorization = `Bearer ${token}`;
-    if (tenantId) config.headers['X-Tenant-ID'] = tenantId;
+    config.headers['Tenant-Id'] = tenantId;
     return config;
   },
   (error) => Promise.reject(error)
@@ -33,14 +33,25 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
+        const accessToken = localStorage.getItem('crm_access_token');
         const refreshToken = localStorage.getItem('crm_refresh_token');
-        if (refreshToken) {
-          const { data } = await axios.post(`${API_BASE}/auth/refresh`, { refreshToken });
+        const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+        if (refreshToken && accessToken) {
+          const { data } = await axios.post(`${API_BASE}api/v1/auth/refresh`, {
+            token: accessToken,
+            refreshToken
+          }, {
+            headers: {
+              'Tenant-Id': tenantId,
+              'Content-Type': 'application/json'
+            }
+          });
           localStorage.setItem('crm_access_token', data.accessToken);
+          localStorage.setItem('crm_refresh_token', data.refreshToken);
           originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
           return apiClient(originalRequest);
         }
-      } catch {
+      } catch (refreshError) {
         localStorage.removeItem('crm_access_token');
         localStorage.removeItem('crm_refresh_token');
         window.location.href = '/auth/login';
@@ -67,14 +78,27 @@ export function createResourceService(path) {
 
 // ─── Typed Service Modules ────────────────────────────────
 export const authApi = {
-  login: (credentials) => apiClient.post('/auth/login', credentials).then(r => r.data),
-  logout: () => apiClient.post('/auth/logout').then(r => r.data),
-  verifyMfa: (code, tempToken) => apiClient.post('/auth/mfa/verify', { code, tempToken }).then(r => r.data),
-  refresh: (refreshToken) => apiClient.post('/auth/refresh', { refreshToken }).then(r => r.data),
-  me: () => apiClient.get('/auth/me').then(r => r.data),
-  updateProfile: (data) => apiClient.patch('/auth/profile', data).then(r => r.data),
-  sessions: () => apiClient.get('/auth/sessions').then(r => r.data),
-  revokeSession: (id) => apiClient.delete(`/auth/sessions/${id}`).then(r => r.data),
+  login: (credentials) => apiClient.post('/api/v1/auth/login', credentials).then(r => r.data),
+  logout: () => apiClient.post('/api/v1/auth/logout').then(r => r.data),
+  refresh: (token, refreshToken) => apiClient.post('/api/v1/auth/refresh', { token, refreshToken }).then(r => r.data),
+  me: () => apiClient.get('/api/v1/users/me').then(r => r.data),
+  updateProfile: (data) => apiClient.put('/api/v1/users/me', data).then(r => r.data),
+};
+
+export const usersApi = {
+  list: () => apiClient.get('/api/v1/users').then(r => r.data),
+  get: (id) => apiClient.get(`/api/v1/users/${id}`).then(r => r.data),
+  create: (data) => apiClient.post('/api/v1/users', data).then(r => r.data),
+  update: (id, data) => apiClient.put(`/api/v1/users/${id}`, data).then(r => r.data),
+  delete: (id) => apiClient.delete(`/api/v1/users/${id}`).then(r => r.data),
+};
+
+export const rolesApi = {
+  list: () => apiClient.get('/api/v1/roles').then(r => r.data),
+  get: (id) => apiClient.get(`/api/v1/roles/${id}`).then(r => r.data),
+  create: (data) => apiClient.post('/api/v1/roles', data).then(r => r.data),
+  update: (id, data) => apiClient.put(`/api/v1/roles/${id}`, data).then(r => r.data),
+  delete: (id) => apiClient.delete(`/api/v1/roles/${id}`).then(r => r.data),
 };
 
 export const leadsApi = {
