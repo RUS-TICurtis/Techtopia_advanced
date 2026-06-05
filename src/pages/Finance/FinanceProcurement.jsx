@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
+import { useProcurement } from '../../hooks/useCrmData';
 
 const STATUS_CONFIG = {
   Draft:     { class: 'badge-neutral', icon: FileText },
@@ -14,19 +15,11 @@ const STATUS_CONFIG = {
   Completed: { class: 'badge-info',    icon: CheckCircle },
 };
 
-const MOCK_POS = [
-  { id: 'PO-001', title: 'Server Hardware Upgrade', vendor: 'TechSupply Ghana', amount: 85000, items: 4, requestedBy: 'Ama Boateng', dept: 'DevOps', date: '2026-05-28', status: 'Approved', priority: 'High' },
-  { id: 'PO-002', title: 'Office Furniture', vendor: 'Office Plus Ltd', amount: 12500, items: 8, requestedBy: 'Grace Mensah', dept: 'Admin', date: '2026-05-25', status: 'Submitted', priority: 'Low' },
-  { id: 'PO-003', title: 'Annual Cloud Licenses', vendor: 'CloudNova Africa', amount: 144000, items: 2, requestedBy: 'Kwame Darko', dept: 'Engineering', date: '2026-05-20', status: 'Draft', priority: 'Medium' },
-  { id: 'PO-004', title: 'Marketing Collateral Print', vendor: 'PrintMaster GH', amount: 8200, items: 5, requestedBy: 'Kofi Asante', dept: 'Marketing', date: '2026-05-18', status: 'Completed', priority: 'Low' },
-  { id: 'PO-005', title: 'Logistics Fleet Rental', vendor: 'FastTrack Logistics', amount: 34000, items: 1, requestedBy: 'Isaac Nkrumah', dept: 'Operations', date: '2026-06-01', status: 'Rejected', priority: 'High' },
-];
-
 const PRIORITY_COLORS = { High: '#FF47DA', Medium: '#E4FF1A', Low: '#21FA90' };
 const EMPTY_PO = { title: '', vendor: '', dept: '', amount: '', items: 1, priority: 'Medium', notes: '' };
 
 export default function FinanceProcurement() {
-  const [pos, setPos] = useState(MOCK_POS);
+  const { pos = [], isLoading, createPurchaseOrder, approvePurchaseOrder, rejectPurchaseOrder } = useProcurement();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -40,24 +33,47 @@ export default function FinanceProcurement() {
 
   const pending = pos.filter(p => p.status === 'Submitted');
 
-  const handleApprove = (id) => setPos(prev => prev.map(p => p.id === id ? { ...p, status: 'Approved' } : p));
-  const handleReject = (id) => setPos(prev => prev.map(p => p.id === id ? { ...p, status: 'Rejected' } : p));
+  const handleApprove = async (id) => {
+    try {
+      await approvePurchaseOrder(id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const handleCreate = (e) => {
+  const handleReject = async (id) => {
+    try {
+      await rejectPurchaseOrder(id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCreate = async (e) => {
     e.preventDefault();
-    const po = {
-      id: `PO-${String(pos.length + 1).padStart(3, '0')}`,
-      requestedBy: 'Current User',
-      date: new Date().toISOString().slice(0, 10),
-      status: 'Draft',
+    const isDraft = e.nativeEvent.submitter?.name === 'draft';
+    const payload = {
       ...newPO,
       amount: parseFloat(newPO.amount) || 0,
       items: parseInt(newPO.items) || 1,
+      status: isDraft ? 'Draft' : 'Submitted',
     };
-    setPos(prev => [po, ...prev]);
-    setShowCreateModal(false);
-    setNewPO(EMPTY_PO);
+    try {
+      await createPurchaseOrder(payload);
+      setShowCreateModal(false);
+      setNewPO(EMPTY_PO);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">

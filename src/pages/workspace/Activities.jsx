@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   Clock, 
   Search, 
@@ -17,103 +17,53 @@ import {
   CheckCircle,
   FileText
 } from 'lucide-react';
-import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
-import { showToast } from '../../components/ui/Toast';
+import { useAuditLogs } from '../../hooks/useCrmData';
 import './Activities.css';
 
 const MODULES = ['All', 'Pipeline', 'Leads', 'Billing', 'Support', 'Projects'];
 
-const INITIAL_ACTIVITIES = [
-  {
-    id: "act1",
-    user: "Curtis Miller",
-    action: "Updated deal stage",
-    details: "Quantum Core Cloud Migration → Qualified",
-    module: "Pipeline",
-    timestamp: "10m ago",
-    type: "pipeline"
-  },
-  {
-    id: "act2",
-    user: "Sarah Jenkins",
-    action: "Promoted prospect lead",
-    details: "Bruce Wayne (Wayne Enterprises) promoted to CRM contact dossier",
-    module: "Leads",
-    timestamp: "1h ago",
-    type: "leads"
-  },
-  {
-    id: "act3",
-    user: "Alex Client",
-    action: "Paid billing invoice",
-    details: "Settled INV-2026-002 ($45,000) for CloudScale Inc.",
-    module: "Billing",
-    timestamp: "2h ago",
-    type: "billing"
-  },
-  {
-    id: "act4",
-    user: "Faye Morgan",
-    action: "Issued new billing invoice",
-    details: "Created INV-2026-004 ($15,000) for Roma Tech",
-    module: "Billing",
-    timestamp: "1d ago",
-    type: "billing"
-  },
-  {
-    id: "act5",
-    user: "Sam Porter",
-    action: "Resolved support ticket",
-    details: "Closed ticket TK-0022 regarding cluster synchronization latency",
-    module: "Support",
-    timestamp: "2d ago",
-    type: "support"
-  }
-];
-
 export default function Activities() {
-  const [activities, setActivities] = useState(() => {
-    const saved = localStorage.getItem('crm_activities');
-    return saved ? JSON.parse(saved) : INITIAL_ACTIVITIES;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('crm_activities', JSON.stringify(activities));
-  }, [activities]);
-
+  const { logs = [], isLoading } = useAuditLogs();
   const [activeTab, setActiveTab] = useState('All');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  // Form states
-  const [user, setUser] = useState('Curtis Miller');
-  const [action, setAction] = useState('');
-  const [details, setDetails] = useState('');
-  const [module, setModule] = useState('Pipeline');
+  const activities = useMemo(() => {
+    return logs.map(act => {
+      // Calculate a friendly relative time or standard localized string
+      const timeDiff = Date.now() - new Date(act.timestamp).getTime();
+      let timeStr = 'Just now';
+      if (!isNaN(timeDiff)) {
+        const mins = Math.floor(timeDiff / (60 * 1000));
+        const hours = Math.floor(mins / 60);
+        const days = Math.floor(hours / 24);
+        if (days > 0) timeStr = `${days}d ago`;
+        else if (hours > 0) timeStr = `${hours}h ago`;
+        else if (mins > 0) timeStr = `${mins}m ago`;
+      } else {
+        timeStr = new Date(act.timestamp).toLocaleDateString();
+      }
 
-  const handleAddSubmit = (e) => {
-    e.preventDefault();
-    if (!action || !details) return;
+      // Map module name to standard tab modules (Leads, Projects, Billing, Pipeline, Support)
+      let displayModule = act.module || 'System';
+      if (displayModule.toLowerCase() === 'opportunities') displayModule = 'Pipeline';
+      else if (displayModule.toLowerCase() === 'invoices' || displayModule.toLowerCase() === 'payments' || displayModule.toLowerCase() === 'finance') displayModule = 'Billing';
+      else if (displayModule.toLowerCase() === 'tickets') displayModule = 'Support';
 
-    const newActivity = {
-      id: "act_" + Date.now(),
-      user,
-      action,
-      details,
-      module,
-      timestamp: "Just now",
-      type: module.toLowerCase()
-    };
+      // Capitalize first letter
+      displayModule = displayModule.charAt(0).toUpperCase() + displayModule.slice(1);
 
-    setActivities([newActivity, ...activities]);
-    setIsAddModalOpen(false);
-
-    // Reset Form
-    setAction(''); setDetails(''); setModule('Pipeline');
-
-    showToast('Activity Logged', 'CRM transaction was cataloged on the audit timeline.', 'success');
-  };
+      return {
+        id: `act_${act.id}`,
+        user: act.actor || 'System',
+        action: act.action || 'Performed action',
+        details: act.newValue ? (act.previousValue ? `${act.previousValue} → ${act.newValue}` : act.newValue) : (act.previousValue || ''),
+        module: displayModule,
+        timestamp: timeStr,
+        type: displayModule.toLowerCase()
+      };
+    });
+  }, [logs]);
 
   const getModuleIcon = (mod) => {
     switch (mod.toLowerCase()) {
@@ -135,16 +85,26 @@ export default function Activities() {
     }
   };
 
-  const filteredActivities = activities.filter(act => {
-    const matchesSearch = 
-      act.action.toLowerCase().includes(search.toLowerCase()) ||
-      act.details.toLowerCase().includes(search.toLowerCase()) ||
-      act.user.toLowerCase().includes(search.toLowerCase());
-    
-    const matchesTab = activeTab === 'All' || act.module === activeTab;
+  const filteredActivities = useMemo(() => {
+    return activities.filter(act => {
+      const matchesSearch = 
+        act.action.toLowerCase().includes(search.toLowerCase()) ||
+        act.details.toLowerCase().includes(search.toLowerCase()) ||
+        act.user.toLowerCase().includes(search.toLowerCase());
+      
+      const matchesTab = activeTab === 'All' || act.module === activeTab;
 
-    return matchesSearch && matchesTab;
-  });
+      return matchesSearch && matchesTab;
+    });
+  }, [activities, search, activeTab]);
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container activities-page">
@@ -155,9 +115,6 @@ export default function Activities() {
           </h1>
           <p className="page-subtitle">Cross-module transaction streams, diagnostic compliance & live audit trails</p>
         </div>
-        <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
-          <Plus size={18} /> Record Event
-        </button>
       </div>
 
       {/* Filter Tabs */}
@@ -178,20 +135,20 @@ export default function Activities() {
         </div>
 
         <div className="search-wrapper flex items-center gap-2 w-full md:max-w-xs relative">
-          
           <input 
-          className="search-input"
+            className="search-input"
             type="text" 
             placeholder="Search timeline..." 
             value={search}
             onChange={e => setSearch(e.target.value)}
-            
             style={{
               backgroundColor: 'var(--bg-app)',
               borderColor: 'var(--border-light)',
-              color: 'var(--text-main)'
+              color: 'var(--text-main)',
+              paddingLeft: '32px'
             }}
-          /><Search className="absolute left-3.5 text-gray-500" size={14} />
+          />
+          <Search className="absolute left-3 text-gray-500" size={14} style={{ top: '50%', transform: 'translateY(-50%)' }} />
         </div>
       </div>
 
@@ -249,84 +206,7 @@ export default function Activities() {
             </div>
           )}
         </div>
-
       </div>
-
-      {/* Manual Activity Logging Modal */}
-      <Modal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Record Operations Event"
-        size="md"
-      >
-        <form onSubmit={handleAddSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Representative *</label>
-            <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#E4FF1A]" 
-              value={user} 
-              onChange={e => setUser(e.target.value)}
-            >
-              <option value="Curtis Miller">Curtis Miller</option>
-              <option value="Sarah Jenkins">Sarah Jenkins</option>
-              <option value="Alex Client">Alex Client</option>
-              <option value="Faye Morgan">Faye Morgan</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Module</label>
-            <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#E4FF1A]" 
-              value={module} 
-              onChange={e => setModule(e.target.value)}
-            >
-              {MODULES.filter(m => m !== 'All').map(m => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Event Action *</label>
-            <input 
-              type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#E4FF1A]" 
-              placeholder="e.g. Cleared SLA database parameters" 
-              value={action} 
-              onChange={e => setAction(e.target.value)} 
-              required 
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Transaction details *</label>
-            <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#E4FF1A] h-20 resize-none" 
-              placeholder="Provide exact parameter changes..." 
-              value={details} 
-              onChange={e => setDetails(e.target.value)} 
-              required
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 mt-4">
-            <button 
-              type="button" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-gray-950 border border-gray-850 text-gray-300 hover:text-white transition-all" 
-              onClick={() => setIsAddModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#E4FF1A] hover:bg-[#c9e016] text-[#0a0f1e] font-bold shadow-glow transition-all"
-            >
-              Log Transaction
-            </button>
-          </div>
-        </form>
-      </Modal>
     </div>
   );
 }

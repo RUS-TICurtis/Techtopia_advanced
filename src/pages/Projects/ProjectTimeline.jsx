@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Calendar, 
@@ -13,76 +13,33 @@ import {
   Sparkles
 } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
+import { useProjects } from '../../hooks/useCrmData';
 import './Projects.css';
 
-const INITIAL_PROJECTS = [
-  {
-    id: "p1",
-    title: "Quantum Core Cloud Migration",
-    company: "CloudScale Inc.",
-    progress: 74,
-    health: "On Track",
-    startDate: "2026-05-01",
-    dueDate: "2026-07-15",
-    owner: "Curtis Miller",
-    milestones: [
-      { name: "Database replication", date: "2026-05-15" },
-      { name: "Network security audit", date: "2026-06-10" },
-      { name: "API Gateway cuts", date: "2026-07-05" }
-    ]
-  },
-  {
-    id: "p2",
-    title: "AI Genomics Sequencer Integration",
-    company: "BioGen Lab",
-    progress: 38,
-    health: "At Risk",
-    startDate: "2026-04-10",
-    dueDate: "2026-06-30",
-    owner: "Sarah Jenkins",
-    milestones: [
-      { name: "API deployment", date: "2026-05-05" },
-      { name: "Genomic mapping verify", date: "2026-06-01" },
-      { name: "SLA validation", date: "2026-06-25" }
-    ]
-  },
-  {
-    id: "p3",
-    title: "Wayne Secure Dashboard",
-    company: "Wayne Enterprises",
-    progress: 15,
-    health: "Off Track",
-    startDate: "2026-05-10",
-    dueDate: "2026-08-01",
-    owner: "Curtis Miller",
-    milestones: [
-      { name: "Security handshake", date: "2026-05-30" },
-      { name: "Multi-tenant logic", date: "2026-07-01" },
-      { name: "Role matrix mapping", date: "2026-07-25" }
-    ]
-  },
-  {
-    id: "p4",
-    title: "Bespoke Glassmorphism UI",
-    company: "Stark Industries",
-    progress: 100,
-    health: "Completed",
-    startDate: "2026-03-01",
-    dueDate: "2026-05-20",
-    owner: "Tony Stark",
-    milestones: [
-      { name: "Grid layout", date: "2026-03-20" },
-      { name: "Neon brand setup", date: "2026-04-15" },
-      { name: "Vite production compile", date: "2026-05-10" }
-    ]
-  }
-];
-
 export default function ProjectTimeline() {
-  const [projects] = useState(() => {
-    const saved = localStorage.getItem('crm_projects');
-    return saved ? JSON.parse(saved) : INITIAL_PROJECTS;
-  });
+  const { projects: backendProjects = [], isLoading } = useProjects();
+
+  const projects = useMemo(() => {
+    return backendProjects.map(proj => {
+      // Ensure milestones, dates, progress and health have visual fallbacks
+      const start = proj.startDate || proj.createdAt?.slice(0, 10) || '2026-05-01';
+      const end = proj.dueDate || proj.endDate || '2026-07-15';
+      const ms = proj.milestones && proj.milestones.length > 0 ? proj.milestones : [
+        { name: "Project kickoff", date: start }
+      ];
+      return {
+        id: proj.id,
+        title: proj.title || proj.name || 'Unnamed Project',
+        company: proj.company || proj.clientName || 'General Client',
+        progress: typeof proj.progress === 'number' ? proj.progress : 0,
+        health: proj.health || 'On Track',
+        startDate: start,
+        dueDate: end,
+        owner: proj.owner || proj.manager || 'Curtis Miller',
+        milestones: ms
+      };
+    });
+  }, [backendProjects]);
 
   const getHealthColor = (h) => {
     switch (h) {
@@ -93,6 +50,14 @@ export default function ProjectTimeline() {
       default: return '#627496';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
 
   // Gantt Chart Column Months: April 2026 to Sept 2026
   const timelineMonths = [

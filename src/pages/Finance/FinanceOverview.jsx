@@ -10,53 +10,8 @@ import {
   BarChart3, Zap, RefreshCw, ChevronRight, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
+import { useFinanceSummary } from '../../hooks/useCrmData';
 import './Finance.css';
-
-// ── Mock data (replaced by API once backend is connected) ─────────────────
-const REVENUE_DATA = [
-  { month: 'Jan', Revenue: 128000, Expenses: 42000, Profit: 86000 },
-  { month: 'Feb', Revenue: 145000, Expenses: 38000, Profit: 107000 },
-  { month: 'Mar', Revenue: 162000, Expenses: 51000, Profit: 111000 },
-  { month: 'Apr', Revenue: 139000, Expenses: 44000, Profit: 95000 },
-  { month: 'May', Revenue: 198000, Expenses: 58000, Profit: 140000 },
-  { month: 'Jun', Revenue: 234000, Expenses: 62000, Profit: 172000 },
-  { month: 'Jul', Revenue: 218000, Expenses: 55000, Profit: 163000 },
-  { month: 'Aug', Revenue: 251000, Expenses: 67000, Profit: 184000 },
-  { month: 'Sep', Revenue: 287000, Expenses: 72000, Profit: 215000 },
-  { month: 'Oct', Revenue: 312000, Expenses: 80000, Profit: 232000 },
-  { month: 'Nov', Revenue: 298000, Expenses: 75000, Profit: 223000 },
-  { month: 'Dec', Revenue: 341000, Expenses: 88000, Profit: 253000 },
-];
-
-const EXPENSE_BREAKDOWN = [
-  { name: 'Operations', value: 32, color: '#01FDF6' },
-  { name: 'Payroll', value: 28, color: '#8A4FFF' },
-  { name: 'Marketing', value: 18, color: '#FF47DA' },
-  { name: 'Infrastructure', value: 12, color: '#21FA90' },
-  { name: 'Travel', value: 6, color: '#E4FF1A' },
-  { name: 'Other', value: 4, color: '#3772FF' },
-];
-
-const INVOICE_AGING = [
-  { range: '0-30 days', amount: 145000, color: '#21FA90' },
-  { range: '31-60 days', amount: 87000, color: '#E4FF1A' },
-  { range: '61-90 days', amount: 43000, color: '#FF8C42' },
-  { range: '90+ days', amount: 22000, color: '#FF47DA' },
-];
-
-const RECENT_TRANSACTIONS = [
-  { id: 'TXN-001', client: 'Acme Corp', amount: 12500, type: 'payment', status: 'completed', time: '2 hours ago', gateway: 'Hubtel' },
-  { id: 'TXN-002', client: 'BioGen Labs', amount: 34200, type: 'invoice', status: 'sent', time: '4 hours ago', gateway: null },
-  { id: 'TXN-003', client: 'CyberPulse', amount: 8900, type: 'payment', status: 'pending', time: '6 hours ago', gateway: 'Paystack' },
-  { id: 'TXN-004', client: 'DataVault Inc', amount: 21000, type: 'payment', status: 'completed', time: '1 day ago', gateway: 'Hubtel' },
-  { id: 'TXN-005', client: 'EcoLogistics', amount: 5600, type: 'expense', status: 'approved', time: '1 day ago', gateway: null },
-];
-
-const AI_INSIGHTS = [
-  { id: 1, type: 'warning', icon: AlertCircle, color: '#E4FF1A', text: 'Outstanding invoices above GH₵10,000 increased by 18% this month. 7 clients need follow-up.' },
-  { id: 2, type: 'danger', icon: TrendingDown, color: '#FF47DA', text: 'Projected cashflow risk in 27 days due to delayed collections from 3 enterprise clients.' },
-  { id: 3, type: 'info', icon: Sparkles, color: '#01FDF6', text: 'Subscription churn risk detected for 2 accounts. Recommend proactive outreach this week.' },
-];
 
 const ChartTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
@@ -74,28 +29,41 @@ const ChartTooltip = ({ active, payload, label }) => {
 
 export default function FinanceOverview() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const { overview, isLoading, refetch } = useFinanceSummary();
+
+  const REVENUE_DATA = overview?.revenueData || [];
+  const EXPENSE_BREAKDOWN = overview?.expenseBreakdown || [];
+  const INVOICE_AGING = overview?.invoiceAging || [];
+  const RECENT_TRANSACTIONS = overview?.recentTransactions || [];
+  const AI_INSIGHTS = overview?.aiInsights || [];
+
+  const totalRevenue = overview?.totalRevenue ?? 0;
+  const outstandingInvoices = overview?.outstandingInvoices ?? 0;
+  const collectedThisMonth = overview?.collectedThisMonth ?? 0;
+  const totalExpenses = overview?.totalExpenses ?? 0;
+  const pendingInvoiceCount = overview?.pendingInvoiceCount ?? 0;
+  const operatingRatio = overview?.operatingRatio ?? '0%';
 
   const kpiCards = [
     {
-      label: 'Total Revenue (YTD)', value: formatCurrency(2713000), change: '+24.3%', up: true,
+      label: 'Total Revenue (YTD)', value: formatCurrency(totalRevenue), change: '+24.3%', up: true,
       icon: DollarSign, color: '#21FA90', bg: 'rgba(33,250,144,0.1)',
-      sub: 'vs GH₵2.19M last year'
+      sub: 'vs last year'
     },
     {
-      label: 'Outstanding Invoices', value: formatCurrency(297000), change: '+18%', up: false,
+      label: 'Outstanding Invoices', value: formatCurrency(outstandingInvoices), change: '+18%', up: false,
       icon: FileText, color: '#E4FF1A', bg: 'rgba(228,255,26,0.1)',
-      sub: '34 invoices pending'
+      sub: `${pendingInvoiceCount} invoices pending`
     },
     {
-      label: 'Collected This Month', value: formatCurrency(341000), change: '+12.7%', up: true,
+      label: 'Collected This Month', value: formatCurrency(collectedThisMonth), change: '+12.7%', up: true,
       icon: CheckCircle, color: '#01FDF6', bg: 'rgba(1,253,246,0.1)',
       sub: 'Hubtel + Paystack'
     },
     {
-      label: 'Total Expenses (YTD)', value: formatCurrency(732000), change: '+8.2%', up: false,
+      label: 'Total Expenses (YTD)', value: formatCurrency(totalExpenses), change: '+8.2%', up: false,
       icon: Receipt, color: '#FF47DA', bg: 'rgba(255,71,218,0.1)',
-      sub: '28% operating ratio'
+      sub: `${operatingRatio} operating ratio`
     },
   ];
 
@@ -107,6 +75,7 @@ export default function FinanceOverview() {
     { label: 'AI Insights', icon: Sparkles, path: '/finance/ai-agent', color: '#E4FF1A' },
   ];
 
+
   return (
     <div className="page-container">
       {/* Page Header */}
@@ -116,8 +85,8 @@ export default function FinanceOverview() {
           <p className="page-subtitle">Real-time financial intelligence for Techtopia Corp · GH₵ · FY 2026</p>
         </div>
         <div className="page-actions">
-          <button className="btn btn-secondary" onClick={() => setLoading(!loading)}>
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+          <button className="btn btn-secondary" onClick={() => refetch()}>
+            <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
             <span>Refresh</span>
           </button>
           <button className="btn btn-primary" onClick={() => navigate('/finance/invoices')}>

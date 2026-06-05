@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useUIStore } from '../../store/uiStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,7 +7,14 @@ import './NotificationCenter.css';
 
 export default function NotificationCenter() {
   const { notificationCenterOpen, setNotificationCenterOpen } = useUIStore();
-  const { notifications, unreadCount, markAllRead, markAsRead, dismissNotification } = useNotificationStore();
+  const { notifications, unreadCount, markAllRead, markAsRead, dismissNotification, fetchNotifications } = useNotificationStore();
+
+  useEffect(() => {
+    if (notificationCenterOpen) {
+      fetchNotifications();
+    }
+  }, [notificationCenterOpen, fetchNotifications]);
+
 
   const getIcon = (type) => {
     switch (type) {

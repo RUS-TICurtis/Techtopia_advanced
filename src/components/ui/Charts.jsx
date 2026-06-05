@@ -3,9 +3,9 @@ import { useState } from 'react';
 // ==========================================================================
 // 1. Weekly Activity Chart (Bar Chart)
 // ==========================================================================
-export const WeeklyActivityChart = () => {
+export const WeeklyActivityChart = ({ data: propData }) => {
   // Let's summarize the deals value by stage or mock weekly values for visual beauty
-  const data = [
+  const defaultData = [
     { day: "Mon", leads: 4, revenue: 15000 },
     { day: "Tue", leads: 8, revenue: 32000 },
     { day: "Wed", leads: 5, revenue: 18000 },
@@ -15,8 +15,9 @@ export const WeeklyActivityChart = () => {
     { day: "Sun", leads: 3, revenue: 9000 },
   ];
 
-  const maxLeads = 15;
-  const maxRevenue = 50000;
+  const data = propData || defaultData;
+  const maxLeads = Math.max(1, ...data.map(d => d.leads || 0));
+  const maxRevenue = Math.max(1, ...data.map(d => d.revenue || 0));
   const chartHeight = 180;
   const chartWidth = 500;
   const [hoveredBar, setHoveredBar] = useState(null);
@@ -290,8 +291,8 @@ export const DealPipelineChart = ({ deals = [] }) => {
 // ==========================================================================
 // 3. Monthly Trends Area Line Chart (Balance History replacement)
 // ==========================================================================
-export const MonthlyTrendsChart = () => {
-  const points = [
+export const MonthlyTrendsChart = ({ data: propData }) => {
+  const defaultPoints = [
     { label: "Jan", val: 12000 },
     { label: "Feb", val: 18000 },
     { label: "Mar", val: 15000 },
@@ -300,7 +301,8 @@ export const MonthlyTrendsChart = () => {
     { label: "Jun", val: 42000 },
   ];
 
-  const maxVal = 50000;
+  const points = propData || defaultPoints;
+  const maxVal = Math.max(1, ...points.map(p => p.val || 0));
   const chartHeight = 120;
   const chartWidth = 520;
   const paddingX = 40;

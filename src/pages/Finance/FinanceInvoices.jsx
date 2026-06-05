@@ -20,18 +20,6 @@ const STATUS_CONFIG = {
   Cancelled:       { class: 'status-cancelled', icon: X },
 };
 
-// ── Mock Data ─────────────────────────────────────────────────────────────
-const MOCK_INVOICES = [
-  { id: 'INV-2026-001', client: 'Acme Corp', project: 'ERP Integration', amount: 45000, paid: 45000, issueDate: '2026-05-01', dueDate: '2026-05-31', status: 'Paid', currency: 'GHS' },
-  { id: 'INV-2026-002', client: 'BioGen Labs', project: 'API SLA Support', amount: 28500, paid: 14250, issueDate: '2026-05-10', dueDate: '2026-06-10', status: 'Partially Paid', currency: 'GHS' },
-  { id: 'INV-2026-003', client: 'CyberPulse', project: 'Security Audit', amount: 62000, paid: 0, issueDate: '2026-05-15', dueDate: '2026-06-15', status: 'Sent', currency: 'GHS' },
-  { id: 'INV-2026-004', client: 'DataVault Inc', project: 'Cloud Migration', amount: 110000, paid: 0, issueDate: '2026-04-20', dueDate: '2026-05-20', status: 'Overdue', currency: 'GHS' },
-  { id: 'INV-2026-005', client: 'EcoLogistics', project: 'Fleet Analytics', amount: 18750, paid: 0, issueDate: '2026-05-22', dueDate: '2026-06-22', status: 'Draft', currency: 'GHS' },
-  { id: 'INV-2026-006', client: 'FinTech Hub', project: 'Compliance Platform', amount: 87000, paid: 0, issueDate: '2026-05-25', dueDate: '2026-06-25', status: 'Pending Approval', currency: 'GHS' },
-  { id: 'INV-2026-007', client: 'GreenTech Ltd', project: 'Carbon Tracker', amount: 33000, paid: 33000, issueDate: '2026-05-28', dueDate: '2026-06-28', status: 'Paid', currency: 'GHS' },
-  { id: 'INV-2026-008', client: 'Acme Corp', project: 'Mobile App', amount: 55000, paid: 0, issueDate: '2026-05-30', dueDate: '2026-06-30', status: 'Approved', currency: 'GHS' },
-];
-
 const EMPTY_INVOICE = {
   client: '', project: '', email: '', phone: '', address: '',
   issueDate: new Date().toISOString().slice(0, 10),

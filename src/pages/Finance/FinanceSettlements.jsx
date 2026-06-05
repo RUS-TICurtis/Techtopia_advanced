@@ -2,14 +2,7 @@ import React, { useState } from 'react';
 import { CheckCircle, Clock, AlertCircle, ArrowRight, RefreshCw, Download, Filter } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
-
-const MOCK_SETTLEMENTS = [
-  { id: 'STL-001', gateway: 'Hubtel', period: 'May 1–15, 2026', grossVol: 148000, fees: 2960, net: 145040, status: 'settled', settledDate: '2026-05-18', txnCount: 32 },
-  { id: 'STL-002', gateway: 'Paystack', period: 'May 1–15, 2026', grossVol: 95000, fees: 1425, net: 93575, status: 'settled', settledDate: '2026-05-17', txnCount: 21 },
-  { id: 'STL-003', gateway: 'Hubtel', period: 'May 16–31, 2026', grossVol: 203000, fees: 4060, net: 198940, status: 'settled', settledDate: '2026-06-02', txnCount: 48 },
-  { id: 'STL-004', gateway: 'Paystack', period: 'May 16–31, 2026', grossVol: 112000, fees: 1680, net: 110320, status: 'pending', settledDate: null, txnCount: 27 },
-  { id: 'STL-005', gateway: 'Hubtel', period: 'Jun 1–15, 2026', grossVol: 87000, fees: 1740, net: 85260, status: 'processing', settledDate: null, txnCount: 19 },
-];
+import { useSettlements } from '../../hooks/useCrmData';
 
 const STATUS_CONFIG = {
   settled:    { class: 'badge-success', icon: CheckCircle, label: 'Settled' },
@@ -24,15 +17,24 @@ const GATEWAY_CONFIG = {
 };
 
 export default function FinanceSettlements() {
+  const { settlements = [], isLoading } = useSettlements();
   const [gatewayFilter, setGatewayFilter] = useState('All');
 
-  const filtered = MOCK_SETTLEMENTS.filter(s => gatewayFilter === 'All' || s.gateway === gatewayFilter);
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
+
+  const filtered = settlements.filter(s => gatewayFilter === 'All' || s.gateway === gatewayFilter);
 
   const totals = {
-    gross: filtered.reduce((s, x) => s + x.grossVol, 0),
-    fees: filtered.reduce((s, x) => s + x.fees, 0),
-    net: filtered.reduce((s, x) => s + x.net, 0),
-    pending: filtered.filter(x => x.status === 'pending').reduce((s, x) => s + x.net, 0),
+    gross: filtered.reduce((s, x) => s + (x.grossVol || 0), 0),
+    fees: filtered.reduce((s, x) => s + (x.fees || 0), 0),
+    net: filtered.reduce((s, x) => s + (x.net || 0), 0),
+    pending: filtered.filter(x => x.status === 'pending').reduce((s, x) => s + (x.net || 0), 0),
   };
 
   return (
@@ -94,13 +96,13 @@ export default function FinanceSettlements() {
           </thead>
           <tbody>
             {filtered.map(stl => {
-              const cfg = STATUS_CONFIG[stl.status];
-              const gwCfg = GATEWAY_CONFIG[stl.gateway];
-              const StatusIcon = cfg.icon;
+              const cfg = STATUS_CONFIG[stl.status] || { class: 'badge-neutral', icon: Clock, label: stl.status || 'Pending' };
+              const gwCfg = GATEWAY_CONFIG[stl.gateway] || { class: 'badge-neutral', color: '#627496' };
+              const StatusIcon = cfg.icon || Clock;
               return (
                 <tr key={stl.id}>
                   <td><span className="font-mono text-xs" style={{ color: 'var(--brand-cyan)' }}>{stl.id}</span></td>
-                  <td><span className={`badge badge-sm ${gwCfg.class}`}>{stl.gateway}</span></td>
+                  <td><span className={`badge badge-sm ${gwCfg.class || ''}`}>{stl.gateway}</span></td>
                   <td className="text-sm">{stl.period}</td>
                   <td className="text-sm">{stl.txnCount} txns</td>
                   <td className="font-semibold">{formatCurrency(stl.grossVol)}</td>
@@ -127,13 +129,13 @@ export default function FinanceSettlements() {
           </tfoot>
         </table>
       </div>
-
+ 
       {/* Fee Breakdown */}
       <div className="card">
         <div className="card-title">Gateway Fee Structure</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           {Object.entries(GATEWAY_CONFIG).map(([gw, cfg]) => {
-            const gwData = MOCK_SETTLEMENTS.filter(s => s.gateway === gw);
+            const gwData = settlements.filter(s => s.gateway === gw);
             const gwGross = gwData.reduce((s, x) => s + x.grossVol, 0);
             const gwFees = gwData.reduce((s, x) => s + x.fees, 0);
             const feeRate = gwGross > 0 ? ((gwFees / gwGross) * 100).toFixed(2) : '0.00';

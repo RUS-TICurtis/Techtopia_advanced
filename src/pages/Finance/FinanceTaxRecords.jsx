@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Download, Search, CheckCircle, Clock, X, AlertCircle, FileText } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
+import { useTaxRecords } from '../../hooks/useCrmData';
 
 const TAX_TYPES = ['VAT', 'Income Tax', 'Withholding Tax', 'PAYE', 'SSNIT', 'Other'];
 
@@ -12,19 +13,10 @@ const STATUS_CONFIG = {
   Draft:    { class: 'badge-neutral', icon: FileText },
 };
 
-const MOCK_TAX_RECORDS = [
-  { id: 'TAX-001', type: 'VAT', period: 'Q1 2026', grossRevenue: 435000, taxableAmount: 363000, taxRate: 15, taxDue: 54450, taxPaid: 54450, status: 'Filed', filedDate: '2026-04-15', dueDate: '2026-04-30' },
-  { id: 'TAX-002', type: 'Income Tax', period: 'Q1 2026', grossRevenue: 435000, taxableAmount: 435000, taxRate: 25, taxDue: 108750, taxPaid: 108750, status: 'Filed', filedDate: '2026-04-28', dueDate: '2026-04-30' },
-  { id: 'TAX-003', type: 'VAT', period: 'Q2 2026', grossRevenue: 794000, taxableAmount: 662000, taxRate: 15, taxDue: 99300, taxPaid: 0, status: 'Pending', filedDate: null, dueDate: '2026-07-31' },
-  { id: 'TAX-004', type: 'PAYE', period: 'May 2026', grossRevenue: null, taxableAmount: 210000, taxRate: 17.5, taxDue: 36750, taxPaid: 36750, status: 'Filed', filedDate: '2026-06-07', dueDate: '2026-06-15' },
-  { id: 'TAX-005', type: 'Withholding Tax', period: 'May 2026', grossRevenue: null, taxableAmount: 145000, taxRate: 5, taxDue: 7250, taxPaid: 0, status: 'Overdue', filedDate: null, dueDate: '2026-06-01' },
-  { id: 'TAX-006', type: 'SSNIT', period: 'May 2026', grossRevenue: null, taxableAmount: 210000, taxRate: 18.5, taxDue: 38850, taxPaid: 38850, status: 'Filed', filedDate: '2026-06-07', dueDate: '2026-06-14' },
-];
-
 const EMPTY_RECORD = { type: 'VAT', period: '', grossRevenue: '', taxableAmount: '', taxRate: 15, dueDate: '' };
 
 export default function FinanceTaxRecords() {
-  const [records, setRecords] = useState(MOCK_TAX_RECORDS);
+  const { records = [], isLoading, createRecord } = useTaxRecords();
   const [typeFilter, setTypeFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -37,29 +29,40 @@ export default function FinanceTaxRecords() {
   });
 
   const totals = {
-    due: records.reduce((s, r) => s + r.taxDue, 0),
-    paid: records.reduce((s, r) => s + r.taxPaid, 0),
-    outstanding: records.reduce((s, r) => s + (r.taxDue - r.taxPaid), 0),
+    due: records.reduce((s, r) => s + (r.taxDue || 0), 0),
+    paid: records.reduce((s, r) => s + (r.taxPaid || 0), 0),
+    outstanding: records.reduce((s, r) => s + ((r.taxDue || 0) - (r.taxPaid || 0)), 0),
     overdue: records.filter(r => r.status === 'Overdue').length,
   };
 
   const computedTax = parseFloat(newRecord.taxableAmount || 0) * (parseFloat(newRecord.taxRate || 0) / 100);
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
-    const rec = {
-      id: `TAX-${String(records.length + 1).padStart(3, '0')}`,
-      taxDue: computedTax, taxPaid: 0, status: 'Pending',
-      filedDate: null,
-      ...newRecord,
-      grossRevenue: parseFloat(newRecord.grossRevenue) || null,
+    const payload = {
+      type: newRecord.type,
+      period: newRecord.period,
       taxableAmount: parseFloat(newRecord.taxableAmount) || 0,
       taxRate: parseFloat(newRecord.taxRate) || 0,
+      taxDue: computedTax,
+      dueDate: newRecord.dueDate,
     };
-    setRecords(prev => [rec, ...prev]);
-    setShowCreateModal(false);
-    setNewRecord(EMPTY_RECORD);
+    try {
+      await createRecord(payload);
+      setShowCreateModal(false);
+      setNewRecord(EMPTY_RECORD);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">

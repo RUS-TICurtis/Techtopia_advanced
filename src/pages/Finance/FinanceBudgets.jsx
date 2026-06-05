@@ -3,25 +3,10 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, Plus, X, Edit } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Plus, X, Edit, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
+import { useBudgets } from '../../hooks/useCrmData';
 import './Finance.css';
-
-const MOCK_BUDGETS = [
-  { id: 'BUD-001', name: 'Engineering Department', type: 'Department', allocated: 500000, spent: 312000, period: 'FY 2026', color: '#01FDF6', alerts: [] },
-  { id: 'BUD-002', name: 'Marketing Hub', type: 'Department', allocated: 200000, spent: 187000, period: 'FY 2026', color: '#FF47DA', alerts: ['90% threshold reached'] },
-  { id: 'BUD-003', name: 'CRM Platform Rebuild', type: 'Project', allocated: 350000, spent: 290000, period: 'Q2 2026', color: '#8A4FFF', alerts: ['83% used'] },
-  { id: 'BUD-004', name: 'Operations', type: 'Department', allocated: 150000, spent: 62000, period: 'FY 2026', color: '#21FA90', alerts: [] },
-  { id: 'BUD-005', name: 'Mobile App Launch', type: 'Project', allocated: 180000, spent: 195000, period: 'Q2 2026', color: '#E4FF1A', alerts: ['⚠ Budget Exceeded!'] },
-  { id: 'BUD-006', name: 'HR & Recruitment', type: 'Department', allocated: 120000, spent: 44000, period: 'FY 2026', color: '#3772FF', alerts: [] },
-];
-
-const VARIANCE_DATA = MOCK_BUDGETS.map(b => ({
-  name: b.name.split(' ').slice(0, 2).join(' '),
-  Allocated: b.allocated,
-  Spent: b.spent,
-  Remaining: Math.max(0, b.allocated - b.spent),
-}));
 
 const ChartTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
@@ -38,9 +23,16 @@ const ChartTooltip = ({ active, payload, label }) => {
 const EMPTY_BUDGET = { name: '', type: 'Department', allocated: '', period: 'FY 2026', threshold: 80 };
 
 export default function FinanceBudgets() {
-  const [budgets, setBudgets] = useState(MOCK_BUDGETS);
+  const { budgets, isLoading, createBudget, deleteBudget } = useBudgets();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBudget, setNewBudget] = useState(EMPTY_BUDGET);
+
+  const VARIANCE_DATA = budgets.map(b => ({
+    name: b.name.split(' ').slice(0, 2).join(' '),
+    Allocated: b.allocated,
+    Spent: b.spent,
+    Remaining: Math.max(0, b.allocated - b.spent),
+  }));
 
   const totals = {
     allocated: budgets.reduce((s, b) => s + b.allocated, 0),
@@ -49,18 +41,31 @@ export default function FinanceBudgets() {
     exceeded: budgets.filter(b => b.spent > b.allocated).length,
   };
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
-    const budget = {
-      id: `BUD-${String(budgets.length + 1).padStart(3, '0')}`,
-      spent: 0, color: '#01FDF6', alerts: [],
-      ...newBudget,
-      allocated: parseFloat(newBudget.allocated) || 0,
-    };
-    setBudgets(prev => [...prev, budget]);
-    setShowCreateModal(false);
-    setNewBudget(EMPTY_BUDGET);
+    try {
+      await createBudget({
+        name: newBudget.name,
+        type: newBudget.type,
+        allocated: parseFloat(newBudget.allocated) || 0,
+        period: newBudget.period,
+        spent: 0,
+        alerts: []
+      });
+      setShowCreateModal(false);
+      setNewBudget(EMPTY_BUDGET);
+    } catch (err) {
+      console.error(err);
+    }
   };
+ 
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
@@ -151,17 +156,20 @@ export default function FinanceBudgets() {
                 <div>
                   <span className="font-semibold text-sm">{budget.name}</span>
                   <span className="badge badge-sm badge-neutral ml-2" style={{ fontSize: 10 }}>{budget.type}</span>
-                  {budget.alerts.length > 0 && (
+                  {budget.alerts && budget.alerts.length > 0 && (
                     <span className="ml-2" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: isExceeded ? 'var(--error)' : 'var(--warning)' }}>
                       <AlertTriangle size={11} /> {budget.alerts[0]}
                     </span>
                   )}
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
                   <span className="text-sm font-semibold" style={{ color: isExceeded ? 'var(--error)' : 'var(--text-title)' }}>
                     {formatCurrency(budget.spent)} / {formatCurrency(budget.allocated)}
                   </span>
-                  <span className="text-xs text-muted ml-2">({pct}%)</span>
+                  <span className="text-xs text-muted">({pct}%)</span>
+                  <button onClick={() => { if(window.confirm('Delete this budget?')) deleteBudget(budget.id) }} className="btn-icon" style={{ color: 'var(--error)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
               <div className="budget-progress-bar-track">

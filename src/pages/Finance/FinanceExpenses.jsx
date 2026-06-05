@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
+import { useExpenses } from '../../hooks/useCrmData';
 
 const EXPENSE_TYPES = ['Travel', 'Operations', 'Marketing', 'Payroll', 'Procurement', 'Infrastructure', 'Other'];
 
@@ -21,19 +22,10 @@ const TYPE_COLORS = {
   Payroll: '#21FA90', Procurement: '#E4FF1A', Infrastructure: '#3772FF', Other: '#627496',
 };
 
-const MOCK_EXPENSES = [
-  { id: 'EXP-001', title: 'Team Offsite Retreat', type: 'Travel', submitter: 'Isaac Nkrumah', dept: 'Engineering', amount: 12500, date: '2026-05-28', status: 'Approved', receipt: true, notes: 'Q2 team building' },
-  { id: 'EXP-002', title: 'AWS Infrastructure Upgrade', type: 'Infrastructure', submitter: 'Ama Boateng', dept: 'DevOps', amount: 34800, date: '2026-05-25', status: 'Submitted', receipt: true, notes: 'Compute cluster expansion' },
-  { id: 'EXP-003', title: 'Google Ads Q2 Campaign', type: 'Marketing', submitter: 'Kofi Asante', dept: 'Marketing', amount: 18000, date: '2026-05-20', status: 'Under Review', receipt: false, notes: '' },
-  { id: 'EXP-004', title: 'Office Supplies & Stationery', type: 'Operations', submitter: 'Grace Mensah', dept: 'Admin', amount: 2400, date: '2026-05-18', status: 'Reimbursed', receipt: true, notes: 'Monthly office supplies' },
-  { id: 'EXP-005', title: 'Vendor Conference Tickets', type: 'Travel', submitter: 'Kwame Darko', dept: 'Sales', amount: 9600, date: '2026-05-15', status: 'Rejected', receipt: false, notes: 'Conference cancelled' },
-  { id: 'EXP-006', title: 'Software Licenses', type: 'Infrastructure', submitter: 'Akua Sarpong', dept: 'Engineering', amount: 15200, date: '2026-06-01', status: 'Submitted', receipt: true, notes: 'Annual SaaS subscriptions' },
-];
-
 const EMPTY_EXPENSE = { title: '', type: 'Operations', amount: '', dept: '', date: new Date().toISOString().slice(0, 10), notes: '', receipt: false };
 
 export default function FinanceExpenses() {
-  const [expenses, setExpenses] = useState(MOCK_EXPENSES);
+  const { expenses = [], isLoading, submitExpense, approveExpense, rejectExpense } = useExpenses();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -42,18 +34,18 @@ export default function FinanceExpenses() {
   const [newExpense, setNewExpense] = useState(EMPTY_EXPENSE);
 
   const metrics = useMemo(() => ({
-    total: expenses.reduce((s, e) => s + e.amount, 0),
-    pending: expenses.filter(e => ['Submitted', 'Under Review'].includes(e.status)).reduce((s, e) => s + e.amount, 0),
-    approved: expenses.filter(e => e.status === 'Approved' || e.status === 'Reimbursed').reduce((s, e) => s + e.amount, 0),
+    total: expenses.reduce((s, e) => s + (e.amount || 0), 0),
+    pending: expenses.filter(e => ['Submitted', 'Under Review'].includes(e.status)).reduce((s, e) => s + (e.amount || 0), 0),
+    approved: expenses.filter(e => e.status === 'Approved' || e.status === 'Reimbursed').reduce((s, e) => s + (e.amount || 0), 0),
     byType: EXPENSE_TYPES.map(t => ({
       type: t,
-      total: expenses.filter(e => e.type === t).reduce((s, e) => s + e.amount, 0),
+      total: expenses.filter(e => e.type === t).reduce((s, e) => s + (e.amount || 0), 0),
       count: expenses.filter(e => e.type === t).length,
     })).filter(t => t.count > 0),
   }), [expenses]);
 
   const filtered = useMemo(() => expenses.filter(e => {
-    const matchSearch = !search || e.title.toLowerCase().includes(search.toLowerCase()) || e.submitter.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || e.title?.toLowerCase().includes(search.toLowerCase()) || e.submitter?.toLowerCase().includes(search.toLowerCase());
     const matchType = typeFilter === 'All' || e.type === typeFilter;
     const matchStatus = statusFilter === 'All' || e.status === statusFilter;
     return matchSearch && matchType && matchStatus;
@@ -61,24 +53,50 @@ export default function FinanceExpenses() {
 
   const pendingApprovals = expenses.filter(e => ['Submitted', 'Under Review'].includes(e.status));
 
-  const handleApprove = (id) => setExpenses(prev => prev.map(e => e.id === id ? { ...e, status: 'Approved' } : e));
-  const handleReject = (id) => setExpenses(prev => prev.map(e => e.id === id ? { ...e, status: 'Rejected' } : e));
+  const handleApprove = async (id) => {
+    try {
+      await approveExpense(id);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const handleSubmit = (ev) => {
+  const handleReject = async (id) => {
+    try {
+      await rejectExpense({ id, reason: 'Rejected by admin' });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSubmit = async (ev) => {
     ev.preventDefault();
-    const exp = {
-      id: `EXP-${String(expenses.length + 1).padStart(3, '0')}`,
-      submitter: 'Current User',
+    const payload = {
+      title: newExpense.title,
+      type: newExpense.type,
       dept: newExpense.dept || 'General',
       status: 'Submitted',
       receipt: newExpense.receipt,
-      ...newExpense,
       amount: parseFloat(newExpense.amount) || 0,
+      date: newExpense.date,
+      notes: newExpense.notes,
     };
-    setExpenses(prev => [exp, ...prev]);
-    setShowSubmitModal(false);
-    setNewExpense(EMPTY_EXPENSE);
+    try {
+      await submitExpense(payload);
+      setShowSubmitModal(false);
+      setNewExpense(EMPTY_EXPENSE);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">

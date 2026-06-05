@@ -87,6 +87,7 @@ export default function AuthLogin() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
+                  autocomplete="email"
                 />
               </div>
             </div>
@@ -102,6 +103,7 @@ export default function AuthLogin() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
+                  autocomplete="current-password"
                 />
               </div>
             </div>

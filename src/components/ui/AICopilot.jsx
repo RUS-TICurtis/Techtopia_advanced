@@ -26,35 +26,7 @@ export default function AICopilot() {
   // Approval Queue State (Persistent mock in localStorage)
   const [approvals, setApprovals] = useState(() => {
     const saved = localStorage.getItem('crm_ai_approvals');
-    return saved ? JSON.parse(saved) : [
-      { 
-        id: 'app-1', 
-        type: 'finance', 
-        agent: 'Finance Agent', 
-        title: 'Overdue Collection Notice', 
-        description: 'Draft collection email warning for CloudScale Inc. (Invoice #INV-2026-002: $45,000)',
-        details: 'Dear Alice,\n\nOur system registers Invoice #INV-2026-002 as Sent but unpaid. Please let us know if we can assist. \n\nBest,\nTechtopia Finance Agent',
-        status: 'pending' 
-      },
-      { 
-        id: 'app-2', 
-        type: 'hr', 
-        agent: 'HR Agent', 
-        title: 'New Hire Onboarding Invites', 
-        description: 'Auto-schedule 3 calendar discovery calls and trigger Slack checklist for incoming Sales Lead.',
-        details: 'Trigger workflow standard block: [Onboard Sales Lead]. Dispatch calendar invites for Curtis Tungsten, Curtis Miller, and Sarah Jenkins.',
-        status: 'pending' 
-      },
-      {
-        id: 'app-3', 
-        type: 'finance', 
-        agent: 'Finance Agent', 
-        title: 'Subscription Risk Flag Escalation', 
-        description: 'Decline standard renewal warning to Roma Tech due to continuous payment failures.',
-        details: 'Flag Roma Tech account as high-risk, disable automatic stripe retries, notify Account Lead Curtis Tungsten immediately.',
-        status: 'pending'
-      }
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Save approvals

@@ -5,16 +5,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
-
-const MOCK_PAYMENTS = [
-  { id: 'PAY-001', reference: 'HTL-2026-88412', client: 'Acme Corp', amount: 45000, gateway: 'Hubtel', method: 'Mobile Money', status: 'completed', date: '2026-05-31', invoiceId: 'INV-2026-001' },
-  { id: 'PAY-002', reference: 'PSK-2026-TXN9821', client: 'GreenTech Ltd', amount: 33000, gateway: 'Paystack', method: 'Card', status: 'completed', date: '2026-05-28', invoiceId: 'INV-2026-007' },
-  { id: 'PAY-003', reference: 'PSK-2026-TXN0041', client: 'CyberPulse', amount: 8900, gateway: 'Paystack', method: 'Bank Transfer', status: 'pending', date: '2026-05-30', invoiceId: 'INV-2026-003' },
-  { id: 'PAY-004', reference: 'HTL-2026-88490', client: 'BioGen Labs', amount: 14250, gateway: 'Hubtel', method: 'Visa', status: 'completed', date: '2026-05-20', invoiceId: 'INV-2026-002' },
-  { id: 'PAY-005', reference: 'MAN-2026-00012', client: 'DataVault Inc', amount: 110000, gateway: 'Manual', method: 'Bank Transfer', status: 'failed', date: '2026-05-18', invoiceId: 'INV-2026-004' },
-  { id: 'PAY-006', reference: 'HTL-2026-88561', client: 'FinTech Hub', amount: 25000, gateway: 'Hubtel', method: 'Mobile Money', status: 'refunded', date: '2026-05-15', invoiceId: 'INV-2026-006' },
-  { id: 'PAY-007', reference: 'PSK-2026-TXN2211', client: 'EcoLogistics', amount: 18750, gateway: 'Paystack', method: 'Card', status: 'pending', date: '2026-06-01', invoiceId: 'INV-2026-005' },
-];
+import { usePayments } from '../../hooks/useCrmData';
 
 const STATUS_CONFIG = {
   completed: { label: 'Completed', class: 'badge-success', icon: CheckCircle },
@@ -26,45 +17,58 @@ const STATUS_CONFIG = {
 const GATEWAY_CLASS = { Hubtel: 'gateway-hubtel', Paystack: 'gateway-paystack', Manual: 'badge-neutral' };
 
 export default function FinancePayments() {
-  const [payments, setPayments] = useState(MOCK_PAYMENTS);
+  const { payments = [], isLoading, createPayment, refundPayment } = usePayments();
   const [search, setSearch] = useState('');
   const [gatewayFilter, setGatewayFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showManualModal, setShowManualModal] = useState(false);
   const [showRefundModal, setShowRefundModal] = useState(null);
+  const [refundReason, setRefundReason] = useState('');
   const [manualPayment, setManualPayment] = useState({ client: '', invoiceId: '', amount: '', method: 'Bank Transfer', reference: '', notes: '' });
 
   const metrics = useMemo(() => ({
-    collected: payments.filter(p => p.status === 'completed').reduce((s, p) => s + p.amount, 0),
-    pending: payments.filter(p => p.status === 'pending').reduce((s, p) => s + p.amount, 0),
+    collected: payments.filter(p => p.status === 'completed').reduce((s, p) => s + (p.amount || 0), 0),
+    pending: payments.filter(p => p.status === 'pending').reduce((s, p) => s + (p.amount || 0), 0),
     failed: payments.filter(p => p.status === 'failed').length,
-    refunded: payments.filter(p => p.status === 'refunded').reduce((s, p) => s + p.amount, 0),
+    refunded: payments.filter(p => p.status === 'refunded').reduce((s, p) => s + (p.amount || 0), 0),
   }), [payments]);
 
   const filtered = useMemo(() => {
     return payments.filter(p => {
-      const matchSearch = !search || p.client.toLowerCase().includes(search.toLowerCase()) || p.reference.toLowerCase().includes(search.toLowerCase());
+      const matchSearch = !search || p.client?.toLowerCase().includes(search.toLowerCase()) || p.reference?.toLowerCase().includes(search.toLowerCase());
       const matchGateway = gatewayFilter === 'All' || p.gateway === gatewayFilter;
       const matchStatus = statusFilter === 'All' || p.status === statusFilter;
       return matchSearch && matchGateway && matchStatus;
     });
   }, [payments, search, gatewayFilter, statusFilter]);
 
-  const handleRecordManual = (e) => {
+  const handleRecordManual = async (e) => {
     e.preventDefault();
-    const pay = {
-      id: `PAY-${String(payments.length + 1).padStart(3, '0')}`,
-      reference: `MAN-2026-${String(payments.length + 1).padStart(5, '0')}`,
-      gateway: 'Manual',
-      status: 'completed',
-      date: new Date().toISOString().slice(0, 10),
-      ...manualPayment,
+    const payload = {
+      client: manualPayment.client,
+      invoiceId: manualPayment.invoiceId,
       amount: parseFloat(manualPayment.amount) || 0,
+      method: manualPayment.method,
+      reference: manualPayment.reference,
+      notes: manualPayment.notes,
+      gateway: 'Manual',
     };
-    setPayments(prev => [pay, ...prev]);
-    setShowManualModal(false);
-    setManualPayment({ client: '', invoiceId: '', amount: '', method: 'Bank Transfer', reference: '', notes: '' });
+    try {
+      await createPayment(payload);
+      setShowManualModal(false);
+      setManualPayment({ client: '', invoiceId: '', amount: '', method: 'Bank Transfer', reference: '', notes: '' });
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
@@ -302,13 +306,18 @@ export default function FinancePayments() {
               </p>
               <div className="form-group">
                 <label>Reason for Refund</label>
-                <textarea className="form-input" rows={3} placeholder="Enter refund reason..." />
+                <textarea className="form-input" rows={3} placeholder="Enter refund reason..." value={refundReason} onChange={e => setRefundReason(e.target.value)} />
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={() => setShowRefundModal(null)}>Cancel</button>
-                <button className="btn btn-primary" style={{ background: 'var(--error)' }} onClick={() => {
-                  setPayments(prev => prev.map(p => p.id === showRefundModal.id ? { ...p, status: 'refunded' } : p));
-                  setShowRefundModal(null);
+                <button className="btn btn-primary" style={{ background: 'var(--error)' }} onClick={async () => {
+                  try {
+                    await refundPayment({ id: showRefundModal.id, reason: refundReason });
+                    setShowRefundModal(null);
+                    setRefundReason('');
+                  } catch (err) {
+                    console.error(err);
+                  }
                 }}>
                   <RotateCcw size={14} /> Confirm Refund
                 </button>

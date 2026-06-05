@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
+import { useSubscriptions } from '../../hooks/useCrmData';
 
 const PLANS = [
   {
@@ -30,15 +31,6 @@ const PLANS = [
   },
 ];
 
-const MOCK_SUBSCRIPTIONS = [
-  { id: 'SUB-001', tenant: 'Acme Corp', plan: 'Business', seats: 45, billing: 'Monthly', amount: 1299, status: 'active', nextBilling: '2026-07-01', since: '2025-01-15' },
-  { id: 'SUB-002', tenant: 'BioGen Labs', plan: 'Pro', seats: 12, billing: 'Annual', amount: 4990, status: 'active', nextBilling: '2027-01-10', since: '2026-01-10' },
-  { id: 'SUB-003', tenant: 'CyberPulse', plan: 'Enterprise', seats: 120, billing: 'Annual', amount: 60000, status: 'active', nextBilling: '2027-03-01', since: '2026-03-01' },
-  { id: 'SUB-004', tenant: 'DataVault Inc', plan: 'Pro', seats: 8, billing: 'Monthly', amount: 499, status: 'suspended', nextBilling: '—', since: '2025-08-12' },
-  { id: 'SUB-005', tenant: 'EcoLogistics', plan: 'Free', seats: 3, billing: '—', amount: 0, status: 'active', nextBilling: '—', since: '2026-02-20' },
-  { id: 'SUB-006', tenant: 'FinTech Hub', plan: 'Business', seats: 22, billing: 'Monthly', amount: 1299, status: 'cancelled', nextBilling: '—', since: '2025-11-05' },
-];
-
 const STATUS_CLASSES = {
   active: 'badge-success',
   suspended: 'badge-warning',
@@ -47,23 +39,41 @@ const STATUS_CLASSES = {
 };
 
 export default function FinanceSubscriptions() {
-  const [subscriptions, setSubscriptions] = useState(MOCK_SUBSCRIPTIONS);
+  const { subscriptions = [], isLoading, cancelSubscription, suspendSubscription, resumeSubscription } = useSubscriptions();
   const [activeTab, setActiveTab] = useState('subscriptions');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [actionModal, setActionModal] = useState(null); // { type, sub }
 
   const metrics = {
-    mrr: PLANS.reduce((s, p) => s + p.mrr, 0),
-    arr: PLANS.reduce((s, p) => s + p.mrr * 12, 0),
+    mrr: subscriptions.filter(s => s.status === 'active' || s.status === 'trial').reduce((sum, s) => sum + (s.amount || 0), 0),
+    arr: subscriptions.filter(s => s.status === 'active' || s.status === 'trial').reduce((sum, s) => sum + (s.amount || 0), 0) * 12,
     active: subscriptions.filter(s => s.status === 'active').length,
     churnRisk: subscriptions.filter(s => s.status === 'suspended').length,
   };
 
-  const handleAction = (action, subId) => {
-    const statusMap = { activate: 'active', suspend: 'suspended', cancel: 'cancelled' };
-    setSubscriptions(prev => prev.map(s => s.id === subId ? { ...s, status: statusMap[action] || s.status } : s));
+  const handleAction = async (action, subId) => {
+    try {
+      if (action === 'suspend') {
+        await suspendSubscription(subId);
+      } else if (action === 'cancel') {
+        await cancelSubscription(subId);
+      } else if (action === 'activate') {
+        await resumeSubscription(subId);
+      }
+    } catch (err) {
+      console.error(err);
+    }
     setActionModal(null);
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="page-container">

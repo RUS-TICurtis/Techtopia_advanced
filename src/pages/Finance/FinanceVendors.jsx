@@ -1,41 +1,50 @@
 import React, { useState } from 'react';
-import { Building2, Plus, Search, Phone, Mail, Globe, MapPin, Package, X, ExternalLink } from 'lucide-react';
+import { Building2, Plus, Search, Phone, Mail, Globe, MapPin, Package, X, ExternalLink, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
+import { useVendors } from '../../hooks/useCrmData';
 import './Finance.css';
-
-const MOCK_VENDORS = [
-  { id: 'VEN-001', name: 'TechSupply Ghana', category: 'IT Hardware', contact: 'Kofi Mensah', email: 'kofi@techsupply.gh', phone: '+233 20 123 4567', location: 'Accra, Ghana', totalOrders: 12, totalSpend: 245000, status: 'active', website: 'techsupply.gh', rating: 4.8 },
-  { id: 'VEN-002', name: 'CloudNova Africa', category: 'Cloud Services', contact: 'Abena Asante', email: 'abena@cloudnova.io', phone: '+233 24 987 6543', location: 'Kumasi, Ghana', totalOrders: 8, totalSpend: 189000, status: 'active', website: 'cloudnova.io', rating: 4.5 },
-  { id: 'VEN-003', name: 'Office Plus Ltd', category: 'Office Supplies', contact: 'Samuel Boateng', email: 'sam@officeplus.gh', phone: '+233 54 321 0987', location: 'Takoradi, Ghana', totalOrders: 24, totalSpend: 42000, status: 'active', website: '', rating: 4.2 },
-  { id: 'VEN-004', name: 'FastTrack Logistics', category: 'Logistics', contact: 'Grace Owusu', email: 'grace@fasttrack.com', phone: '+233 27 555 8910', location: 'Tema, Ghana', totalOrders: 6, totalSpend: 78000, status: 'inactive', website: 'fasttrack.com', rating: 3.9 },
-  { id: 'VEN-005', name: 'PrintMaster GH', category: 'Printing', contact: 'Emmanuel Darko', email: 'emma@printmaster.gh', phone: '+233 50 246 1357', location: 'Accra, Ghana', totalOrders: 31, totalSpend: 28000, status: 'active', website: '', rating: 4.6 },
-];
 
 const CATEGORY_COLORS = { 'IT Hardware': '#01FDF6', 'Cloud Services': '#8A4FFF', 'Office Supplies': '#21FA90', 'Logistics': '#E4FF1A', 'Printing': '#FF47DA' };
 const EMPTY_VENDOR = { name: '', category: '', contact: '', email: '', phone: '', location: '', website: '' };
 
 export default function FinanceVendors() {
-  const [vendors, setVendors] = useState(MOCK_VENDORS);
+  const { vendors, isLoading, createVendor, deleteVendor } = useVendors();
   const [search, setSearch] = useState('');
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newVendor, setNewVendor] = useState(EMPTY_VENDOR);
 
   const filtered = vendors.filter(v =>
-    !search || v.name.toLowerCase().includes(search.toLowerCase()) || v.category.toLowerCase().includes(search.toLowerCase())
+    !search || 
+    (v.name || '').toLowerCase().includes(search.toLowerCase()) || 
+    (v.category || '').toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
-    const vendor = {
-      id: `VEN-${String(vendors.length + 1).padStart(3, '0')}`,
-      totalOrders: 0, totalSpend: 0, status: 'active', rating: 0,
-      ...newVendor,
-    };
-    setVendors(prev => [...prev, vendor]);
-    setShowAddModal(false);
-    setNewVendor(EMPTY_VENDOR);
+    try {
+      await createVendor({
+        totalOrders: 0, 
+        totalSpend: 0, 
+        status: 'active', 
+        rating: 0,
+        ...newVendor,
+      });
+      setShowAddModal(false);
+      setNewVendor(EMPTY_VENDOR);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="page-container">
@@ -168,7 +177,7 @@ export default function FinanceVendors() {
               </div>
             </div>
             <div className="finance-drawer-footer">
-              <button className="btn btn-secondary">Edit Vendor</button>
+              <button className="btn btn-secondary" style={{ color: 'var(--error)' }} onClick={() => { if(window.confirm('Delete this vendor?')) { deleteVendor(selectedVendor.id); setSelectedVendor(null); } }}>Delete Vendor</button>
               <button className="btn btn-primary"><Package size={14} /> New PO</button>
             </div>
           </div>
