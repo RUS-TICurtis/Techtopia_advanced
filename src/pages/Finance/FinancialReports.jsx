@@ -50,12 +50,15 @@ export default function FinancialReports() {
 
   // Compute Profit & Loss dynamically from payments and expenses
   const plStatement = useMemo(() => {
-    const totalRev = revenueData.reduce((sum, r) => sum + (r.amount || 0), 0);
+    const revs = Array.isArray(revenueData) ? revenueData : [];
+    const exps = Array.isArray(expenseData) ? expenseData : [];
+    
+    const totalRev = revs.reduce((sum, r) => sum + (r.amount || 0), 0);
     const cogs = Math.round(totalRev * 0.18); // Assume cost of goods sold is 18% of revenue
     const grossProfit = totalRev - cogs;
     
     // Approved expenses
-    const opex = expenseData.filter(e => e.status === 'Approved' || e.status === 'Reimbursed').reduce((sum, e) => sum + (e.amount || 0), 0);
+    const opex = exps.filter(e => e.status === 'Approved' || e.status === 'Reimbursed').reduce((sum, e) => sum + (e.amount || 0), 0);
     const ebitda = grossProfit - opex;
     
     const depreciation = Math.round(opex * 0.05); // 5% depreciation simulation
@@ -204,7 +207,7 @@ export default function FinancialReports() {
               <div className="card-title">Cash Flow Statement — {dateRange.from} to {dateRange.to}</div>
               <div style={{ height: 280 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <RBarChart data={cashFlowData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <RBarChart data={Array.isArray(cashFlowData) ? cashFlowData : []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                     <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 11 }} />
                     <YAxis stroke="#3d4e6b" tick={{ fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
@@ -221,7 +224,7 @@ export default function FinancialReports() {
           {/* Generic placeholder for other report types */}
           {!['pl', 'cf'].includes(activeReport) && (
             <div className="card">
-              {genericData && genericData.length > 0 ? (
+              {Array.isArray(genericData) && genericData.length > 0 ? (
                 <div style={{ overflowX: 'auto' }}>
                   <div className="card-title" style={{ textTransform: 'capitalize' }}>
                     {REPORT_TYPES.find(r => r.id === activeReport)?.label} Data

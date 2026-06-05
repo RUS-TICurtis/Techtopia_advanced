@@ -31,6 +31,14 @@ export default function FinanceOverview() {
   const navigate = useNavigate();
   const { overview, isLoading, refetch } = useFinanceSummary();
 
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+      </div>
+    );
+  }
+
   const REVENUE_DATA = overview?.revenueData || [];
   const EXPENSE_BREAKDOWN = overview?.expenseBreakdown || [];
   const INVOICE_AGING = overview?.invoiceAging || [];
