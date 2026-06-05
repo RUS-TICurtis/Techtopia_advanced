@@ -136,8 +136,8 @@ export default function FinanceSettlements() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           {Object.entries(GATEWAY_CONFIG).map(([gw, cfg]) => {
             const gwData = settlements.filter(s => s.gateway === gw);
-            const gwGross = gwData.reduce((s, x) => s + x.grossVol, 0);
-            const gwFees = gwData.reduce((s, x) => s + x.fees, 0);
+            const gwGross = gwData.reduce((s, x) => s + (x.grossVol || 0), 0);
+            const gwFees = gwData.reduce((s, x) => s + (x.fees || 0), 0);
             const feeRate = gwGross > 0 ? ((gwFees / gwGross) * 100).toFixed(2) : '0.00';
             return (
               <div key={gw} className="finance-metric-mini" style={{ borderLeft: `3px solid ${cfg.color}` }}>

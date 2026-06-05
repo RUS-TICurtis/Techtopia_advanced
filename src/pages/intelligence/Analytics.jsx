@@ -199,7 +199,7 @@ export default function Analytics() {
                 </div>
                 
                 <div className="w-full h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <AreaChart
                       data={monthlyTrendsData}
                       margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
@@ -300,7 +300,7 @@ export default function Analytics() {
                 </div>
 
                 <div className="w-full h-[220px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <BarChart data={funnelData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
                       <XAxis dataKey="name" stroke="#627496" fontSize={10} tickLine={false} />
@@ -334,7 +334,7 @@ export default function Analytics() {
                 </div>
 
                 <div className="w-full h-[200px] flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <PieChart>
                       <Pie
                         data={regionData}

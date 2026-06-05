@@ -65,8 +65,8 @@ export default function FinanceVendors() {
         {[
           { label: 'Total Vendors', value: vendors.length },
           { label: 'Active Vendors', value: vendors.filter(v => v.status === 'active').length },
-          { label: 'Total Spend (YTD)', value: formatCurrency(vendors.reduce((s, v) => s + v.totalSpend, 0)) },
-          { label: 'Avg Vendor Rating', value: `${(vendors.reduce((s, v) => s + v.rating, 0) / vendors.length).toFixed(1)} / 5.0` },
+          { label: 'Total Spend (YTD)', value: formatCurrency(vendors.reduce((s, v) => s + (v.totalSpend || 0), 0)) },
+          { label: 'Avg Vendor Rating', value: vendors.length > 0 ? `${(vendors.reduce((s, v) => s + (v.rating || 0), 0) / vendors.length).toFixed(1)} / 5.0` : '0.0 / 5.0' },
         ].map(m => (
           <div key={m.label} className="finance-metric-mini">
             <span className="finance-metric-mini-label">{m.label}</span>

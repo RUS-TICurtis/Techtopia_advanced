@@ -206,7 +206,7 @@ export default function FinancialReports() {
             <div className="card">
               <div className="card-title">Cash Flow Statement — {dateRange.from} to {dateRange.to}</div>
               <div style={{ height: 280 }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <RBarChart data={Array.isArray(cashFlowData) ? cashFlowData : []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                     <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 11 }} />

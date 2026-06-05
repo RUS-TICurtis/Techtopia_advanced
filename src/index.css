@@ -211,10 +211,20 @@ li {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   margin-left: var(--sidebar-width);
   transition: margin-left var(--transition-normal);
   background-color: var(--bg-app);
+  overflow: hidden;
+}
+
+.main-content main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .main-content.collapsed {

@@ -27,18 +27,24 @@ export default function FinanceBudgets() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBudget, setNewBudget] = useState(EMPTY_BUDGET);
 
-  const VARIANCE_DATA = budgets.map(b => ({
-    name: b.name.split(' ').slice(0, 2).join(' '),
-    Allocated: b.allocated,
-    Spent: b.spent,
-    Remaining: Math.max(0, b.allocated - b.spent),
-  }));
+  const VARIANCE_DATA = budgets.map(b => {
+    const nameStr = b.name || '';
+    const name = nameStr.split(' ').slice(0, 2).join(' ');
+    const allocated = b.allocated || 0;
+    const spent = b.spent || 0;
+    return {
+      name,
+      Allocated: allocated,
+      Spent: spent,
+      Remaining: Math.max(0, allocated - spent),
+    };
+  });
 
   const totals = {
-    allocated: budgets.reduce((s, b) => s + b.allocated, 0),
-    spent: budgets.reduce((s, b) => s + b.spent, 0),
-    remaining: budgets.reduce((s, b) => s + Math.max(0, b.allocated - b.spent), 0),
-    exceeded: budgets.filter(b => b.spent > b.allocated).length,
+    allocated: budgets.reduce((s, b) => s + (b.allocated || 0), 0),
+    spent: budgets.reduce((s, b) => s + (b.spent || 0), 0),
+    remaining: budgets.reduce((s, b) => s + Math.max(0, (b.allocated || 0) - (b.spent || 0)), 0),
+    exceeded: budgets.filter(b => (b.spent || 0) > (b.allocated || 0)).length,
   };
 
   const handleCreate = async (e) => {
@@ -106,7 +112,7 @@ export default function FinanceBudgets() {
         <div className="card">
           <div className="card-title">Budget vs Actual Spend</div>
           <div style={{ height: 280 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={VARIANCE_DATA} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                 <XAxis dataKey="name" stroke="#3d4e6b" tick={{ fontSize: 10 }} />
@@ -121,7 +127,7 @@ export default function FinanceBudgets() {
         <div className="card">
           <div className="card-title">Budget Utilisation</div>
           <div style={{ height: 230 }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie data={budgets} cx="50%" cy="50%" innerRadius={50} outerRadius={85}
                   paddingAngle={2} dataKey="spent">
@@ -147,8 +153,10 @@ export default function FinanceBudgets() {
       <div className="card">
         <div className="card-title">Department & Project Budgets</div>
         {budgets.map(budget => {
-          const pct = Math.min(100, Math.round((budget.spent / budget.allocated) * 100));
-          const isExceeded = budget.spent > budget.allocated;
+          const allocated = budget.allocated || 0;
+          const spent = budget.spent || 0;
+          const pct = allocated > 0 ? Math.min(100, Math.round((spent / allocated) * 100)) : 0;
+          const isExceeded = spent > allocated;
           const isWarning = pct >= 80 && !isExceeded;
           return (
             <div key={budget.id} className="budget-progress-item">
@@ -164,7 +172,7 @@ export default function FinanceBudgets() {
                 </div>
                 <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
                   <span className="text-sm font-semibold" style={{ color: isExceeded ? 'var(--error)' : 'var(--text-title)' }}>
-                    {formatCurrency(budget.spent)} / {formatCurrency(budget.allocated)}
+                    {formatCurrency(spent)} / {formatCurrency(allocated)}
                   </span>
                   <span className="text-xs text-muted">({pct}%)</span>
                   <button onClick={() => { if(window.confirm('Delete this budget?')) deleteBudget(budget.id) }} className="btn-icon" style={{ color: 'var(--error)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
@@ -179,7 +187,7 @@ export default function FinanceBudgets() {
                 }} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)' }}>
-                <span>Remaining: {isExceeded ? `Over by ${formatCurrency(budget.spent - budget.allocated)}` : formatCurrency(budget.allocated - budget.spent)}</span>
+                <span>Remaining: {isExceeded ? `Over by ${formatCurrency(spent - allocated)}` : formatCurrency(allocated - spent)}</span>
                 <span>{budget.period}</span>
               </div>
             </div>

@@ -19,8 +19,14 @@ export default function SuperAdminOversight() {
   ]);
 
   // Impersonation state
-  const [isImpersonating, setIsImpersonating] = useState(false);
-  const [impersonatingTenant, setImpersonatingTenant] = useState(null);
+  const [isImpersonating, setIsImpersonating] = useState(
+    localStorage.getItem('crm_is_impersonating') === 'true'
+  );
+  const [impersonatingTenant, setImpersonatingTenant] = useState(
+    localStorage.getItem('crm_is_impersonating') === 'true'
+      ? { name: localStorage.getItem('crm_impersonated_tenant_name') || 'Impersonated Tenant' }
+      : null
+  );
   const [showMfaModal, setShowMfaModal] = useState(false);
   const [mfaCode, setMfaCode] = useState('');
   const [mfaError, setMfaError] = useState('');
@@ -45,14 +51,31 @@ export default function SuperAdminOversight() {
     if (mfaCode === '123456' || mfaCode === '000000') {
       setShowMfaModal(false);
       setIsImpersonating(true);
+      
+      let targetTenantId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; // Techtopia default
+      if (impersonatingTenant?.name.includes('Acme')) {
+        targetTenantId = 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12';
+      } else if (impersonatingTenant?.name.includes('Nexus') || impersonatingTenant?.name.includes('Apex') || impersonatingTenant?.name.includes('Stark')) {
+        targetTenantId = 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13';
+      }
+      
+      localStorage.setItem('crm_tenant_id', targetTenantId);
+      localStorage.setItem('crm_is_impersonating', 'true');
+      localStorage.setItem('crm_impersonated_tenant_name', impersonatingTenant?.name || '');
+      
+      window.location.href = '/admin/oversight';
     } else {
       setMfaError('Invalid Super Admin MFA credentials. Impersonation rejected.');
     }
   };
 
   const handleStopImpersonate = () => {
+    localStorage.removeItem('crm_is_impersonating');
+    localStorage.removeItem('crm_impersonated_tenant_name');
+    localStorage.setItem('crm_tenant_id', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
     setIsImpersonating(false);
     setImpersonatingTenant(null);
+    window.location.href = '/admin/oversight';
   };
 
   const toggleTenantStatus = (id) => {

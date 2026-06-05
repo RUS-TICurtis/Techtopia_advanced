@@ -25,7 +25,20 @@ export default function Sidebar({
   const navigate = useNavigate();
 
   // Multi-Tenant State
-  const [activeTenant, setActiveTenant] = useState('Techtopia Corp');
+  const getTenantName = (id) => {
+    if (id === 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12') return 'Acme Enterprises';
+    if (id === 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13') return 'Platform Super Admin';
+    return 'Techtopia Corp';
+  };
+
+  const getTenantId = (name) => {
+    if (name === 'Acme Enterprises') return 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12';
+    if (name === 'Platform Super Admin') return 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13';
+    return 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  };
+
+  const initialTenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  const [activeTenant, setActiveTenant] = useState(getTenantName(initialTenantId));
   const [showTenantMenu, setShowTenantMenu] = useState(false);
   
   // Search state
@@ -91,11 +104,13 @@ export default function Sidebar({
   };
 
   const handleTenantSwitch = (tenantName) => {
+    const id = getTenantId(tenantName);
+    localStorage.setItem('crm_tenant_id', id);
     setActiveTenant(tenantName);
     setShowTenantMenu(false);
     
-    // Auto-navigate to dashboard to re-orient workspace
-    navigate('/');
+    // Clean redirect to dashboard with new tenant scope
+    window.location.href = '/';
   };
 
   // Identify Pinned list
