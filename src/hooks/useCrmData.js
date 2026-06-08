@@ -12,7 +12,11 @@ import {
   auditApi, 
   notificationsApi,
   apiClient,
-  contractsApi
+  contractsApi,
+  budgetsApi,
+  expensesApi,
+  vendorsApi,
+  invitationsApi
 } from '../lib/api';
 
 // Leads Hook
@@ -435,11 +439,11 @@ export function useBudgets() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['budgets'],
-    queryFn: () => apiClient.get('/finance/budgets').then(r => r.data),
+    queryFn: () => budgetsApi.list(),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/finance/budgets', data).then(r => r.data),
+    mutationFn: (data) => budgetsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -448,7 +452,7 @@ export function useBudgets() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => apiClient.delete(`/finance/budgets/${id}`).then(r => r.data),
+    mutationFn: (id) => budgetsApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -469,21 +473,21 @@ export function useVendors() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['vendors'],
-    queryFn: () => apiClient.get('/finance/vendors').then(r => r.data),
+    queryFn: () => vendorsApi.list(),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/finance/vendors', data).then(r => r.data),
+    mutationFn: (data) => vendorsApi.create(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendors'] }),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => apiClient.patch(`/finance/vendors/${id}`, data).then(r => r.data),
+    mutationFn: ({ id, data }) => vendorsApi.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendors'] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => apiClient.delete(`/finance/vendors/${id}`).then(r => r.data),
+    mutationFn: (id) => vendorsApi.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendors'] }),
   });
 
@@ -501,21 +505,21 @@ export function useSubscriptions() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['subscriptions'],
-    queryFn: () => apiClient.get('/finance/subscriptions').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/subscriptions').then(r => r.data),
   });
 
   const cancelMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/finance/subscriptions/${id}/cancel`).then(r => r.data),
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/subscriptions/${id}/cancel`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subscriptions'] }),
   });
 
   const suspendMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/finance/subscriptions/${id}/suspend`).then(r => r.data),
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/subscriptions/${id}/suspend`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subscriptions'] }),
   });
 
   const resumeMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/finance/subscriptions/${id}/resume`).then(r => r.data),
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/subscriptions/${id}/resume`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subscriptions'] }),
   });
 
@@ -533,11 +537,11 @@ export function useTaxRecords() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['taxRecords'],
-    queryFn: () => apiClient.get('/finance/tax').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/tax').then(r => r.data),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/finance/tax', data).then(r => r.data),
+    mutationFn: (data) => apiClient.post('/api/v1/finance/tax', data).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['taxRecords'] }),
   });
 
@@ -552,7 +556,7 @@ export function useTaxRecords() {
 export function useSettlements() {
   const query = useQuery({
     queryKey: ['settlements'],
-    queryFn: () => apiClient.get('/finance/settlements').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/settlements').then(r => r.data),
   });
 
   return {
@@ -566,21 +570,21 @@ export function useProcurement() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['procurement'],
-    queryFn: () => apiClient.get('/finance/procurement').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/procurement').then(r => r.data),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/finance/procurement', data).then(r => r.data),
+    mutationFn: (data) => apiClient.post('/api/v1/finance/procurement', data).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
   });
 
   const approveMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/finance/procurement/${id}/approve`).then(r => r.data),
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/procurement/${id}/approve`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/finance/procurement/${id}/reject`).then(r => r.data),
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/procurement/${id}/reject`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
   });
 
@@ -598,11 +602,11 @@ export function usePayments() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['payments'],
-    queryFn: () => apiClient.get('/finance/payments').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/payments').then(r => r.data),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/finance/payments/manual', data).then(r => r.data),
+    mutationFn: (data) => apiClient.post('/api/v1/finance/payments/manual', data).then(r => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -611,7 +615,7 @@ export function usePayments() {
   });
 
   const refundMutation = useMutation({
-    mutationFn: ({ id, reason }) => apiClient.post(`/finance/payments/${id}/refund`, { reason }).then(r => r.data),
+    mutationFn: ({ id, reason }) => apiClient.post(`/api/v1/finance/payments/${id}/refund`, { reason }).then(r => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -631,11 +635,11 @@ export function useExpenses() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['expenses'],
-    queryFn: () => apiClient.get('/finance/expenses').then(r => r.data),
+    queryFn: () => expensesApi.list(),
   });
 
   const submitMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/finance/expenses', data).then(r => r.data),
+    mutationFn: (data) => expensesApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -643,7 +647,7 @@ export function useExpenses() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/finance/expenses/${id}/approve`).then(r => r.data),
+    mutationFn: (id) => expensesApi.approve(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -651,7 +655,7 @@ export function useExpenses() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: ({ id, reason }) => apiClient.post(`/finance/expenses/${id}/reject`, { reason }).then(r => r.data),
+    mutationFn: ({ id, reason }) => expensesApi.reject(id, { decision: "Rejected", comment: reason }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -671,7 +675,7 @@ export function useExpenses() {
 export function useRevenueAnalytics() {
   const query = useQuery({
     queryKey: ['revenueAnalytics'],
-    queryFn: () => apiClient.get('/finance/reports/revenue-summary').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/reports/revenue-summary').then(r => r.data),
   });
 
   return {
@@ -684,7 +688,7 @@ export function useRevenueAnalytics() {
 export function useFinancialReport(type, from, to) {
   const query = useQuery({
     queryKey: ['financialReport', type, from, to],
-    queryFn: () => apiClient.get(`/finance/reports/${type}`, { params: { start: from, end: to } }).then(r => r.data),
+    queryFn: () => apiClient.get(`/api/v1/finance/reports/${type}`, { params: { start: from, end: to } }).then(r => r.data),
     enabled: !!type,
   });
 

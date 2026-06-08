@@ -7,8 +7,25 @@ import axios from 'axios';
 // ─── Config ───────────────────────────────────────────────
 const API_BASE = import.meta.env.VITE_API_URL || 'https://techtopiagh-crm.onrender.com/';
 
+/**
+ * Returns the active API Base URL. Auto-detects localhost if not overridden in localStorage.
+ */
+export function getApiBaseUrl() {
+  const savedUrl = localStorage.getItem('crm_api_url');
+  if (savedUrl) {
+    return savedUrl.endsWith('/') ? savedUrl : `${savedUrl}/`;
+  }
+  
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:5102/';
+  }
+  
+  const envUrl = import.meta.env.VITE_API_URL || 'https://techtopiagh-crm.onrender.com/';
+  return envUrl.endsWith('/') ? envUrl : `${envUrl}/`;
+}
+
 export const apiClient = axios.create({
-  baseURL: API_BASE,
+  baseURL: getApiBaseUrl(),
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -16,6 +33,7 @@ export const apiClient = axios.create({
 // ─── Request Interceptor — attach JWT + tenant ─────────────
 apiClient.interceptors.request.use(
   (config) => {
+    config.baseURL = getApiBaseUrl();
     const token = localStorage.getItem('crm_access_token');
     const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
     if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -37,7 +55,8 @@ apiClient.interceptors.response.use(
         const refreshToken = localStorage.getItem('crm_refresh_token');
         const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
         if (refreshToken && accessToken) {
-          const { data } = await axios.post(`${API_BASE}api/v1/auth/refresh`, {
+          const apiBase = getApiBaseUrl();
+          const { data } = await axios.post(`${apiBase}api/v1/auth/refresh`, {
             token: accessToken,
             refreshToken
           }, {
@@ -49,6 +68,8 @@ apiClient.interceptors.response.use(
           localStorage.setItem('crm_access_token', data.accessToken);
           localStorage.setItem('crm_refresh_token', data.refreshToken);
           originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          // Sync base URL of the retried request
+          originalRequest.baseURL = apiBase;
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
@@ -61,9 +82,9 @@ apiClient.interceptors.response.use(
   }
 );
 
-// ─── Generic CRUD factory ─────────────────────────────────
+// ─── Generic CRUD factories ────────────────────────────────
 /**
- * Create a scoped resource service
+ * Create a scoped resource service (PATCH update)
  * @param {string} path - e.g. '/leads'
  */
 export function createResourceService(path) {
@@ -72,6 +93,20 @@ export function createResourceService(path) {
     get: (id) => apiClient.get(`${path}/${id}`).then(r => r.data),
     create: (data) => apiClient.post(path, data).then(r => r.data),
     update: (id, data) => apiClient.patch(`${path}/${id}`, data).then(r => r.data),
+    delete: (id) => apiClient.delete(`${path}/${id}`).then(r => r.data),
+  };
+}
+
+/**
+ * Create a PUT-scoped resource service
+ * @param {string} path - e.g. '/api/v1/finance/budgets'
+ */
+export function createPutResourceService(path) {
+  return {
+    list: (params) => apiClient.get(path, { params }).then(r => r.data),
+    get: (id) => apiClient.get(`${path}/${id}`).then(r => r.data),
+    create: (data) => apiClient.post(path, data).then(r => r.data),
+    update: (id, data) => apiClient.put(`${path}/${id}`, data).then(r => r.data),
     delete: (id) => apiClient.delete(`${path}/${id}`).then(r => r.data),
   };
 }
@@ -101,10 +136,19 @@ export const rolesApi = {
   delete: (id) => apiClient.delete(`/api/v1/roles/${id}`).then(r => r.data),
 };
 
+export const invitationsApi = {
+  create: (data) => apiClient.post('/api/v1/invitations', data).then(r => r.data),
+  getDevTokens: () => apiClient.get('/api/v1/invitations/dev-tokens').then(r => r.data),
+  accept: (data) => apiClient.post('/api/v1/invitations/accept', data).then(r => r.data),
+  resend: (id) => apiClient.post(`/api/v1/invitations/${id}/resend`).then(r => r.data),
+  delete: (id) => apiClient.delete(`/api/v1/invitations/${id}`).then(r => r.data),
+};
+
 export const leadsApi = {
   ...createResourceService('/api/leads'),
   convert: (id) => apiClient.post(`/api/leads/${id}/convert`).then(r => r.data),
 };
+
 export const contactsApi = createResourceService('/api/contacts');
 export const companiesApi = createResourceService('/api/companies');
 export const dealsApi = createResourceService('/api/opportunities');
@@ -112,13 +156,53 @@ export const clientsApi = createResourceService('/api/contacts');
 export const projectsApi = createResourceService('/api/projects');
 export const tasksApi = createResourceService('/api/tasks');
 export const ticketsApi = createResourceService('/api/tickets');
+
 export const invoicesApi = {
-  ...createResourceService('/finance/invoices'),
-  send: (id) => apiClient.post(`/finance/invoices/${id}/send`).then(r => r.data),
-  approve: (id) => apiClient.post(`/finance/invoices/${id}/approve`).then(r => r.data),
-  duplicate: (id) => apiClient.post(`/finance/invoices/${id}/duplicate`).then(r => r.data),
+  ...createPutResourceService('/api/v1/finance/invoices'),
+  submit: (id) => apiClient.post(`/api/v1/finance/invoices/${id}/submit`).then(r => r.data),
+  approve: (id, data) => apiClient.post(`/api/v1/finance/invoices/${id}/approve`, data).then(r => r.data),
+  recordPayment: (id, data) => apiClient.post(`/api/v1/finance/invoices/${id}/payments`, data).then(r => r.data),
 };
-export const contractsApi = createResourceService('/finance/contracts');
+
+export const budgetsApi = {
+  ...createPutResourceService('/api/v1/finance/budgets'),
+  submit: (id, data) => apiClient.post(`/api/v1/finance/budgets/${id}/submit`, data).then(r => r.data),
+  approve: (id, data) => apiClient.post(`/api/v1/finance/budgets/${id}/approve`, data).then(r => r.data),
+  reject: (id, data) => apiClient.post(`/api/v1/finance/budgets/${id}/reject`, data).then(r => r.data),
+  activate: (id) => apiClient.post(`/api/v1/finance/budgets/${id}/activate`).then(r => r.data),
+  close: (id, data) => apiClient.post(`/api/v1/finance/budgets/${id}/close`, data).then(r => r.data),
+  cancel: (id) => apiClient.post(`/api/v1/finance/budgets/${id}/cancel`).then(r => r.data),
+  listAllocations: (id) => apiClient.get(`/api/v1/finance/budgets/${id}/allocations`).then(r => r.data),
+  createAllocation: (id, data) => apiClient.post(`/api/v1/finance/budgets/${id}/allocations`, data).then(r => r.data),
+};
+
+export const expensesApi = {
+  ...createPutResourceService('/api/v1/finance/expenses'),
+  submit: (id) => apiClient.post(`/api/v1/finance/expenses/${id}/submit`).then(r => r.data),
+  approve: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/approve`, data).then(r => r.data),
+  reject: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/reject`, data).then(r => r.data),
+  recordPayment: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/payment`, data).then(r => r.data),
+};
+
+export const vendorsApi = {
+  ...createPutResourceService('/api/v1/finance/vendors'),
+  listContacts: (id) => apiClient.get(`/api/v1/finance/vendors/${id}/contacts`).then(r => r.data),
+  createContact: (id, data) => apiClient.post(`/api/v1/finance/vendors/${id}/contacts`, data).then(r => r.data),
+  updateContact: (id, contactId, data) => apiClient.put(`/api/v1/finance/vendors/${id}/contacts/${contactId}`, data).then(r => r.data),
+  deleteContact: (id, contactId) => apiClient.delete(`/api/v1/finance/vendors/${id}/contacts/${contactId}`).then(r => r.data),
+  listContracts: (id) => apiClient.get(`/api/v1/finance/vendors/${id}/contracts`).then(r => r.data),
+  createContract: (id, data) => apiClient.post(`/api/v1/finance/vendors/${id}/contracts`, data).then(r => r.data),
+  listDocuments: (id) => apiClient.get(`/api/v1/finance/vendors/${id}/documents`).then(r => r.data),
+  createDocument: (id, data) => apiClient.post(`/api/v1/finance/vendors/${id}/documents`, data).then(r => r.data),
+};
+
+export const vendorCategoriesApi = {
+  list: () => apiClient.get('/api/v1/finance/vendor-categories').then(r => r.data),
+  create: (data) => apiClient.post('/api/v1/finance/vendor-categories', data).then(r => r.data),
+  update: (categoryId, data) => apiClient.put(`/api/v1/finance/vendor-categories/${categoryId}`, data).then(r => r.data),
+};
+
+export const contractsApi = createPutResourceService('/api/v1/finance/contracts');
 export const teamApi = createResourceService('/api/hr/employees');
 export const auditApi = {
   list: (params) => apiClient.get('/api/audit/logs', { params }).then(r => r.data),
@@ -126,9 +210,9 @@ export const auditApi = {
 };
 export const analyticsApi = {
   summary: (params) => apiClient.get('/api/analytics/summary', { params }).then(r => r.data),
-  revenue: (params) => apiClient.get('/finance/reports/revenue-summary', { params }).then(r => r.data),
-  sales: (params) => apiClient.get('/finance/reports/sales', { params }).then(r => r.data),
-  forecast: (params) => apiClient.get('/finance/reports/forecast', { params }).then(r => r.data),
+  revenue: (params) => apiClient.get('/api/v1/finance/reports/revenue-summary', { params }).then(r => r.data),
+  sales: (params) => apiClient.get('/api/v1/finance/reports/sales', { params }).then(r => r.data),
+  forecast: (params) => apiClient.get('/api/v1/finance/reports/forecast', { params }).then(r => r.data),
 };
 export const aiApi = {
   chat: (payload) => apiClient.post('/api/ai/conversations', payload).then(r => r.data),
@@ -144,10 +228,10 @@ export const notificationsApi = {
 };
 export const automationsApi = createResourceService('/api/automations');
 export const billingApi = {
-  invoices: createResourceService('/finance/invoices'),
-  subscriptions: createResourceService('/finance/subscriptions'),
-  plans: () => apiClient.get('/finance/subscriptions/plans').then(r => r.data),
-  usage: () => apiClient.get('/finance/subscriptions/usage').then(r => r.data),
+  invoices: createPutResourceService('/api/v1/finance/invoices'),
+  subscriptions: createPutResourceService('/api/v1/finance/subscriptions'),
+  plans: () => apiClient.get('/api/v1/finance/subscriptions/plans').then(r => r.data),
+  usage: () => apiClient.get('/api/v1/finance/subscriptions/usage').then(r => r.data),
 };
 export const filesApi = {
   upload: (formData, onProgress) => apiClient.post('/files/upload', formData, {

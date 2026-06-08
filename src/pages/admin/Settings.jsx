@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   User, 
   Settings as SettingsIcon,
@@ -8,9 +8,15 @@ import {
   Eye, 
   EyeOff,
   Building2,
-  Palette
+  Palette,
+  Server,
+  Activity,
+  AlertTriangle,
+  RotateCcw
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { getApiBaseUrl, apiClient } from '../../lib/api';
+import toast from 'react-hot-toast';
 import './Settings.css';
 
 export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
@@ -135,11 +141,107 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     setTimeout(() => setSecuritySuccess(''), 3000);
   };
 
+  // Developer API settings states
+  const [apiEnv, setApiEnv] = useState(() => {
+    const saved = localStorage.getItem('crm_api_env');
+    return saved || 'auto';
+  });
+  
+  const [customApiUrl, setCustomApiUrl] = useState(() => {
+    return localStorage.getItem('crm_api_url_custom') || '';
+  });
+
+  const [activeTenantId, setActiveTenantId] = useState(() => {
+    return localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  });
+
+  const [connectionStatus, setConnectionStatus] = useState('idle'); // idle | testing | success | error
+  const [connectionError, setConnectionError] = useState('');
+
+  const handleSaveApiSettings = (e) => {
+    e.preventDefault();
+    
+    // Save active API env
+    localStorage.setItem('crm_api_env', apiEnv);
+    
+    // Calculate final API URL based on selection
+    let resolvedUrl = '';
+    if (apiEnv === 'production') {
+      resolvedUrl = 'https://techtopiagh-crm.onrender.com/';
+    } else if (apiEnv === 'local-http') {
+      resolvedUrl = 'http://localhost:5102/';
+    } else if (apiEnv === 'local-https') {
+      resolvedUrl = 'https://localhost:7074/';
+    } else if (apiEnv === 'custom') {
+      resolvedUrl = customApiUrl;
+      localStorage.setItem('crm_api_url_custom', customApiUrl);
+    }
+
+    if (apiEnv !== 'auto') {
+      localStorage.setItem('crm_api_url', resolvedUrl);
+    } else {
+      localStorage.removeItem('crm_api_url');
+    }
+    
+    // Save tenant ID
+    localStorage.setItem('crm_tenant_id', activeTenantId);
+    
+    toast.success('Developer API settings saved successfully!');
+  };
+
+  const handleTestConnection = async () => {
+    setConnectionStatus('testing');
+    setConnectionError('');
+    
+    let urlToTest = '';
+    if (apiEnv === 'production') {
+      urlToTest = 'https://techtopiagh-crm.onrender.com/';
+    } else if (apiEnv === 'local-http') {
+      urlToTest = 'http://localhost:5102/';
+    } else if (apiEnv === 'local-https') {
+      urlToTest = 'https://localhost:7074/';
+    } else if (apiEnv === 'custom') {
+      urlToTest = customApiUrl;
+    } else {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        urlToTest = 'http://localhost:5102/';
+      } else {
+        urlToTest = 'https://techtopiagh-crm.onrender.com/';
+      }
+    }
+
+    if (urlToTest && !urlToTest.endsWith('/')) {
+      urlToTest += '/';
+    }
+
+    try {
+      const response = await apiClient.get(urlToTest, { 
+        timeout: 5000,
+        headers: { 'Tenant-Id': activeTenantId } 
+      });
+      if (response.status === 200 || response.data) {
+        setConnectionStatus('success');
+      } else {
+        setConnectionStatus('error');
+        setConnectionError(`Unexpected response status: ${response.status}`);
+      }
+    } catch (err) {
+      setConnectionStatus('error');
+      setConnectionError(err.message || 'Connection timed out or refused.');
+    }
+  };
+
+  const resetTenantId = () => {
+    setActiveTenantId('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
+    toast.success('Tenant ID reset to default Developer Tenant.');
+  };
+
   const TABS = [
     { id: 'profile',    label: 'My Profile',       icon: User },
     { id: 'company',    label: 'Company Settings', icon: Building2 },
     { id: 'appearance', label: 'Appearance',       icon: Palette },
-    { id: 'security',   label: 'Security',         icon: Lock }
+    { id: 'security',   label: 'Security',         icon: Lock },
+    { id: 'developer',  label: 'API Settings',     icon: Server }
   ];
 
   return (
@@ -342,6 +444,130 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
                 <div style={{ marginTop: 24 }}>
                   <button type="submit" className="btn btn-primary">Change Credentials</button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* DEVELOPER API SETTINGS */}
+          {activeTab === 'developer' && (
+            <div className="settings-section">
+              <h2 className="settings-section-title">Developer API Settings</h2>
+              <p className="settings-security-hint" style={{ marginTop: -10, marginBottom: 24, borderLeftColor: 'var(--brand-cyan)' }}>
+                Configure hostnames and boundary headers to switch between the local mock server, Docker environment, or the live staging API cluster.
+              </p>
+
+              <form onSubmit={handleSaveApiSettings} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div className="settings-form-grid">
+                  
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label>Active Backend Target Environment</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, marginTop: 8 }}>
+                      {[
+                        { id: 'auto', name: 'Auto-Detect', desc: 'Localhost/Render' },
+                        { id: 'local-http', name: 'Local Dev (HTTP)', desc: 'localhost:5102' },
+                        { id: 'local-https', name: 'Local Dev (HTTPS)', desc: 'localhost:7074' },
+                        { id: 'production', name: 'Production API', desc: 'onrender.com' },
+                        { id: 'custom', name: 'Custom Gateway', desc: 'Configure manual IP' }
+                      ].map(env => (
+                        <div 
+                          key={env.id}
+                          className={`settings-theme-card ${apiEnv === env.id ? 'active' : ''}`}
+                          style={{ padding: '12px 14px', height: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}
+                          onClick={() => setApiEnv(env.id)}
+                        >
+                          <span style={{ fontSize: 13, fontWeight: 700, display: 'block', textAlign: 'left', color: 'var(--text-title)' }}>{env.name}</span>
+                          <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', textAlign: 'left', fontFamily: 'monospace' }}>{env.desc}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {apiEnv === 'custom' && (
+                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                      <label>Custom Backend Service URL</label>
+                      <input 
+                        type="url" 
+                        className="form-input" 
+                        placeholder="https://api.yourdomain.com/" 
+                        value={customApiUrl}
+                        onChange={e => setCustomApiUrl(e.target.value)}
+                        required={apiEnv === 'custom'}
+                      />
+                    </div>
+                  )}
+
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Active Boundary Tenant Identifier (Tenant-Id)</span>
+                      <button 
+                        type="button" 
+                        className="btn-icon" 
+                        style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4, height: 'auto', width: 'auto', color: 'var(--brand-cyan)' }}
+                        onClick={resetTenantId}
+                        title="Reset to default developer tenant"
+                      >
+                        <RotateCcw size={11} /> Reset Default
+                      </button>
+                    </label>
+                    <input 
+                      type="text" 
+                      className="form-input font-mono" 
+                      placeholder="e.g. a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" 
+                      value={activeTenantId}
+                      onChange={e => setActiveTenantId(e.target.value)}
+                      required
+                    />
+                    <span style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>
+                      All data transactions and analytical queries will be compartmentalized under this UUID boundary.
+                    </span>
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                    <label>Active Endpoint Connection State</label>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 16, marginTop: 8,
+                      padding: 14, background: 'var(--bg-app)', border: '1px solid var(--border-light)',
+                      borderRadius: 'var(--radius-md)'
+                    }}>
+                      <button 
+                        type="button" 
+                        className="btn btn-secondary" 
+                        onClick={handleTestConnection}
+                        disabled={connectionStatus === 'testing'}
+                        style={{ padding: '8px 16px', fontSize: 12 }}
+                      >
+                        <Activity size={14} className={connectionStatus === 'testing' ? 'animate-spin' : ''} />
+                        {connectionStatus === 'testing' ? 'Testing...' : 'Test Connection'}
+                      </button>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {connectionStatus === 'idle' && (
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Idle. Click test to ping host service.</span>
+                        )}
+                        {connectionStatus === 'success' && (
+                          <span style={{ fontSize: 12, color: 'var(--success)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <Check size={14} /> Connection Successful (HTTP 200 OK)
+                          </span>
+                        )}
+                        {connectionStatus === 'error' && (
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontSize: 12, color: 'var(--error)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <AlertTriangle size={14} /> Connection Failed
+                            </span>
+                            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{connectionError}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+                  <button type="submit" className="btn btn-primary">
+                    <Check size={18} /> Save API Configuration
+                  </button>
                 </div>
               </form>
             </div>
