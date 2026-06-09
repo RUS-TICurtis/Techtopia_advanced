@@ -7,17 +7,10 @@ import axios from 'axios';
 // ─── Config ───────────────────────────────────────────────
 const API_BASE = import.meta.env.VITE_API_URL || 'https://techtopiagh-crm.onrender.com/';
 
-/**
- * Returns the active API Base URL. Auto-detects localhost if not overridden in localStorage.
- */
 export function getApiBaseUrl() {
   const savedUrl = localStorage.getItem('crm_api_url');
   if (savedUrl) {
     return savedUrl.endsWith('/') ? savedUrl : `${savedUrl}/`;
-  }
-  
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:5102/';
   }
   
   const envUrl = import.meta.env.VITE_API_URL || 'https://techtopiagh-crm.onrender.com/';
@@ -162,6 +155,7 @@ export const invoicesApi = {
   submit: (id) => apiClient.post(`/api/v1/finance/invoices/${id}/submit`).then(r => r.data),
   approve: (id, data) => apiClient.post(`/api/v1/finance/invoices/${id}/approve`, data).then(r => r.data),
   recordPayment: (id, data) => apiClient.post(`/api/v1/finance/invoices/${id}/payments`, data).then(r => r.data),
+  getActivities: (id) => apiClient.get(`/api/v1/finance/invoices/${id}/activities`).then(r => r.data),
 };
 
 export const budgetsApi = {
@@ -182,6 +176,7 @@ export const expensesApi = {
   approve: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/approve`, data).then(r => r.data),
   reject: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/reject`, data).then(r => r.data),
   recordPayment: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/payment`, data).then(r => r.data),
+  getActivities: (id) => apiClient.get(`/api/v1/finance/expenses/${id}/activities`).then(r => r.data),
 };
 
 export const vendorsApi = {

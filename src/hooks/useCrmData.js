@@ -16,7 +16,8 @@ import {
   budgetsApi,
   expensesApi,
   vendorsApi,
-  invitationsApi
+  invitationsApi,
+  vendorCategoriesApi
 } from '../lib/api';
 
 // Leads Hook
@@ -91,6 +92,8 @@ export function useProjects() {
 // Invoices Hook
 export function useInvoices() {
   const queryClient = useQueryClient();
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['invoices'] });
+
   const query = useQuery({
     queryKey: ['invoices'],
     queryFn: () => invoicesApi.list(),
@@ -98,32 +101,35 @@ export function useInvoices() {
 
   const createMutation = useMutation({
     mutationFn: (data) => invoicesApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+    onSuccess: invalidate,
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => invoicesApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+    onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => invoicesApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+    onSuccess: invalidate,
   });
 
-  const sendMutation = useMutation({
-    mutationFn: (id) => invoicesApi.send(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+  // POST /api/v1/finance/invoices/{id}/submit  → Draft → PendingApproval
+  const submitMutation = useMutation({
+    mutationFn: (id) => invoicesApi.submit(id),
+    onSuccess: invalidate,
   });
 
+  // POST /api/v1/finance/invoices/{id}/approve  body: { comment, status: "Approved"|"Rejected" }
   const approveMutation = useMutation({
-    mutationFn: (id) => invoicesApi.approve(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+    mutationFn: ({ id, data }) => invoicesApi.approve(id, data),
+    onSuccess: invalidate,
   });
 
-  const duplicateMutation = useMutation({
-    mutationFn: (id) => invoicesApi.duplicate(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+  // POST /api/v1/finance/invoices/{id}/payments
+  const recordPaymentMutation = useMutation({
+    mutationFn: ({ id, data }) => invoicesApi.recordPayment(id, data),
+    onSuccess: invalidate,
   });
 
   return {
@@ -132,9 +138,9 @@ export function useInvoices() {
     createInvoice: createMutation.mutateAsync,
     updateInvoice: updateMutation.mutateAsync,
     deleteInvoice: deleteMutation.mutateAsync,
-    sendInvoice: sendMutation.mutateAsync,
+    submitInvoice: submitMutation.mutateAsync,
     approveInvoice: approveMutation.mutateAsync,
-    duplicateInvoice: duplicateMutation.mutateAsync,
+    recordInvoicePayment: recordPaymentMutation.mutateAsync,
   };
 }
 
@@ -354,32 +360,27 @@ export function useCommunications() {
 
 // Finance Summary Hook
 export function useFinanceSummary() {
-  const overviewQuery = useQuery({
-    queryKey: ['financeOverview'],
-    queryFn: () => apiClient.get('/finance/overview').then(r => r.data),
-  });
-
   const budgetsQuery = useQuery({
     queryKey: ['financeBudgets'],
-    queryFn: () => apiClient.get('/finance/budgets').then(r => r.data),
+    queryFn: () => budgetsApi.list().catch(() => []),
   });
 
   const paymentsQuery = useQuery({
     queryKey: ['financePayments'],
-    queryFn: () => apiClient.get('/finance/payments').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/payments').then(r => r.data).catch(() => []),
   });
 
   const settlementsQuery = useQuery({
     queryKey: ['financeSettlements'],
-    queryFn: () => apiClient.get('/finance/settlements').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/settlements').then(r => r.data).catch(() => []),
   });
 
   return {
-    overview: overviewQuery.data || null,
+    overview: null,
     budgets: budgetsQuery.data || [],
     payments: paymentsQuery.data || [],
     settlements: settlementsQuery.data || [],
-    isLoading: overviewQuery.isLoading || budgetsQuery.isLoading || paymentsQuery.isLoading || settlementsQuery.isLoading,
+    isLoading: budgetsQuery.isLoading || paymentsQuery.isLoading || settlementsQuery.isLoading,
   };
 }
 
@@ -437,6 +438,12 @@ export function useConversationMessages(conversationId) {
 // Budgets Hook
 export function useBudgets() {
   const queryClient = useQueryClient();
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['budgets'] });
+    queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
+    queryClient.invalidateQueries({ queryKey: ['financeBudgets'] });
+  };
+
   const query = useQuery({
     queryKey: ['budgets'],
     queryFn: () => budgetsApi.list(),
@@ -444,33 +451,75 @@ export function useBudgets() {
 
   const createMutation = useMutation({
     mutationFn: (data) => budgetsApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
-      queryClient.invalidateQueries({ queryKey: ['financeBudgets'] });
-    },
+    onSuccess: invalidate,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => budgetsApi.update(id, data),
+    onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => budgetsApi.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
-      queryClient.invalidateQueries({ queryKey: ['financeBudgets'] });
-    },
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/budgets/{id}/submit  body: { comment }
+  const submitMutation = useMutation({
+    mutationFn: ({ id, data }) => budgetsApi.submit(id, data),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/budgets/{id}/approve  body: { comment }
+  const approveMutation = useMutation({
+    mutationFn: ({ id, data }) => budgetsApi.approve(id, data),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/budgets/{id}/reject  body: { comment }
+  const rejectMutation = useMutation({
+    mutationFn: ({ id, data }) => budgetsApi.reject(id, data),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/budgets/{id}/activate
+  const activateMutation = useMutation({
+    mutationFn: (id) => budgetsApi.activate(id),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/budgets/{id}/close  body: { comment }
+  const closeMutation = useMutation({
+    mutationFn: ({ id, data }) => budgetsApi.close(id, data),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/budgets/{id}/cancel
+  const cancelMutation = useMutation({
+    mutationFn: (id) => budgetsApi.cancel(id),
+    onSuccess: invalidate,
   });
 
   return {
     ...query,
     budgets: query.data || [],
     createBudget: createMutation.mutateAsync,
+    updateBudget: updateMutation.mutateAsync,
     deleteBudget: deleteMutation.mutateAsync,
+    submitBudget: submitMutation.mutateAsync,
+    approveBudget: approveMutation.mutateAsync,
+    rejectBudget: rejectMutation.mutateAsync,
+    activateBudget: activateMutation.mutateAsync,
+    closeBudget: closeMutation.mutateAsync,
+    cancelBudget: cancelMutation.mutateAsync,
   };
 }
 
 // Vendors Hook
 export function useVendors() {
   const queryClient = useQueryClient();
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['vendors'] });
+
   const query = useQuery({
     queryKey: ['vendors'],
     queryFn: () => vendorsApi.list(),
@@ -478,17 +527,45 @@ export function useVendors() {
 
   const createMutation = useMutation({
     mutationFn: (data) => vendorsApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendors'] }),
+    onSuccess: invalidate,
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => vendorsApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendors'] }),
+    onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => vendorsApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendors'] }),
+    onSuccess: invalidate,
+  });
+
+  // Vendor Contacts — GET/POST/PUT/DELETE /api/v1/finance/vendors/{id}/contacts
+  const createContactMutation = useMutation({
+    mutationFn: ({ id, data }) => vendorsApi.createContact(id, data),
+    onSuccess: (_, { id }) => queryClient.invalidateQueries({ queryKey: ['vendorContacts', id] }),
+  });
+
+  const updateContactMutation = useMutation({
+    mutationFn: ({ id, contactId, data }) => vendorsApi.updateContact(id, contactId, data),
+    onSuccess: (_, { id }) => queryClient.invalidateQueries({ queryKey: ['vendorContacts', id] }),
+  });
+
+  const deleteContactMutation = useMutation({
+    mutationFn: ({ id, contactId }) => vendorsApi.deleteContact(id, contactId),
+    onSuccess: (_, { id }) => queryClient.invalidateQueries({ queryKey: ['vendorContacts', id] }),
+  });
+
+  // Vendor Contracts — POST /api/v1/finance/vendors/{id}/contracts
+  const createContractMutation = useMutation({
+    mutationFn: ({ id, data }) => vendorsApi.createContract(id, data),
+    onSuccess: (_, { id }) => queryClient.invalidateQueries({ queryKey: ['vendorContracts', id] }),
+  });
+
+  // Vendor Documents — POST /api/v1/finance/vendors/{id}/documents
+  const createDocumentMutation = useMutation({
+    mutationFn: ({ id, data }) => vendorsApi.createDocument(id, data),
+    onSuccess: (_, { id }) => queryClient.invalidateQueries({ queryKey: ['vendorDocuments', id] }),
   });
 
   return {
@@ -497,6 +574,11 @@ export function useVendors() {
     createVendor: createMutation.mutateAsync,
     updateVendor: updateMutation.mutateAsync,
     deleteVendor: deleteMutation.mutateAsync,
+    createVendorContact: createContactMutation.mutateAsync,
+    updateVendorContact: updateContactMutation.mutateAsync,
+    deleteVendorContact: deleteContactMutation.mutateAsync,
+    createVendorContract: createContractMutation.mutateAsync,
+    createVendorDocument: createDocumentMutation.mutateAsync,
   };
 }
 
@@ -633,41 +715,76 @@ export function usePayments() {
 // Expenses Hook
 export function useExpenses() {
   const queryClient = useQueryClient();
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
+  };
+
   const query = useQuery({
     queryKey: ['expenses'],
     queryFn: () => expensesApi.list(),
   });
 
-  const submitMutation = useMutation({
+  // GET /api/v1/finance/expenses/categories
+  const categoriesQuery = useQuery({
+    queryKey: ['expenseCategories'],
+    queryFn: () => apiClient.get('/api/v1/finance/expenses/categories').then(r => r.data).catch(() => []),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // POST /api/v1/finance/expenses  — creates expense in Draft status
+  const createMutation = useMutation({
     mutationFn: (data) => expensesApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
-    },
+    onSuccess: invalidate,
   });
 
+  // PUT /api/v1/finance/expenses/{id}  — updates Draft or Rejected expense
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => expensesApi.update(id, data),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/expenses/{id}/submit  — Draft → PendingApproval
+  const submitMutation = useMutation({
+    mutationFn: (id) => expensesApi.submit(id),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/expenses/{id}/approve  body: { decision: "Approved", comment }
   const approveMutation = useMutation({
-    mutationFn: (id) => expensesApi.approve(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
-    },
+    mutationFn: ({ id, data }) => expensesApi.approve(id, data),
+    onSuccess: invalidate,
   });
 
+  // POST /api/v1/finance/expenses/{id}/reject  body: { decision: "Rejected", comment } (comment required!)
   const rejectMutation = useMutation({
-    mutationFn: ({ id, reason }) => expensesApi.reject(id, { decision: "Rejected", comment: reason }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
-    },
+    mutationFn: ({ id, data }) => expensesApi.reject(id, data),
+    onSuccess: invalidate,
+  });
+
+  // POST /api/v1/finance/expenses/{id}/payment  (singular — not /payments)
+  const recordPaymentMutation = useMutation({
+    mutationFn: ({ id, data }) => expensesApi.recordPayment(id, data),
+    onSuccess: invalidate,
+  });
+
+  // DELETE /api/v1/finance/expenses/{id}  — only Draft or Rejected
+  const deleteMutation = useMutation({
+    mutationFn: (id) => expensesApi.delete(id),
+    onSuccess: invalidate,
   });
 
   return {
     ...query,
     expenses: query.data || [],
+    categories: categoriesQuery.data || [],
+    createExpense: createMutation.mutateAsync,
+    updateExpense: updateMutation.mutateAsync,
     submitExpense: submitMutation.mutateAsync,
     approveExpense: approveMutation.mutateAsync,
     rejectExpense: rejectMutation.mutateAsync,
+    recordExpensePayment: recordPaymentMutation.mutateAsync,
+    deleteExpense: deleteMutation.mutateAsync,
   };
 }
 
@@ -695,6 +812,60 @@ export function useFinancialReport(type, from, to) {
   return {
     ...query,
     reportData: query.data || null,
+  };
+}
+
+// Invoice Activities Hook
+export function useInvoiceActivities(invoiceId) {
+  const query = useQuery({
+    queryKey: ['invoiceActivities', invoiceId],
+    queryFn: () => invoicesApi.getActivities(invoiceId),
+    enabled: !!invoiceId,
+  });
+
+  return {
+    ...query,
+    activities: query.data || [],
+  };
+}
+
+// Expense Activities Hook
+export function useExpenseActivities(expenseId) {
+  const query = useQuery({
+    queryKey: ['expenseActivities', expenseId],
+    queryFn: () => expensesApi.getActivities(expenseId),
+    enabled: !!expenseId,
+  });
+
+  return {
+    ...query,
+    activities: query.data || [],
+  };
+}
+
+// Vendor Categories Hook
+export function useVendorCategories() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['vendorCategories'],
+    queryFn: () => vendorCategoriesApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => vendorCategoriesApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendorCategories'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ categoryId, data }) => vendorCategoriesApi.update(categoryId, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendorCategories'] }),
+  });
+
+  return {
+    ...query,
+    categories: query.data || [],
+    createCategory: createMutation.mutateAsync,
+    updateCategory: updateMutation.mutateAsync,
   };
 }
 

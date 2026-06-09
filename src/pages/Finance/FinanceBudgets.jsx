@@ -20,48 +20,62 @@ const ChartTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const EMPTY_BUDGET = { name: '', type: 'Department', allocated: '', period: 'FY 2026', threshold: 80 };
+const BUDGET_COLORS = ['#01FDF6', '#8A4FFF', '#FF47DA', '#21FA90', '#E4FF1A', '#3772FF', '#FF6B35', '#627496'];
+
+const EMPTY_BUDGET = {
+  name: '',
+  description: '',
+  type: 'Quarterly',
+  startDate: new Date().toISOString().slice(0, 10),
+  endDate: '',
+  totalAmount: '',
+};
 
 export default function FinanceBudgets() {
-  const { budgets, isLoading, createBudget, deleteBudget } = useBudgets();
+  const { budgets = [], isLoading, createBudget, deleteBudget } = useBudgets();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBudget, setNewBudget] = useState(EMPTY_BUDGET);
 
-  const VARIANCE_DATA = budgets.map(b => {
+  // Map API response fields → chart data
+  // API returns: totalAmount, consumedAmount, remainingAmount, allocatedAmount
+  const VARIANCE_DATA = budgets.map((b, i) => {
     const nameStr = b.name || '';
     const name = nameStr.split(' ').slice(0, 2).join(' ');
-    const allocated = b.allocated || 0;
-    const spent = b.spent || 0;
+    const allocated = b.totalAmount || 0;
+    const spent = b.consumedAmount || 0;
     return {
       name,
       Allocated: allocated,
       Spent: spent,
       Remaining: Math.max(0, allocated - spent),
+      color: BUDGET_COLORS[i % BUDGET_COLORS.length],
     };
   });
 
   const totals = {
-    allocated: budgets.reduce((s, b) => s + (b.allocated || 0), 0),
-    spent: budgets.reduce((s, b) => s + (b.spent || 0), 0),
-    remaining: budgets.reduce((s, b) => s + Math.max(0, (b.allocated || 0) - (b.spent || 0)), 0),
-    exceeded: budgets.filter(b => (b.spent || 0) > (b.allocated || 0)).length,
+    allocated: budgets.reduce((s, b) => s + (b.totalAmount || 0), 0),
+    spent: budgets.reduce((s, b) => s + (b.consumedAmount || 0), 0),
+    remaining: budgets.reduce((s, b) => s + (b.remainingAmount || Math.max(0, (b.totalAmount || 0) - (b.consumedAmount || 0))), 0),
+    exceeded: budgets.filter(b => (b.consumedAmount || 0) > (b.totalAmount || 0)).length,
   };
 
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
+      // POST /api/v1/finance/budgets
       await createBudget({
         name: newBudget.name,
+        description: newBudget.description,
         type: newBudget.type,
-        allocated: parseFloat(newBudget.allocated) || 0,
-        period: newBudget.period,
-        spent: 0,
-        alerts: []
+        startDate: new Date(newBudget.startDate).toISOString(),
+        endDate: new Date(newBudget.endDate).toISOString(),
+        totalAmount: parseFloat(newBudget.totalAmount) || 0,
       });
       setShowCreateModal(false);
       setNewBudget(EMPTY_BUDGET);
     } catch (err) {
       console.error(err);
+      alert(err?.response?.data?.details || err?.response?.data?.error || 'Failed to create budget.');
     }
   };
  
@@ -130,8 +144,8 @@ export default function FinanceBudgets() {
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie data={budgets} cx="50%" cy="50%" innerRadius={50} outerRadius={85}
-                  paddingAngle={2} dataKey="spent">
-                  {budgets.map((b, i) => <Cell key={i} fill={b.color} />)}
+                  paddingAngle={2} dataKey="consumedAmount">
+                  {budgets.map((b, i) => <Cell key={i} fill={BUDGET_COLORS[i % BUDGET_COLORS.length]} />)}
                 </Pie>
                 <Tooltip formatter={(v) => [formatCurrency(v), 'Spent']}
                   contentStyle={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
@@ -139,10 +153,10 @@ export default function FinanceBudgets() {
             </ResponsiveContainer>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {budgets.map(b => (
+            {budgets.map((b, i) => (
               <div key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: b.color, display: 'inline-block' }} />
-                {b.name.split(' ').slice(0, 2).join(' ')}
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: BUDGET_COLORS[i % BUDGET_COLORS.length], display: 'inline-block' }} />
+                {(b.name || '').split(' ').slice(0, 2).join(' ')}
               </div>
             ))}
           </div>
@@ -152,30 +166,38 @@ export default function FinanceBudgets() {
       {/* Budget Progress Cards */}
       <div className="card">
         <div className="card-title">Department & Project Budgets</div>
-        {budgets.map(budget => {
-          const allocated = budget.allocated || 0;
-          const spent = budget.spent || 0;
+        {budgets.map((budget, i) => {
+          const allocated = budget.totalAmount || 0;
+          const spent = budget.consumedAmount || 0;
+          const remaining = budget.remainingAmount ?? Math.max(0, allocated - spent);
           const pct = allocated > 0 ? Math.min(100, Math.round((spent / allocated) * 100)) : 0;
           const isExceeded = spent > allocated;
           const isWarning = pct >= 80 && !isExceeded;
+          const barColor = BUDGET_COLORS[i % BUDGET_COLORS.length];
           return (
             <div key={budget.id} className="budget-progress-item">
               <div className="budget-progress-header">
                 <div>
                   <span className="font-semibold text-sm">{budget.name}</span>
                   <span className="badge badge-sm badge-neutral ml-2" style={{ fontSize: 10 }}>{budget.type}</span>
-                  {budget.alerts && budget.alerts.length > 0 && (
-                    <span className="ml-2" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: isExceeded ? 'var(--error)' : 'var(--warning)' }}>
-                      <AlertTriangle size={11} /> {budget.alerts[0]}
-                    </span>
+                  {budget.budgetCode && (
+                    <span className="font-mono text-xs ml-2" style={{ color: 'var(--text-muted)' }}>{budget.budgetCode}</span>
                   )}
+                  <span className="badge badge-sm ml-2" style={{
+                    fontSize: 10,
+                    background: budget.status === 'Active' ? 'rgba(33,250,144,0.15)' : 'rgba(98,116,150,0.15)',
+                    color: budget.status === 'Active' ? 'var(--success)' : 'var(--text-muted)',
+                  }}>{budget.status || 'Draft'}</span>
                 </div>
                 <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
                   <span className="text-sm font-semibold" style={{ color: isExceeded ? 'var(--error)' : 'var(--text-title)' }}>
                     {formatCurrency(spent)} / {formatCurrency(allocated)}
                   </span>
                   <span className="text-xs text-muted">({pct}%)</span>
-                  <button onClick={() => { if(window.confirm('Delete this budget?')) deleteBudget(budget.id) }} className="btn-icon" style={{ color: 'var(--error)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}>
+                  <button
+                    onClick={() => { if (window.confirm('Delete this budget?')) deleteBudget(budget.id); }}
+                    className="btn-icon" style={{ color: 'var(--error)' }}
+                  >
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -183,12 +205,19 @@ export default function FinanceBudgets() {
               <div className="budget-progress-bar-track">
                 <div className="budget-progress-bar-fill" style={{
                   width: `${pct}%`,
-                  background: isExceeded ? 'var(--error)' : isWarning ? 'var(--warning)' : budget.color,
+                  background: isExceeded ? 'var(--error)' : isWarning ? 'var(--warning)' : barColor,
                 }} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)' }}>
-                <span>Remaining: {isExceeded ? `Over by ${formatCurrency(spent - allocated)}` : formatCurrency(allocated - spent)}</span>
-                <span>{budget.period}</span>
+                <span>Remaining: {isExceeded
+                  ? `Over by ${formatCurrency(spent - allocated)}`
+                  : formatCurrency(remaining)}
+                </span>
+                <span>
+                  {budget.startDate && budget.endDate
+                    ? `${new Date(budget.startDate).toLocaleDateString()} – ${new Date(budget.endDate).toLocaleDateString()}`
+                    : budget.type}
+                </span>
               </div>
             </div>
           );
@@ -207,31 +236,43 @@ export default function FinanceBudgets() {
               <div className="form-group">
                 <label>Budget Name *</label>
                 <input type="text" className="form-input" required value={newBudget.name}
-                  onChange={e => setNewBudget(p => ({ ...p, name: e.target.value }))} placeholder="Engineering Department" />
+                  onChange={e => setNewBudget(p => ({ ...p, name: e.target.value }))}
+                  placeholder="Q3 Marketing Budget, Engineering FY2026…" />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea className="form-input" rows={2} value={newBudget.description}
+                  onChange={e => setNewBudget(p => ({ ...p, description: e.target.value }))}
+                  placeholder="Purpose of this budget…" />
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
                   <label>Type</label>
-                  <select className="form-input" value={newBudget.type} onChange={e => setNewBudget(p => ({ ...p, type: e.target.value }))}>
-                    <option>Department</option><option>Project</option><option>Organization</option>
+                  <select className="form-input" value={newBudget.type}
+                    onChange={e => setNewBudget(p => ({ ...p, type: e.target.value }))}>
+                    <option value="Annual">Annual</option>
+                    <option value="Quarterly">Quarterly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Project">Project</option>
                   </select>
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Period</label>
-                  <input type="text" className="form-input" value={newBudget.period}
-                    onChange={e => setNewBudget(p => ({ ...p, period: e.target.value }))} placeholder="FY 2026, Q3 2026..." />
+                  <label>Total Amount (GH₵) *</label>
+                  <input type="number" className="form-input" required min={0} step="0.01"
+                    value={newBudget.totalAmount}
+                    onChange={e => setNewBudget(p => ({ ...p, totalAmount: e.target.value }))} />
                 </div>
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Allocated Amount (GH₵) *</label>
-                  <input type="number" className="form-input" required min={0} value={newBudget.allocated}
-                    onChange={e => setNewBudget(p => ({ ...p, allocated: e.target.value }))} />
+                  <label>Start Date *</label>
+                  <input type="date" className="form-input" required value={newBudget.startDate}
+                    onChange={e => setNewBudget(p => ({ ...p, startDate: e.target.value }))} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Alert Threshold (%)</label>
-                  <input type="number" className="form-input" min={0} max={100} value={newBudget.threshold}
-                    onChange={e => setNewBudget(p => ({ ...p, threshold: e.target.value }))} />
+                  <label>End Date *</label>
+                  <input type="date" className="form-input" required value={newBudget.endDate}
+                    onChange={e => setNewBudget(p => ({ ...p, endDate: e.target.value }))} />
                 </div>
               </div>
               <div className="modal-footer">

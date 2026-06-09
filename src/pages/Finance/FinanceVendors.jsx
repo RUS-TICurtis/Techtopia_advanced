@@ -1,50 +1,74 @@
 import React, { useState } from 'react';
 import { Building2, Plus, Search, Phone, Mail, Globe, MapPin, Package, X, ExternalLink, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
-import { useVendors } from '../../hooks/useCrmData';
+import { useVendors, useVendorCategories } from '../../hooks/useCrmData';
 import './Finance.css';
 
-const CATEGORY_COLORS = { 'IT Hardware': '#01FDF6', 'Cloud Services': '#8A4FFF', 'Office Supplies': '#21FA90', 'Logistics': '#E4FF1A', 'Printing': '#FF47DA' };
-const EMPTY_VENDOR = { name: '', category: '', contact: '', email: '', phone: '', location: '', website: '' };
+// Status badge config (API returns 'Active', 'Inactive', etc.)
+const STATUS_COLORS = {
+  Active:   { badge: 'badge-success',  text: '#21FA90' },
+  Inactive: { badge: 'badge-neutral',  text: '#627496' },
+  Suspended:{ badge: 'badge-danger',   text: '#FF4747' },
+};
+const AVATAR_COLORS = ['#01FDF6', '#8A4FFF', '#FF47DA', '#21FA90', '#E4FF1A', '#3772FF', '#FF6B35'];
+
+// POST /api/v1/finance/vendors request body
+const EMPTY_VENDOR = {
+  name: '',
+  registrationNumber: '',
+  taxIdentificationNumber: '',
+  email: '',
+  phone: '',
+  website: '',
+  address: '',
+  country: 'Ghana',
+  city: 'Accra',
+};
 
 export default function FinanceVendors() {
-  const { vendors, isLoading, createVendor, deleteVendor } = useVendors();
+  const { vendors = [], isLoading, createVendor, deleteVendor } = useVendors();
   const [search, setSearch] = useState('');
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newVendor, setNewVendor] = useState(EMPTY_VENDOR);
 
-  const filtered = vendors.filter(v =>
-    !search || 
-    (v.name || '').toLowerCase().includes(search.toLowerCase()) || 
-    (v.category || '').toLowerCase().includes(search.toLowerCase())
+  const filtered = (vendors || []).filter(v =>
+    !search ||
+    (v.name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (v.city || '').toLowerCase().includes(search.toLowerCase()) ||
+    (v.country || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
+      // POST /api/v1/finance/vendors
       await createVendor({
-        totalOrders: 0, 
-        totalSpend: 0, 
-        status: 'active', 
-        rating: 0,
-        ...newVendor,
+        name: newVendor.name,
+        registrationNumber: newVendor.registrationNumber || null,
+        taxIdentificationNumber: newVendor.taxIdentificationNumber || null,
+        email: newVendor.email || null,
+        phone: newVendor.phone || null,
+        website: newVendor.website || null,
+        address: newVendor.address || null,
+        country: newVendor.country || 'Ghana',
+        city: newVendor.city || 'Accra',
       });
       setShowAddModal(false);
       setNewVendor(EMPTY_VENDOR);
     } catch (err) {
       console.error(err);
+      alert(err?.response?.data?.details || err?.response?.data?.error || 'Failed to create vendor.');
     }
   };
 
   if (isLoading) {
     return (
-      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
       </div>
     );
   }
-
 
   return (
     <div className="page-container">
@@ -64,9 +88,9 @@ export default function FinanceVendors() {
       <div className="finance-metric-row">
         {[
           { label: 'Total Vendors', value: vendors.length },
-          { label: 'Active Vendors', value: vendors.filter(v => v.status === 'active').length },
-          { label: 'Total Spend (YTD)', value: formatCurrency(vendors.reduce((s, v) => s + (v.totalSpend || 0), 0)) },
-          { label: 'Avg Vendor Rating', value: vendors.length > 0 ? `${(vendors.reduce((s, v) => s + (v.rating || 0), 0) / vendors.length).toFixed(1)} / 5.0` : '0.0 / 5.0' },
+          { label: 'Active Vendors', value: vendors.filter(v => v.status === 'Active').length },
+          { label: 'Countries', value: new Set(vendors.map(v => v.country).filter(Boolean)).size || 0 },
+          { label: 'Cities', value: new Set(vendors.map(v => v.city).filter(Boolean)).size || 0 },
         ].map(m => (
           <div key={m.label} className="finance-metric-mini">
             <span className="finance-metric-mini-label">{m.label}</span>
@@ -85,45 +109,41 @@ export default function FinanceVendors() {
 
       {/* Vendor Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-        {filtered.map(vendor => {
-          const initial = vendor.name.charAt(0);
-          const catColor = CATEGORY_COLORS[vendor.category] || '#627496';
+        {filtered.map((vendor, i) => {
+          const initial = (vendor.name || '?').charAt(0).toUpperCase();
+          const avatarColor = AVATAR_COLORS[i % AVATAR_COLORS.length];
+          const statusCfg = STATUS_COLORS[vendor.status] || STATUS_COLORS.Inactive;
           return (
             <div key={vendor.id} className="vendor-card" onClick={() => setSelectedVendor(vendor)}>
-              <div className="vendor-avatar" style={{ background: `${catColor}20`, color: catColor, fontSize: 20 }}>
+              <div className="vendor-avatar" style={{ background: `${avatarColor}20`, color: avatarColor, fontSize: 20 }}>
                 {initial}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                   <p className="font-semibold text-sm">{vendor.name}</p>
-                  <span className={`badge badge-sm ${vendor.status === 'active' ? 'badge-success' : 'badge-neutral'}`}>
-                    {vendor.status}
-                  </span>
+                  <span className={`badge badge-sm ${statusCfg.badge}`}>{vendor.status || 'Active'}</span>
                 </div>
-                <p style={{ fontSize: 11, color: catColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
-                  {vendor.category}
-                </p>
+                {vendor.vendorCode && (
+                  <p style={{ fontSize: 10, color: 'var(--brand-cyan)', fontFamily: 'monospace', marginBottom: 8, letterSpacing: 0.5 }}>
+                    {vendor.vendorCode}
+                  </p>
+                )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
-                    <Mail size={11} /> {vendor.email}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
-                    <MapPin size={11} /> {vendor.location}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: 16, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border-light)', fontSize: 12 }}>
-                  <div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>Orders</p>
-                    <p className="font-semibold">{vendor.totalOrders}</p>
-                  </div>
-                  <div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>Total Spend</p>
-                    <p className="font-semibold">{formatCurrency(vendor.totalSpend)}</p>
-                  </div>
-                  <div>
-                    <p style={{ color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>Rating</p>
-                    <p className="font-semibold" style={{ color: '#E4FF1A' }}>★ {vendor.rating}</p>
-                  </div>
+                  {vendor.email && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+                      <Mail size={11} /> {vendor.email}
+                    </div>
+                  )}
+                  {(vendor.city || vendor.country) && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+                      <MapPin size={11} /> {[vendor.city, vendor.country].filter(Boolean).join(', ')}
+                    </div>
+                  )}
+                  {vendor.phone && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+                      <Phone size={11} /> {vendor.phone}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -145,35 +165,26 @@ export default function FinanceVendors() {
             <div className="finance-drawer-body">
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
                 {[
-                  { label: 'Contact Person', value: selectedVendor.contact, icon: Building2 },
-                  { label: 'Category', value: selectedVendor.category, icon: Package },
-                  { label: 'Email', value: selectedVendor.email, icon: Mail },
-                  { label: 'Phone', value: selectedVendor.phone, icon: Phone },
-                  { label: 'Location', value: selectedVendor.location, icon: MapPin },
+                  { label: 'Vendor Code', value: selectedVendor.vendorCode || '—', icon: Building2 },
+                  { label: 'Email', value: selectedVendor.email || '—', icon: Mail },
+                  { label: 'Phone', value: selectedVendor.phone || '—', icon: Phone },
                   { label: 'Website', value: selectedVendor.website || '—', icon: Globe },
+                  { label: 'City', value: selectedVendor.city || '—', icon: MapPin },
+                  { label: 'Country', value: selectedVendor.country || '—', icon: MapPin },
+                  { label: 'Address', value: selectedVendor.address || '—', icon: Building2 },
+                  { label: 'Reg. Number', value: selectedVendor.registrationNumber || '—', icon: Package },
+                  { label: 'Tax ID (TIN)', value: selectedVendor.taxIdentificationNumber || '—', icon: Package },
                 ].map(f => {
                   const Icon = f.icon;
                   return (
                     <div key={f.label}>
                       <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 700 }}>{f.label}</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}>
-                        <Icon size={12} style={{ color: 'var(--text-muted)' }} /> {f.value}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, wordBreak: 'break-word' }}>
+                        <Icon size={12} style={{ color: 'var(--text-muted)', flexShrink: 0 }} /> {f.value}
                       </div>
                     </div>
                   );
                 })}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
-                {[
-                  { label: 'Total Orders', value: selectedVendor.totalOrders },
-                  { label: 'Total Spend', value: formatCurrency(selectedVendor.totalSpend) },
-                  { label: 'Rating', value: `★ ${selectedVendor.rating}` },
-                ].map(m => (
-                  <div key={m.label} className="finance-metric-mini">
-                    <span className="finance-metric-mini-label">{m.label}</span>
-                    <span className="finance-metric-mini-value" style={{ fontSize: 16 }}>{m.value}</span>
-                  </div>
-                ))}
               </div>
             </div>
             <div className="finance-drawer-footer">
@@ -193,41 +204,65 @@ export default function FinanceVendors() {
               <button className="btn-icon" onClick={() => setShowAddModal(false)}><X size={18} /></button>
             </div>
             <form onSubmit={handleAdd} className="modal-body">
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Vendor Name *</label>
-                  <input type="text" className="form-input" required value={newVendor.name}
-                    onChange={e => setNewVendor(p => ({ ...p, name: e.target.value }))} />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Category</label>
-                  <input type="text" className="form-input" value={newVendor.category}
-                    onChange={e => setNewVendor(p => ({ ...p, category: e.target.value }))} placeholder="IT Hardware, Logistics..." />
-                </div>
+              <div className="form-group">
+                <label>Vendor Name *</label>
+                <input type="text" className="form-input" required value={newVendor.name}
+                  onChange={e => setNewVendor(p => ({ ...p, name: e.target.value }))}
+                  placeholder="Tech Corp, Acme Supplies Ltd…" />
               </div>
               <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Contact Person</label>
-                  <input type="text" className="form-input" value={newVendor.contact}
-                    onChange={e => setNewVendor(p => ({ ...p, contact: e.target.value }))} />
-                </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label>Email</label>
                   <input type="email" className="form-input" value={newVendor.email}
-                    onChange={e => setNewVendor(p => ({ ...p, email: e.target.value }))} />
+                    onChange={e => setNewVendor(p => ({ ...p, email: e.target.value }))}
+                    placeholder="contact@vendor.com" />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Phone</label>
+                  <input type="tel" className="form-input" value={newVendor.phone}
+                    onChange={e => setNewVendor(p => ({ ...p, phone: e.target.value }))}
+                    placeholder="+233550000000" />
                 </div>
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Phone</label>
-                  <input type="tel" className="form-input" value={newVendor.phone}
-                    onChange={e => setNewVendor(p => ({ ...p, phone: e.target.value }))} />
+                  <label>Registration Number</label>
+                  <input type="text" className="form-input" value={newVendor.registrationNumber}
+                    onChange={e => setNewVendor(p => ({ ...p, registrationNumber: e.target.value }))}
+                    placeholder="GH-123456" />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Location</label>
-                  <input type="text" className="form-input" value={newVendor.location}
-                    onChange={e => setNewVendor(p => ({ ...p, location: e.target.value }))} placeholder="Accra, Ghana" />
+                  <label>Tax ID (TIN)</label>
+                  <input type="text" className="form-input" value={newVendor.taxIdentificationNumber}
+                    onChange={e => setNewVendor(p => ({ ...p, taxIdentificationNumber: e.target.value }))}
+                    placeholder="TIN-1234" />
                 </div>
+              </div>
+              <div className="form-group">
+                <label>Address</label>
+                <input type="text" className="form-input" value={newVendor.address}
+                  onChange={e => setNewVendor(p => ({ ...p, address: e.target.value }))}
+                  placeholder="123 Main St, Industrial Area" />
+              </div>
+              <div className="form-row">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>City</label>
+                  <input type="text" className="form-input" value={newVendor.city}
+                    onChange={e => setNewVendor(p => ({ ...p, city: e.target.value }))}
+                    placeholder="Accra" />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Country</label>
+                  <input type="text" className="form-input" value={newVendor.country}
+                    onChange={e => setNewVendor(p => ({ ...p, country: e.target.value }))}
+                    placeholder="Ghana" />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Website</label>
+                <input type="url" className="form-input" value={newVendor.website}
+                  onChange={e => setNewVendor(p => ({ ...p, website: e.target.value }))}
+                  placeholder="https://vendor.com" />
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Cancel</button>
