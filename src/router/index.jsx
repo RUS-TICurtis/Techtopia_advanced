@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+﻿import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PERMISSIONS } from '../constants/permissions';
 import ProtectedRoute from '../components/guards/ProtectedRoute';
@@ -74,7 +74,7 @@ const AuthLogin = lazy(() => import('../pages/Auth/Login'));
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[50vh] w-full">
     <div className="flex flex-col items-center gap-4">
-      <div className="w-10 h-10 border-4 border-[#00e5ff] border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-[#38BDF8] border-t-transparent rounded-full animate-spin"></div>
       <p className="text-gray-500 text-sm font-mono tracking-wider">LOADING TECHTOPIA HUB...</p>
     </div>
   </div>

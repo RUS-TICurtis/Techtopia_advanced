@@ -12,30 +12,30 @@ export default {
           850: "#1d263b",
         },
         brand: {
-          chartreuse: "#E4FF1A",
-          cyan: "#01FDF6",
-          green: "#21FA90",
-          magenta: "#FF47DA",
-          purple: "#8A4FFF",
-          blue: "#3772FF",
+          chartreuse: "#F97316", // CTA Orange
+          cyan: "#3B82F6",       // Secondary Blue
+          green: "#10B981",
+          magenta: "#EF4444",
+          purple: "#6366F1",
+          blue: "#2563EB",       // Primary Blue
         },
         bg: {
           app: {
-            light: "#F5F7FA",
-            dark: "#080D1A",
+            light: "#F8FAFC",
+            dark: "#0F172A",
           },
           sidebar: {
             light: "#FFFFFF",
-            dark: "#0A0F1E",
+            dark: "#0F172A",
           },
           card: {
             light: "#FFFFFF",
-            dark: "#0F1629",
+            dark: "#1E293B",
           }
         }
       },
       fontFamily: {
-        sans: ["Sora", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "system-ui", "-apple-system", "sans-serif"],
       },
       spacing: {
         'page-gap': '32px',

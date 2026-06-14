@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
@@ -136,7 +136,7 @@ export default function OmnichannelInbox() {
       <PageHeader 
         title="Shared Omnichannel Inbox"
         subtitle="Consolidate Gmail, Microsoft Outlook, WhatsApp, and SMS discussions under a unified AI-monitored dashboard"
-        icon={<MessageSquare className="text-[#a6e22e]" />}
+        icon={<MessageSquare className="text-[#10B981]" />}
         actions={
           <button 
             onClick={handleSyncChannels}
@@ -159,7 +159,7 @@ export default function OmnichannelInbox() {
                 <button
                   key={ch.id}
                   onClick={() => setActiveChannel(ch.id)}
-                  className={`w-full text-left px-3.5 py-3 rounded-xl border flex items-center justify-between transition-all ${activeChannel === ch.id ? 'bg-[#a6e22e]/10 border-[#a6e22e]/45 text-[#a6e22e]' : 'bg-gray-900/35 border-gray-850 hover:border-gray-800 text-gray-400 hover:text-white'}`}
+                  className={`w-full text-left px-3.5 py-3 rounded-xl border flex items-center justify-between transition-all ${activeChannel === ch.id ? 'bg-[#10B981]/10 border-[#10B981]/45 text-[#10B981]' : 'bg-gray-900/35 border-gray-850 hover:border-gray-800 text-gray-400 hover:text-white'}`}
                 >
                   <div className="flex items-center gap-2 text-xs font-semibold">
                     <Icon size={14} />
@@ -180,7 +180,7 @@ export default function OmnichannelInbox() {
               <div
                 key={th.id}
                 onClick={() => selectThread(th)}
-                className={`thread-card bg-gray-900/35 border p-3.5 rounded-xl cursor-pointer transition-all duration-200 ${activeThread?.id === th.id ? 'active-thread border-[#a6e22e]/65 bg-gray-900/60' : 'border-gray-850 hover:border-gray-800'}`}
+                className={`thread-card bg-gray-900/35 border p-3.5 rounded-xl cursor-pointer transition-all duration-200 ${activeThread?.id === th.id ? 'active-thread border-[#10B981]/65 bg-gray-900/60' : 'border-gray-850 hover:border-gray-800'}`}
               >
                 <div className="flex justify-between items-start gap-2 mb-1.5">
                   <div className="flex items-center gap-2">
@@ -191,7 +191,7 @@ export default function OmnichannelInbox() {
                   </div>
                   
                   {/* Sentiment dot indicator indicator indicator */}
-                  <span className={`inline-block w-2 h-2 rounded-full ${th.sentiment === 'urgent' ? 'bg-[#ff5555] shadow-red' : th.sentiment === 'positive' ? 'bg-[#50fa7b] shadow-green' : 'bg-[#8be9fd] shadow-cyan'}`} title={`Sentiment: ${th.sentiment}`} />
+                  <span className={`inline-block w-2 h-2 rounded-full ${th.sentiment === 'urgent' ? 'bg-[#EF4444] shadow-red' : th.sentiment === 'positive' ? 'bg-[#10B981] shadow-green' : 'bg-[#38BDF8] shadow-cyan'}`} title={`Sentiment: ${th.sentiment}`} />
                 </div>
                 
                 <p className="text-gray-500 text-[11px] leading-snug truncate">{th.lastMessage}</p>
@@ -210,12 +210,12 @@ export default function OmnichannelInbox() {
               <>
                 <div className="p-3.5 border-b border-gray-850 bg-gray-950/30 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-[#a6e22e] font-bold text-xs uppercase tracking-widest">{activeThread.source} Stream</span>
+                    <span className="text-[#10B981] font-bold text-xs uppercase tracking-widest">{activeThread.source} Stream</span>
                     <span className="text-gray-500 text-[10px]">/</span>
                     <span className="text-white font-semibold text-xs">{activeThread.name}</span>
                   </div>
                   
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${activeThread.sentiment === 'urgent' ? 'bg-[#ff5555]/15 text-[#ff5555]' : activeThread.sentiment === 'positive' ? 'bg-[#50fa7b]/15 text-[#50fa7b]' : 'bg-[#8be9fd]/15 text-[#8be9fd]'}`}>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${activeThread.sentiment === 'urgent' ? 'bg-[#EF4444]/15 text-[#EF4444]' : activeThread.sentiment === 'positive' ? 'bg-[#10B981]/15 text-[#10B981]' : 'bg-[#38BDF8]/15 text-[#38BDF8]'}`}>
                     {activeThread.sentiment} Sentiment
                   </span>
                 </div>
@@ -239,11 +239,11 @@ export default function OmnichannelInbox() {
                     placeholder={`Reply to ${activeThread.name}...`}
                     value={replyInput}
                     onChange={(e) => setReplyInput(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-gray-950 border border-gray-850 rounded-lg text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#a6e22e]/50 transition-all font-sans"
+                    className="flex-1 px-3 py-2 bg-gray-950 border border-gray-850 rounded-lg text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#10B981]/50 transition-all font-sans"
                   />
                   <button 
                     type="submit"
-                    className="p-2 bg-[#a6e22e] hover:bg-[#92d020] text-[#0a0f1e] rounded-lg transition-all flex items-center justify-center"
+                    className="p-2 bg-[#10B981] hover:bg-[#84CC16] text-[#0F172A] rounded-lg transition-all flex items-center justify-center"
                   >
                     <Send size={14} />
                   </button>
@@ -261,7 +261,7 @@ export default function OmnichannelInbox() {
           {activeThread && (
             <div className="co-drafter-panel w-full md:w-60 bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex flex-col gap-3">
               <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <Sparkles size={14} className="text-[#01FDF6]" /> AI Co-Drafter
+                <Sparkles size={14} className="text-[#38BDF8]" /> AI Co-Drafter
               </h4>
               
               <p className="text-gray-500 text-[10px] leading-relaxed">
@@ -274,7 +274,7 @@ export default function OmnichannelInbox() {
 
               <button 
                 onClick={handleApplyDraft}
-                className="w-full py-2 bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-glow"
+                className="w-full py-2 bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-glow"
               >
                 Apply AI Draft
               </button>

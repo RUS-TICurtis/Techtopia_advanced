@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { useUIStore } from '../../store/uiStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,9 +18,9 @@ export default function NotificationCenter() {
 
   const getIcon = (type) => {
     switch (type) {
-      case 'deal': return <TrendingUp size={16} className="text-[#a6e22e]" />;
-      case 'system': return <AlertCircle size={16} className="text-[#ff0055]" />;
-      case 'ai': return <Sparkles size={16} className="text-[#00e5ff]" />;
+      case 'deal': return <TrendingUp size={16} className="text-[#10B981]" />;
+      case 'system': return <AlertCircle size={16} className="text-[#EF4444]" />;
+      case 'ai': return <Sparkles size={16} className="text-[#38BDF8]" />;
       default: return <Bell size={16} className="text-gray-400" />;
     }
   };
@@ -44,15 +44,15 @@ export default function NotificationCenter() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-[#0f1629] border-l border-gray-800 shadow-2xl z-[995] flex flex-col"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-[#1E293B] border-l border-gray-800 shadow-2xl z-[995] flex flex-col"
           >
             {/* Header */}
-            <div className="p-5 border-b border-gray-800/80 bg-[#0a0f1e] flex justify-between items-center">
+            <div className="p-5 border-b border-gray-800/80 bg-[#0F172A] flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <Bell size={20} className="text-[#00e5ff]" />
+                <Bell size={20} className="text-[#38BDF8]" />
                 <h3 className="text-white font-bold font-display text-base">Notifications</h3>
                 {unreadCount > 0 && (
-                  <span className="bg-[#00e5ff]/15 text-[#00e5ff] border border-[#00e5ff]/30 text-xs px-2 py-0.5 rounded-full font-bold">
+                  <span className="bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30 text-xs px-2 py-0.5 rounded-full font-bold">
                     {unreadCount} new
                   </span>
                 )}
@@ -61,7 +61,7 @@ export default function NotificationCenter() {
                 {unreadCount > 0 && (
                   <button 
                     onClick={markAllRead} 
-                    className="text-xs text-[#00e5ff] hover:underline font-medium"
+                    className="text-xs text-[#38BDF8] hover:underline font-medium"
                   >
                     Mark all read
                   </button>
@@ -90,7 +90,7 @@ export default function NotificationCenter() {
                     layout
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`notification-item bg-[#12141a]/60 border border-gray-800/60 p-4 rounded-xl flex gap-3 relative transition-all duration-200 ${n.unread ? 'unread-active' : ''}`}
+                    className={`notification-item bg-[#0F172A]/60 border border-gray-800/60 p-4 rounded-xl flex gap-3 relative transition-all duration-200 ${n.unread ? 'unread-active' : ''}`}
                   >
                     <div className="p-2 bg-gray-900/60 rounded-lg h-max border border-gray-800/50">
                       {getIcon(n.type)}
@@ -106,7 +106,7 @@ export default function NotificationCenter() {
                       {n.unread && (
                         <button
                           onClick={() => markAsRead(n.id)}
-                          className="text-gray-500 hover:text-[#21FA90] transition-colors"
+                          className="text-gray-500 hover:text-[#10B981] transition-colors"
                           title="Mark as read"
                         >
                           <Check size={14} />
@@ -114,7 +114,7 @@ export default function NotificationCenter() {
                       )}
                       <button
                         onClick={() => dismissNotification(n.id)}
-                        className="text-gray-500 hover:text-[#FF47DA] transition-colors"
+                        className="text-gray-500 hover:text-[#EF4444] transition-colors"
                         title="Dismiss"
                       >
                         <X size={14} />

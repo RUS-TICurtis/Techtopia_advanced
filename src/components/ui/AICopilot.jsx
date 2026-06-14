@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sparkles, X, Send, Play, Check, Trash2, Command, 
@@ -159,7 +159,7 @@ export default function AICopilot() {
         title="Open AI Neural Copilot (Alt+A)"
       >
         <div className="glow-ring"></div>
-        <Sparkles size={22} className="text-[#01FDF6]" />
+        <Sparkles size={22} className="text-[#38BDF8]" />
         <span className="tooltip-hint">Alt+A</span>
       </button>
 
@@ -169,10 +169,10 @@ export default function AICopilot() {
           {/* Header */}
           <div className="copilot-header">
             <div className="flex items-center gap-2">
-              <Cpu size={18} className="text-[#01FDF6] animate-pulse" />
+              <Cpu size={18} className="text-[#38BDF8] animate-pulse" />
               <div>
                 <h3 className="text-white text-sm font-bold font-display tracking-wide">NEURAL COPILOT</h3>
-                <span className="text-[9px] text-[#01FDF6]/70 font-semibold font-mono uppercase tracking-wider block">TECHTOPIA OS v2.0</span>
+                <span className="text-[9px] text-[#38BDF8]/70 font-semibold font-mono uppercase tracking-wider block">TECHTOPIA OS v2.0</span>
               </div>
             </div>
             <button 
@@ -187,22 +187,22 @@ export default function AICopilot() {
           <div className="copilot-tabs flex border-b border-gray-850 bg-gray-950/45 text-[10px] font-bold uppercase tracking-wider">
             <button 
               onClick={() => setActiveTab('chat')}
-              className={`flex-1 text-center py-2.5 transition-colors ${activeTab === 'chat' ? 'text-[#01FDF6] border-b-2 border-[#01FDF6] bg-gray-900/30' : 'text-gray-500 hover:text-gray-300'}`}
+              className={`flex-1 text-center py-2.5 transition-colors ${activeTab === 'chat' ? 'text-[#38BDF8] border-b-2 border-[#38BDF8] bg-gray-900/30' : 'text-gray-500 hover:text-gray-300'}`}
             >
               Command Chat
             </button>
             <button 
               onClick={() => setActiveTab('approvals')}
-              className={`flex-1 text-center py-2.5 transition-colors relative ${activeTab === 'approvals' ? 'text-[#01FDF6] border-b-2 border-[#01FDF6] bg-gray-900/30' : 'text-gray-500 hover:text-gray-300'}`}
+              className={`flex-1 text-center py-2.5 transition-colors relative ${activeTab === 'approvals' ? 'text-[#38BDF8] border-b-2 border-[#38BDF8] bg-gray-900/30' : 'text-gray-500 hover:text-gray-300'}`}
             >
               Approvals Queue
               {approvals.filter(a => a.status === 'pending').length > 0 && (
-                <span className="badge-dot absolute top-2 right-2 w-2 h-2 rounded-full bg-[#ff0055]"></span>
+                <span className="badge-dot absolute top-2 right-2 w-2 h-2 rounded-full bg-[#EF4444]"></span>
               )}
             </button>
             <button 
               onClick={() => setActiveTab('prompts')}
-              className={`flex-1 text-center py-2.5 transition-colors ${activeTab === 'prompts' ? 'text-[#01FDF6] border-b-2 border-[#01FDF6] bg-gray-900/30' : 'text-gray-500 hover:text-gray-300'}`}
+              className={`flex-1 text-center py-2.5 transition-colors ${activeTab === 'prompts' ? 'text-[#38BDF8] border-b-2 border-[#38BDF8] bg-gray-900/30' : 'text-gray-500 hover:text-gray-300'}`}
             >
               Page Context
             </button>
@@ -244,11 +244,11 @@ export default function AICopilot() {
                         handleSend();
                       }
                     }}
-                    className="flex-1 px-3 py-2 bg-gray-950/80 border border-gray-850 rounded-lg text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#01FDF6]/50 transition-all font-sans"
+                    className="flex-1 px-3 py-2 bg-gray-950/80 border border-gray-850 rounded-lg text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#38BDF8]/50 transition-all font-sans"
                   />
                   <button 
                     onClick={() => handleSend()}
-                    className="p-2 bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] rounded-lg transition-all flex items-center justify-center"
+                    className="p-2 bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] rounded-lg transition-all flex items-center justify-center"
                   >
                     <Send size={14} />
                   </button>
@@ -259,7 +259,7 @@ export default function AICopilot() {
             {activeTab === 'approvals' && (
               <div className="approvals-list-panel flex flex-col gap-3">
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1 border-b border-gray-900 pb-2">
-                  <AlertCircle size={14} className="text-[#01FDF6]" />
+                  <AlertCircle size={14} className="text-[#38BDF8]" />
                   <span>HR & Financial authorizations require strict supervision.</span>
                 </div>
 
@@ -271,11 +271,11 @@ export default function AICopilot() {
                   approvals.map(app => (
                     <div key={app.id} className={`approval-card bg-gray-900/35 border border-gray-850 p-3 rounded-xl transition-all duration-200 ${app.status !== 'pending' ? 'opacity-45' : ''}`}>
                       <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${app.type === 'finance' ? 'bg-[#f1fa8c]/15 text-[#f1fa8c]' : 'bg-[#ff5555]/15 text-[#ff5555]'}`}>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${app.type === 'finance' ? 'bg-[#F59E0B]/15 text-[#F59E0B]' : 'bg-[#EF4444]/15 text-[#EF4444]'}`}>
                           {app.agent}
                         </span>
-                        {app.status === 'approved' && <span className="text-[10px] text-[#50fa7b] font-semibold">DISPATCHED</span>}
-                        {app.status === 'rejected' && <span className="text-[10px] text-[#ff5555] font-semibold">REJECTED</span>}
+                        {app.status === 'approved' && <span className="text-[10px] text-[#10B981] font-semibold">DISPATCHED</span>}
+                        {app.status === 'rejected' && <span className="text-[10px] text-[#EF4444] font-semibold">REJECTED</span>}
                       </div>
                       
                       <h4 className="text-white text-xs font-bold leading-tight mb-1">{app.title}</h4>
@@ -296,7 +296,7 @@ export default function AICopilot() {
                             </button>
                             <button 
                               onClick={() => executeApproval(app.id)}
-                              className="flex-1 py-1.5 bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-glow"
+                              className="flex-1 py-1.5 bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-glow"
                             >
                               <Check size={10} /> DISPATCH
                             </button>
@@ -312,13 +312,13 @@ export default function AICopilot() {
             {activeTab === 'prompts' && (
               <div className="contextual-prompts-panel flex flex-col gap-2">
                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
-                  <Command size={10} className="text-[#01FDF6]" /> Path: {location.pathname}
+                  <Command size={10} className="text-[#38BDF8]" /> Path: {location.pathname}
                 </div>
                 {activePrompts.map((p, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSend(p)}
-                    className="w-full text-left px-3 py-2.5 bg-gray-900/45 hover:bg-gray-850 border border-gray-850 hover:border-[#01FDF6]/40 text-gray-300 hover:text-[#01FDF6] text-xs font-semibold rounded-xl transition-all flex items-center justify-between"
+                    className="w-full text-left px-3 py-2.5 bg-gray-900/45 hover:bg-gray-850 border border-gray-850 hover:border-[#38BDF8]/40 text-gray-300 hover:text-[#38BDF8] text-xs font-semibold rounded-xl transition-all flex items-center justify-between"
                   >
                     <span>{p}</span>
                     <Sparkles size={11} className="text-gray-500" />

@@ -142,7 +142,7 @@
 
 .sidebar-item:hover {
   color: var(--primary);
-  background-color: rgba(55, 114, 255, 0.07);
+  background-color: var(--primary-bg);
 }
 
 .sidebar-item:hover svg {
@@ -151,7 +151,7 @@
 
 .sidebar-item.active {
   color: var(--primary);
-  background-color: rgba(55, 114, 255, 0.1);
+  background-color: var(--primary-bg);
   font-weight: 700;
 }
 
@@ -296,35 +296,31 @@
 
 /* Dark-mode: use cyan as active/primary colour for nav items */
 [data-theme="dark"] .sidebar-item:hover {
-  color: var(--brand-cyan);
-  background-color: rgba(1, 253, 246, 0.06);
+  color: var(--primary);
+  background-color: var(--primary-bg);
 }
 
 [data-theme="dark"] .sidebar-item.active {
-  color: var(--brand-cyan);
-  background-color: rgba(1, 253, 246, 0.08);
-}
-
-[data-theme="dark"] .sidebar-item.active svg {
-  filter: drop-shadow(0 0 6px rgba(1, 253, 246, 0.5));
+  color: var(--primary);
+  background-color: var(--primary-bg);
 }
 
 [data-theme="dark"] .sidebar-user-avatar {
-  background: linear-gradient(135deg, rgba(1, 253, 246, 0.15), rgba(138, 79, 255, 0.15));
-  color: var(--brand-cyan);
-  border-color: rgba(1, 253, 246, 0.2);
+  background: var(--primary-bg);
+  color: var(--primary);
+  border-color: rgba(96, 165, 250, 0.2);
 }
 
 [data-theme="dark"] .sidebar-collapse-btn:hover,
 [data-theme="dark"] .sidebar-logout-btn:hover {
-  background-color: rgba(1, 253, 246, 0.1);
-  color: var(--brand-cyan);
-  border-color: var(--brand-cyan);
+  background-color: var(--primary-bg);
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 [data-theme="dark"] .sidebar-item-badge {
-  background: rgba(1, 253, 246, 0.15);
-  color: var(--brand-cyan);
+  background: var(--primary-bg);
+  color: var(--primary);
 }
 .sidebar-section-label {
     padding: 14px 12px 4px;
@@ -377,7 +373,7 @@
 }
 
 .tenant-dropdown-menu {
-  background-color: #0c1224;
+  background-color: #0F172A;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   animation: modalSlideUp var(--transition-fast) ease-out;
@@ -480,7 +476,7 @@
 }
 
 .active-pinned {
-  border-left: 2px solid #01FDF6;
+  border-left: 2px solid #38BDF8;
   margin-left: 4px;
   background-color: rgba(1, 253, 246, 0.03);
 }

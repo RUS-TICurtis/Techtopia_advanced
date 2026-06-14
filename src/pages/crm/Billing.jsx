@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Receipt, Plus, X, DollarSign, Clock, FileText, AlertCircle } from 'lucide-react';
+import { useInvoices } from '../../hooks/useCrmData';
 import './Billing.css';
 
 const TABS     = ['All', 'Draft', 'Sent', 'Paid', 'Overdue'];
@@ -14,19 +15,42 @@ const statusColors = {
 };
 
 export default function Billing({ searchValue = '' }) {
-  const [invoices, setInvoices] = useState([]);
+  const { invoices = [], isLoading, createInvoice } = useInvoices();
   const [showModal, setShowModal] = useState(false);
   const [form, setForm]          = useState(emptyForm);
   const [activeTab, setActiveTab] = useState('All');
 
-  const total = (inv) => inv.items.reduce((s, i) => s + (Number(i.qty) * Number(i.rate) || 0), 0);
+  const total = (inv) => {
+    if (inv.amount) return inv.amount;
+    return (inv.items || []).reduce((s, i) => s + (Number(i.qty) * Number(i.rate || i.unitPrice || 0) || 0), 0);
+  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const num = `INV-${String(invoices.length + 1).padStart(4, '0')}`;
-    setInvoices(prev => [...prev, { ...form, id: Date.now(), number: num }]);
-    setForm(emptyForm);
-    setShowModal(false);
+    try {
+      const itemsPayload = form.items.map(item => ({
+        description: item.description,
+        qty: Number(item.qty) || 1,
+        unitPrice: Number(item.rate) || 0
+      }));
+      const calcTotal = itemsPayload.reduce((s, i) => s + (i.qty * i.unitPrice), 0);
+
+      await createInvoice({
+        client: form.client,
+        dueDate: form.dueDate || null,
+        status: form.status,
+        items: itemsPayload,
+        amount: calcTotal,
+        currency: 'USD',
+        taxRate: 0,
+        discount: 0
+      });
+      setForm(emptyForm);
+      setShowModal(false);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to create invoice.');
+    }
   };
 
   const addItem = () => setForm(f => ({ ...f, items: [...f.items, { description: '', qty: 1, rate: '' }] }));
@@ -36,7 +60,7 @@ export default function Billing({ searchValue = '' }) {
   }));
 
   const filtered = invoices.filter(inv => {
-    const matchesSearch = inv.client.toLowerCase().includes(searchValue.toLowerCase()) || inv.number.includes(searchValue);
+    const matchesSearch = inv.client.toLowerCase().includes(searchValue.toLowerCase()) || (inv.invoiceNumber || inv.number || '').includes(searchValue);
     const matchesTab = activeTab === 'All' || inv.status === activeTab;
     return matchesSearch && matchesTab;
   });
@@ -108,7 +132,7 @@ export default function Billing({ searchValue = '' }) {
             <tbody>
               {filtered.map(inv => (
                 <tr key={inv.id}>
-                  <td style={{ fontWeight: 600, color: 'var(--primary)' }}>{inv.number}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--primary)' }}>{inv.invoiceNumber || inv.number}</td>
                   <td>{inv.client}</td>
                   <td>${total(inv).toLocaleString()}</td>
                   <td>{inv.dueDate || '—'}</td>

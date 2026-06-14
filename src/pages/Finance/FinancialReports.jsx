@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import {
   BarChart2, Download, FileText, TrendingUp, Calendar, RefreshCw,
   BarChart, PieChart, Table, ChevronRight
@@ -12,19 +12,19 @@ import { useFinancialReport } from '../../hooks/useCrmData';
 import './Finance.css';
 
 const REPORT_TYPES = [
-  { id: 'pl', label: 'Profit & Loss', icon: TrendingUp, color: '#21FA90', desc: 'Income, expenses, and net profit' },
-  { id: 'bs', label: 'Balance Sheet', icon: Table, color: '#01FDF6', desc: 'Assets, liabilities, and equity' },
-  { id: 'cf', label: 'Cash Flow', icon: BarChart, color: '#8A4FFF', desc: 'Operating, investing, financing' },
-  { id: 'ar', label: 'Accounts Receivable', icon: FileText, color: '#E4FF1A', desc: 'Outstanding client balances' },
-  { id: 'ap', label: 'Accounts Payable', icon: FileText, color: '#FF47DA', desc: 'Outstanding vendor payments' },
+  { id: 'pl', label: 'Profit & Loss', icon: TrendingUp, color: '#10B981', desc: 'Income, expenses, and net profit' },
+  { id: 'bs', label: 'Balance Sheet', icon: Table, color: '#38BDF8', desc: 'Assets, liabilities, and equity' },
+  { id: 'cf', label: 'Cash Flow', icon: BarChart, color: '#6366F1', desc: 'Operating, investing, financing' },
+  { id: 'ar', label: 'Accounts Receivable', icon: FileText, color: '#F59E0B', desc: 'Outstanding client balances' },
+  { id: 'ap', label: 'Accounts Payable', icon: FileText, color: '#EF4444', desc: 'Outstanding vendor payments' },
   { id: 'tax', label: 'Tax Summary', icon: FileText, color: '#FF8C42', desc: 'VAT, income tax, withholding' },
 ];
 
 const ChartTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div style={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-        <p style={{ color: '#627496', fontWeight: 700, marginBottom: 4, fontSize: 10, textTransform: 'uppercase' }}>{label}</p>
+      <div style={{ background: '#1E293B', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
+        <p style={{ color: '#64748B', fontWeight: 700, marginBottom: 4, fontSize: 10, textTransform: 'uppercase' }}>{label}</p>
         {payload.map((e, i) => <p key={i} style={{ color: e.fill || e.color }}>{e.name}: {formatCurrency(Math.abs(e.value))}</p>)}
       </div>
     );
@@ -149,7 +149,7 @@ export default function FinancialReports() {
       {/* Loading overlay */}
       {isLoading ? (
         <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
         </div>
       ) : (
         <>
@@ -178,14 +178,14 @@ export default function FinancialReports() {
                           padding: '12px 12px',
                           fontWeight: ['subtotal', 'total'].includes(row.type) ? 700 : 400,
                           paddingLeft: row.type === 'expense' ? 32 : 12,
-                          color: row.type === 'total' ? '#21FA90' : row.type === 'subtotal' ? 'var(--text-title)' : 'var(--text-main)',
+                          color: row.type === 'total' ? '#10B981' : row.type === 'subtotal' ? 'var(--text-title)' : 'var(--text-main)',
                         }}>
                           {row.category}
                         </td>
                         <td style={{
                           padding: '12px 12px', textAlign: 'right',
                           fontWeight: ['subtotal', 'total'].includes(row.type) ? 700 : 400,
-                          color: row.amount < 0 ? 'var(--error)' : row.type === 'total' ? '#21FA90' : 'var(--text-main)',
+                          color: row.amount < 0 ? 'var(--error)' : row.type === 'total' ? '#10B981' : 'var(--text-main)',
                           fontFamily: 'var(--font-mono)',
                         }}>
                           {row.amount < 0 ? `(${formatCurrency(Math.abs(row.amount))})` : formatCurrency(row.amount)}
@@ -209,12 +209,12 @@ export default function FinancialReports() {
                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <RBarChart data={Array.isArray(cashFlowData) ? cashFlowData : []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                    <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 11 }} />
-                    <YAxis stroke="#3d4e6b" tick={{ fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
+                    <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 11 }} />
+                    <YAxis stroke="#475569" tick={{ fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
                     <Tooltip content={<ChartTooltip />} />
-                    <Bar dataKey="inflows" fill="#21FA90" radius={[4,4,0,0]} name="Inflow" />
-                    <Bar dataKey="outflows" fill="#FF47DA" radius={[4,4,0,0]} name="Outflow" />
-                    <Bar dataKey="net" fill="#8A4FFF" radius={[4,4,0,0]} name="Net Flow" />
+                    <Bar dataKey="inflows" fill="#10B981" radius={[4,4,0,0]} name="Inflow" />
+                    <Bar dataKey="outflows" fill="#EF4444" radius={[4,4,0,0]} name="Outflow" />
+                    <Bar dataKey="net" fill="#6366F1" radius={[4,4,0,0]} name="Net Flow" />
                   </RBarChart>
                 </ResponsiveContainer>
               </div>

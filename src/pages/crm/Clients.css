@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Techtopia CRM Hub - Clients Stylesheet
    ========================================================================== */
 
@@ -46,7 +46,7 @@
 
 [data-theme="dark"] .clients-tab.active {
   background: var(--brand-cyan);
-  color: #050d1b;
+  color: #0F172A;
   box-shadow: 0 4px 12px rgba(1, 253, 246, 0.25);
 }
 
@@ -61,7 +61,7 @@
 
 [data-theme="dark"] .clients-tab.active .clients-tab-count {
   background: rgba(0, 0, 0, 0.15);
-  color: #050d1b;
+  color: #0F172A;
 }
 
 .clients-tab:not(.active) .clients-tab-count {

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,9 +35,9 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 8 }}
                   transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className={`w-full ${sizeClasses[size]} bg-[#0f1629] border border-gray-800 rounded-xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto max-h-[90vh]`}
+                  className={`w-full ${sizeClasses[size]} bg-[#1E293B] border border-gray-800 rounded-xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto max-h-[90vh]`}
                 >
-                  <div className="flex justify-between items-center p-5 border-b border-gray-800/80 bg-[#0a0f1e]">
+                  <div className="flex justify-between items-center p-5 border-b border-gray-800/80 bg-[#0F172A]">
                     <Dialog.Title className="text-lg font-bold text-white font-display">
                       {title}
                     </Dialog.Title>

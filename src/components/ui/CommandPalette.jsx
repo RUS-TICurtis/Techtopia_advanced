@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { Command } from 'cmdk';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../../store/uiStore';
@@ -82,8 +82,8 @@ export default function CommandPalette() {
             {/* Quick Actions */}
             <Command.Group heading="Actions">
               <Command.Item onSelect={() => handleCommand(() => navigate('/ai'))}>
-                <Sparkles size={16} className="text-[#00e5ff]" />
-                <span className="text-[#00e5ff] font-medium">Ask AI Assistant</span>
+                <Sparkles size={16} className="text-[#38BDF8]" />
+                <span className="text-[#38BDF8] font-medium">Ask AI Assistant</span>
                 <kbd>A</kbd>
               </Command.Item>
               <Command.Item onSelect={() => handleCommand(() => navigate('/automations'))}>
@@ -91,7 +91,7 @@ export default function CommandPalette() {
                 <span>Configure Workflow Automations</span>
               </Command.Item>
               <Command.Item onSelect={() => handleCommand(() => navigate('/audit-logs'))}>
-                <ShieldAlert size={16} className="text-[#ff0055]" />
+                <ShieldAlert size={16} className="text-[#EF4444]" />
                 <span className="text-gray-300">View Security Audit Trail</span>
               </Command.Item>
               <Command.Item onSelect={() => handleCommand(() => navigate('/team'))}>

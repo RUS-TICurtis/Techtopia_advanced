@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import {
   Sparkles, Send, User, TrendingUp, TrendingDown, AlertTriangle,
   Lightbulb, Bot, RefreshCw, Copy, ThumbsUp, ThumbsDown,
@@ -11,28 +11,28 @@ import './Finance.css';
 // ── Static AI insights / snapshot ────────────────────────────────────────
 const INSIGHTS = [
   {
-    id: 1, type: 'warning', icon: AlertTriangle, color: '#E4FF1A',
+    id: 1, type: 'warning', icon: AlertTriangle, color: '#F59E0B',
     title: 'Invoice Collection Alert',
     body: '7 invoices totaling GH₵297,000 have been outstanding for 30+ days. Clients most at risk: DataVault Inc, CyberPulse, EcoLogistics.',
     action: 'View Overdue Invoices',
     path: '/finance/invoices',
   },
   {
-    id: 2, type: 'danger', icon: TrendingDown, color: '#FF47DA',
+    id: 2, type: 'danger', icon: TrendingDown, color: '#EF4444',
     title: 'Cashflow Projection Risk',
     body: 'Based on current collection velocity, projected cashflow shortfall of GH₵180,000 is expected in 27 days. Recommend accelerating collections.',
     action: 'View Cash Flow Report',
     path: '/finance/reports',
   },
   {
-    id: 3, type: 'info', icon: TrendingUp, color: '#21FA90',
+    id: 3, type: 'info', icon: TrendingUp, color: '#10B981',
     title: 'Revenue Milestone',
     body: 'December revenue of GH₵341,000 sets a new monthly record — 14.4% above the FY target. Net Revenue Retention hit 122%, indicating strong expansion revenue.',
     action: 'Revenue Analytics',
     path: '/finance/revenue',
   },
   {
-    id: 4, type: 'info', icon: Lightbulb, color: '#8A4FFF',
+    id: 4, type: 'info', icon: Lightbulb, color: '#6366F1',
     title: 'Budget Optimisation Opportunity',
     body: 'Marketing budget is 93.5% utilised with 4 weeks remaining in the quarter. Consider reallocation from Operations (41% utilised) to prevent overrun.',
     action: 'View Budgets',
@@ -180,8 +180,8 @@ export default function AIFinanceAgent() {
     <div className="page-container">
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(1,253,246,0.12)', border: '2px solid #01FDF6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Sparkles size={22} style={{ color: '#01FDF6' }} />
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(1,253,246,0.12)', border: '2px solid #38BDF8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Sparkles size={22} style={{ color: '#38BDF8' }} />
           </div>
           <div>
             <h1 className="page-title" style={{ marginBottom: 2 }}>AI Finance Assistant</h1>
@@ -215,7 +215,7 @@ export default function AIFinanceAgent() {
                 <div key={msg.id} className={`finance-ai-message ${msg.role}`}>
                   <div className="finance-ai-avatar" style={{
                     background: msg.role === 'agent' ? 'rgba(1,253,246,0.15)' : 'rgba(138,79,255,0.2)',
-                    color: msg.role === 'agent' ? '#01FDF6' : '#8A4FFF',
+                    color: msg.role === 'agent' ? '#38BDF8' : '#6366F1',
                   }}>
                     {msg.role === 'agent' ? <Sparkles size={16} /> : <User size={16} />}
                   </div>
@@ -237,14 +237,14 @@ export default function AIFinanceAgent() {
               ))}
               {agentLoading && (
                 <div className="finance-ai-message agent">
-                  <div className="finance-ai-avatar" style={{ background: 'rgba(1,253,246,0.15)', color: '#01FDF6' }}>
+                  <div className="finance-ai-avatar" style={{ background: 'rgba(1,253,246,0.15)', color: '#38BDF8' }}>
                     <Sparkles size={16} />
                   </div>
                   <div className="finance-ai-bubble">
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                       {[0, 1, 2].map(i => (
                         <span key={i} style={{
-                          width: 6, height: 6, borderRadius: '50%', background: '#01FDF6',
+                          width: 6, height: 6, borderRadius: '50%', background: '#38BDF8',
                           animation: `bounce 1.2s ${i * 0.2}s ease-in-out infinite`,
                           display: 'inline-block',
                         }} />
@@ -289,7 +289,7 @@ export default function AIFinanceAgent() {
                       background: 'transparent', color: 'var(--text-muted)', fontSize: 12,
                       cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', lineHeight: 1.4
                     }}
-                    onMouseEnter={e => { e.target.style.borderColor = '#01FDF6'; e.target.style.color = 'var(--text-main)'; }}
+                    onMouseEnter={e => { e.target.style.borderColor = '#38BDF8'; e.target.style.color = 'var(--text-main)'; }}
                     onMouseLeave={e => { e.target.style.borderColor = 'var(--border-light)'; e.target.style.color = 'var(--text-muted)'; }}
                   >{q}</button>
                 ))}
@@ -300,11 +300,11 @@ export default function AIFinanceAgent() {
             <div className="card" style={{ marginTop: 0 }}>
               <div className="card-title" style={{ fontSize: 12, marginBottom: 12 }}>Capabilities</div>
               {[
-                { icon: BarChart3, label: 'Revenue Analysis', color: '#01FDF6' },
-                { icon: FileText, label: 'Invoice Intelligence', color: '#21FA90' },
-                { icon: CreditCard, label: 'Payment Insights', color: '#8A4FFF' },
-                { icon: DollarSign, label: 'Budget Advisory', color: '#E4FF1A' },
-                { icon: TrendingUp, label: 'Forecasting', color: '#FF47DA' },
+                { icon: BarChart3, label: 'Revenue Analysis', color: '#38BDF8' },
+                { icon: FileText, label: 'Invoice Intelligence', color: '#10B981' },
+                { icon: CreditCard, label: 'Payment Insights', color: '#6366F1' },
+                { icon: DollarSign, label: 'Budget Advisory', color: '#F59E0B' },
+                { icon: TrendingUp, label: 'Forecasting', color: '#EF4444' },
               ].map(cap => {
                 const Icon = cap.icon;
                 return (
@@ -324,10 +324,10 @@ export default function AIFinanceAgent() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
             {[
-              { label: 'AI Scans Today', value: '24', icon: Sparkles, color: '#01FDF6' },
-              { label: 'Risks Flagged', value: '3', icon: AlertTriangle, color: '#E4FF1A' },
-              { label: 'Actions Suggested', value: '7', icon: Lightbulb, color: '#8A4FFF' },
-              { label: 'Last Sync', value: '2 min ago', icon: Clock, color: '#21FA90' },
+              { label: 'AI Scans Today', value: '24', icon: Sparkles, color: '#38BDF8' },
+              { label: 'Risks Flagged', value: '3', icon: AlertTriangle, color: '#F59E0B' },
+              { label: 'Actions Suggested', value: '7', icon: Lightbulb, color: '#6366F1' },
+              { label: 'Last Sync', value: '2 min ago', icon: Clock, color: '#10B981' },
             ].map(m => {
               const Icon = m.icon;
               return (
@@ -369,7 +369,7 @@ export default function AIFinanceAgent() {
       {activeTab === 'forecast' && (
         <div className="card">
           <div className="card-title">
-            <span className="flex items-center gap-2"><Sparkles size={16} style={{ color: '#01FDF6' }} /> AI Revenue Forecast — Next 3 Months</span>
+            <span className="flex items-center gap-2"><Sparkles size={16} style={{ color: '#38BDF8' }} /> AI Revenue Forecast — Next 3 Months</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 24 }}>
             {[
@@ -379,10 +379,10 @@ export default function AIFinanceAgent() {
             ].map(f => (
               <div key={f.month} className="finance-metric-mini" style={{ border: '1px solid var(--border-light)' }}>
                 <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 8 }}>{f.month}</p>
-                <p style={{ fontSize: 24, fontWeight: 900, color: '#21FA90', fontFamily: 'var(--font-display)' }}>{formatCurrency(f.forecast)}</p>
+                <p style={{ fontSize: 24, fontWeight: 900, color: '#10B981', fontFamily: 'var(--font-display)' }}>{formatCurrency(f.forecast)}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
                   <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)' }}>
-                    <div style={{ height: '100%', width: `${f.confidence}%`, background: '#21FA90', borderRadius: 'var(--radius-full)' }} />
+                    <div style={{ height: '100%', width: `${f.confidence}%`, background: '#10B981', borderRadius: 'var(--radius-full)' }} />
                   </div>
                   <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{f.confidence}% confidence</span>
                 </div>
@@ -391,7 +391,7 @@ export default function AIFinanceAgent() {
           </div>
           <div style={{ padding: '16px', background: 'rgba(1,253,246,0.05)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(1,253,246,0.15)' }}>
             <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-              <Sparkles size={16} style={{ color: '#01FDF6', flexShrink: 0, marginTop: 2 }} />
+              <Sparkles size={16} style={{ color: '#38BDF8', flexShrink: 0, marginTop: 2 }} />
               <div>
                 <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-title)', marginBottom: 6 }}>AI Forecast Methodology</p>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>

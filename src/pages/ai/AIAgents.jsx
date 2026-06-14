@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
@@ -17,7 +17,7 @@ export default function AIAgents() {
       name: 'Sales Orchestration Agent',
       codeName: 'APEX-SALES',
       icon: TrendingUp,
-      color: '#ff79c6',
+      color: '#EC4899',
       active: true,
       role: 'Lead qualification, automated reminder follow-ups, win-probability forecasting',
       cognitiveLoad: 75,
@@ -31,7 +31,7 @@ export default function AIAgents() {
       name: 'Omni-Support Agent',
       codeName: 'SENTINEL-SUPPORT',
       icon: LifeBuoy,
-      color: '#8be9fd',
+      color: '#38BDF8',
       active: true,
       role: 'Ticket auto-classification, SLA escalation flags, sentiment analysis, drafts generation',
       cognitiveLoad: 60,
@@ -45,7 +45,7 @@ export default function AIAgents() {
       name: 'Autonomous Ledger Agent',
       codeName: 'EQUILIBRIUM-FINANCE',
       icon: Receipt,
-      color: '#f1fa8c',
+      color: '#F59E0B',
       active: true,
       role: 'Invoice follow-ups, payment risk alerts, travel expense anomaly audits',
       cognitiveLoad: 90,
@@ -59,7 +59,7 @@ export default function AIAgents() {
       name: 'Personnel & Ops Agent',
       codeName: 'SYNERGY-HR',
       icon: Users,
-      color: '#ff5555',
+      color: '#EF4444',
       active: false,
       role: 'Onboarding scheduling, leave calendar conflict resolution, review drafts compiler',
       cognitiveLoad: 10,
@@ -73,7 +73,7 @@ export default function AIAgents() {
       name: 'Governance & Security Agent',
       codeName: 'AEGIS-ADMIN',
       icon: ShieldCheck,
-      color: '#ff0055',
+      color: '#EF4444',
       active: true,
       role: 'Access control matrices audits, suspicious login checks, user lifecycle cleaner',
       cognitiveLoad: 45,
@@ -87,7 +87,7 @@ export default function AIAgents() {
       name: 'Semantic Knowledge Agent',
       codeName: 'COGNITIVE-WIKI',
       icon: BookOpen,
-      color: '#ae81ff',
+      color: '#6366F1',
       active: true,
       role: 'Wiki embeddings indexer, corporate SOP search mapping, meeting transcripts extraction',
       cognitiveLoad: 80,
@@ -160,7 +160,7 @@ export default function AIAgents() {
       <PageHeader 
         title="AI Workforce Orchestrator"
         subtitle="Provision, configure, and monitor autonomous specialized agents across departments"
-        icon={<span className="text-[#01FDF6]">⚡</span>}
+        icon={<span className="text-[#38BDF8]">⚡</span>}
         actions={
           <button 
             onClick={handleRefresh} 
@@ -174,36 +174,36 @@ export default function AIAgents() {
       {/* Overview Analytics Cards */}
       <div className="metrics-grid mb-6">
         <div className="card metric-card premium-metric" style={{ background: 'linear-gradient(135deg, rgba(1, 253, 246, 0.15) 0%, rgba(55, 114, 255, 0.05) 100%)', borderColor: 'rgba(1, 253, 246, 0.15)' }}>
-          <div className="metric-icon-wrapper bg-[#01FDF6]/10">
-            <Cpu size={22} className="text-[#01FDF6]" />
+          <div className="metric-icon-wrapper bg-[#38BDF8]/10">
+            <Cpu size={22} className="text-[#38BDF8]" />
           </div>
           <div className="metric-info">
             <span className="metric-label">Active Autonomous Cores</span>
             <span className="metric-value font-display font-black text-white">{getActiveCount()} / {agents.length}</span>
           </div>
-          <div className="metric-glow-dot bg-[#01FDF6]"></div>
+          <div className="metric-glow-dot bg-[#38BDF8]"></div>
         </div>
 
         <div className="card metric-card premium-metric" style={{ background: 'linear-gradient(135deg, rgba(189, 147, 249, 0.15) 0%, rgba(255, 71, 218, 0.05) 100%)', borderColor: 'rgba(189, 147, 249, 0.15)' }}>
-          <div className="metric-icon-wrapper bg-[#bd93f9]/10">
-            <Sliders size={22} className="text-[#bd93f9]" />
+          <div className="metric-icon-wrapper bg-[#6366F1]/10">
+            <Sliders size={22} className="text-[#6366F1]" />
           </div>
           <div className="metric-info">
             <span className="metric-label">Average Cognitive Workload</span>
             <span className="metric-value font-display font-black text-white">{avgLoad}%</span>
           </div>
-          <div className="metric-glow-dot bg-[#bd93f9]"></div>
+          <div className="metric-glow-dot bg-[#6366F1]"></div>
         </div>
 
         <div className="card metric-card premium-metric" style={{ background: 'linear-gradient(135deg, rgba(80, 250, 123, 0.15) 0%, rgba(1, 253, 246, 0.05) 100%)', borderColor: 'rgba(80, 250, 123, 0.15)' }}>
-          <div className="metric-icon-wrapper bg-[#50fa7b]/10">
-            <CheckCircle2 size={22} className="text-[#50fa7b]" />
+          <div className="metric-icon-wrapper bg-[#10B981]/10">
+            <CheckCircle2 size={22} className="text-[#10B981]" />
           </div>
           <div className="metric-info">
             <span className="metric-label">Mean Platform Accuracy</span>
             <span className="metric-value font-display font-black text-white">99.1%</span>
           </div>
-          <div className="metric-glow-dot bg-[#50fa7b]"></div>
+          <div className="metric-glow-dot bg-[#10B981]"></div>
         </div>
       </div>
 
@@ -251,7 +251,7 @@ export default function AIAgents() {
                       value={agent.cognitiveLoad} 
                       disabled={!agent.active}
                       onChange={(e) => handleSliderChange(agent.id, parseInt(e.target.value))}
-                      className="w-full h-1 bg-gray-950 rounded-lg appearance-none cursor-pointer accent-[#01FDF6]"
+                      className="w-full h-1 bg-gray-950 rounded-lg appearance-none cursor-pointer accent-[#38BDF8]"
                     />
                   </div>
 
@@ -277,21 +277,21 @@ export default function AIAgents() {
           {/* Workload Analysis visual chart */}
           <div className="card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex flex-col">
             <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Cpu size={14} className="text-[#01FDF6]" /> Workload Analysis
+              <Cpu size={14} className="text-[#38BDF8]" /> Workload Analysis
             </h4>
             
             <div className="svg-chart-container h-36 flex items-center justify-center bg-gray-950/40 rounded-xl border border-gray-900 relative overflow-hidden p-2">
               <svg viewBox="0 0 200 100" className="w-full h-full">
                 <defs>
                   <linearGradient id="glowGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#01FDF6" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#01FDF6" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 <path 
                   d={`M 10 90 Q 50 ${90 - totalLoad*0.2} 100 ${90 - totalLoad*0.3} T 190 ${90 - avgLoad*0.6}`} 
                   fill="none" 
-                  stroke="#01FDF6" 
+                  stroke="#38BDF8" 
                   strokeWidth="2.5" 
                   className="stroke-glow" 
                 />
@@ -300,8 +300,8 @@ export default function AIAgents() {
                   fill="url(#glowGrad)" 
                 />
                 {/* Reference dots */}
-                <circle cx="100" cy={90 - totalLoad*0.3} r="3.5" fill="#01FDF6" />
-                <circle cx="190" cy={90 - avgLoad*0.6} r="3.5" fill="#ff79c6" />
+                <circle cx="100" cy={90 - totalLoad*0.3} r="3.5" fill="#38BDF8" />
+                <circle cx="190" cy={90 - avgLoad*0.6} r="3.5" fill="#EC4899" />
               </svg>
               <div className="absolute bottom-2 left-3 text-[9px] text-gray-500 font-mono">Neural capacity sync: 100%</div>
             </div>
@@ -310,7 +310,7 @@ export default function AIAgents() {
           {/* Core Logs Console Panel */}
           <div className="card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex-1 flex flex-col min-h-[250px]">
             <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <ShieldAlert size={14} className="text-[#ff0055]" /> Neural Audit Stream
+              <ShieldAlert size={14} className="text-[#EF4444]" /> Neural Audit Stream
             </h4>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 flex flex-col gap-2.5 font-mono text-[10px]">
@@ -318,7 +318,7 @@ export default function AIAgents() {
                 <div key={log.id} className="log-line border-b border-gray-950 pb-2 flex flex-col gap-1">
                   <div className="flex items-center justify-between text-gray-500">
                     <span className="text-gray-600">[{log.timestamp}]</span>
-                    <span className="font-bold" style={{ color: log.status === 'success' ? '#50fa7b' : log.status === 'warning' ? '#f1fa8c' : '#ff5555' }}>
+                    <span className="font-bold" style={{ color: log.status === 'success' ? '#10B981' : log.status === 'warning' ? '#F59E0B' : '#EF4444' }}>
                       {log.agent}
                     </span>
                   </div>

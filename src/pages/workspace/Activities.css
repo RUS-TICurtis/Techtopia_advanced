@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Techtopia CRM Hub - Activities Stream Stylesheet
    Design Spec: Premium Dark/Light Glassmorphism Timeline
    ========================================================================== */
@@ -44,7 +44,7 @@
 [data-theme="dark"] .activities-filter-btn.active {
   background-color: var(--brand-cyan);
   border-color: var(--brand-cyan);
-  color: #050d1b;
+  color: #0F172A;
   box-shadow: 0 4px 14px rgba(1, 253, 246, 0.3);
 }
 

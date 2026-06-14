@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldAlert, ArrowLeft, Home, Sparkles } from 'lucide-react';
 import './Unauthorized.css';
@@ -26,7 +26,7 @@ export default function Unauthorized() {
     <div className="unauthorized-page-wrapper">
       <div className="unauthorized-card glassmorphism animate-fade-in">
         {/* Glowing Shield Icon */}
-        <div className="shield-icon-glow bg-[#FF47DA]/10 border border-[#FF47DA]/35 text-[#FF47DA]">
+        <div className="shield-icon-glow bg-[#EF4444]/10 border border-[#EF4444]/35 text-[#EF4444]">
           <ShieldAlert size={36} className="animate-pulse" />
         </div>
 
@@ -39,12 +39,12 @@ export default function Unauthorized() {
         </p>
 
         {/* Dynamic Countdown Info */}
-        <div className="countdown-container mt-4 px-4 py-2.5 bg-[#FF47DA]/5 border border-[#FF47DA]/10 rounded-xl max-w-[280px] mx-auto">
+        <div className="countdown-container mt-4 px-4 py-2.5 bg-[#EF4444]/5 border border-[#EF4444]/10 rounded-xl max-w-[280px] mx-auto">
           <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center justify-center gap-1.5">
-            <Sparkles size={11} className="text-[#FF47DA]" />
+            <Sparkles size={11} className="text-[#EF4444]" />
             Relocating to Hub Sector
           </span>
-          <div className="font-mono text-xl font-black text-[#FF47DA] mt-1">
+          <div className="font-mono text-xl font-black text-[#EF4444] mt-1">
             0:0{countdown}
           </div>
         </div>
@@ -53,7 +53,7 @@ export default function Unauthorized() {
         <div className="actions-row mt-6 flex flex-col gap-2.5 max-w-[280px] mx-auto">
           <button 
             onClick={() => navigate('/')} 
-            className="btn btn-primary w-full py-3 text-xs flex items-center justify-center gap-2 bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] font-bold shadow-glow"
+            className="btn btn-primary w-full py-3 text-xs flex items-center justify-center gap-2 bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
           >
             <Home size={14} />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useAuditLogs } from '../../hooks/useCrmData';
 import { Search, ShieldAlert, ArrowDownToLine, RefreshCw } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
@@ -61,7 +61,7 @@ export default function AuditLogs() {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <ShieldAlert className="text-[#FF47DA]" />
+            <ShieldAlert className="text-[#EF4444]" />
             Security & Audit Trail
           </h1>
           <p className="page-subtitle">

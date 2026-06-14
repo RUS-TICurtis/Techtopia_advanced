@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FileSignature, Plus, X, Upload, FileText, CheckCircle, Clock, Edit3 } from 'lucide-react';
+import { useContracts } from '../../hooks/useCrmData';
 import './Contracts.css';
 
 const TYPES   = ['Service Agreement', 'NDA', 'SOW', 'Employment', 'Vendor', 'Other'];
@@ -17,7 +18,7 @@ const statusColors = {
 const STATUSES = ['Draft', 'Pending Signature', 'Signed', 'Expired'];
 
 export default function Contracts({ searchValue = '' }) {
-  const [contracts, setContracts] = useState([]);
+  const { contracts = [], isLoading, createContract } = useContracts();
   const [showModal, setShowModal]  = useState(false);
   const [form, setForm]            = useState(emptyForm);
   const fileRef                    = useRef();
@@ -40,16 +41,31 @@ export default function Contracts({ searchValue = '' }) {
     if (file) setForm(f => ({ ...f, file, fileName: file.name }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setContracts(prev => [...prev, { ...form, id: Date.now() }]);
-    setForm(emptyForm);
-    setShowModal(false);
+    try {
+      await createContract({
+        title: form.title,
+        client: form.client,
+        type: form.type,
+        startDate: form.startDate || null,
+        endDate: form.endDate || null,
+        status: form.status,
+        value: 5000.0,
+        contractNumber: `CON-${String(contracts.length + 1).padStart(4, '0')}`,
+        slaTerms: form.notes || ''
+      });
+      setForm(emptyForm);
+      setShowModal(false);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to create contract.');
+    }
   };
 
   const filtered = contracts.filter(c =>
-    c.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-    c.client.toLowerCase().includes(searchValue.toLowerCase())
+    (c.title || '').toLowerCase().includes(searchValue.toLowerCase()) ||
+    (c.client || '').toLowerCase().includes(searchValue.toLowerCase())
   );
 
   return (
@@ -102,7 +118,7 @@ export default function Contracts({ searchValue = '' }) {
                 <tr key={c.id}>
                   <td style={{ fontWeight: 600 }}>{c.title}</td>
                   <td>{c.client}</td>
-                  <td>{c.type}</td>
+                  <td>{c.type || 'Service Agreement'}</td>
                   <td>{c.startDate || '—'}</td>
                   <td>{c.endDate || '—'}</td>
                   <td>

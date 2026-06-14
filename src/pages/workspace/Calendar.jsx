@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock, Users, Video, X } from 'lucide-react';
 import { useTasks } from '../../hooks/useCrmData';
 import { showToast } from '../../components/ui/Toast';
@@ -53,8 +53,8 @@ export default function Calendar() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center min-h-[300px] bg-[#0f1629]/20 border border-gray-800 rounded-2xl">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="flex items-center justify-center min-h-[300px] bg-[#1E293B]/20 border border-gray-800 rounded-2xl">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
         </div>
       ) : (
         <div className="calendar-layout">
@@ -100,10 +100,10 @@ export default function Calendar() {
                   <span className="text-xs text-gray-500 italic">No scheduled activities</span>
                 ) : (
                   tasks.slice(0, 5).map(task => (
-                    <div key={task.id} className="schedule-card p-3 border border-gray-800/80 bg-[#0f1629]/40 rounded-xl">
+                    <div key={task.id} className="schedule-card p-3 border border-gray-800/80 bg-[#1E293B]/40 rounded-xl">
                       <div className="schedule-card-title text-sm font-bold text-white">{task.name || task.title}</div>
                       <div className="schedule-card-meta text-xs text-gray-400 mt-1 flex items-center gap-1.5">
-                        <Clock size={12} className="text-[#01FDF6]" />
+                        <Clock size={12} className="text-[#38BDF8]" />
                         <span>Due: {task.dueDate || task.date || 'No Date'}</span>
                       </div>
                       <div className="schedule-card-type text-[10px] text-gray-500 mt-2 flex items-center gap-1">

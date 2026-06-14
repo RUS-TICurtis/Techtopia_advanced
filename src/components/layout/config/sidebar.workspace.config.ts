@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   LayoutDashboard, Sparkles, Bell, Clock, Search, ShieldCheck,
   TrendingUp, Users, Building2, UserCircle2, GitBranch, FileText, FileSignature,
   DollarSign, BarChart3, Receipt, LifeBuoy, MessageSquare, Zap, ShieldAlert, Settings,
@@ -22,18 +22,18 @@ export interface WorkspaceItem {
 }
 
 export const WORKSPACE_GROUPS: WorkspaceGroup[] = [
-  { id: 'core', label: 'Core Platform', icon: LayoutDashboard, color: '#01FDF6' },
-  { id: 'crm', label: 'CRM Lifecycle', icon: UserCircle2, color: '#bd93f9' },
-  { id: 'sales', label: 'Sales & Revenue', icon: TrendingUp, color: '#ff79c6' },
-  { id: 'support', label: 'Customer Support', icon: LifeBuoy, color: '#8be9fd' },
-  { id: 'marketing', label: 'Marketing Hub', icon: Mail, color: '#ffb86c' },
-  { id: 'projects', label: 'Projects & Sprints', icon: FolderKanban, color: '#50fa7b' },
-  { id: 'hr', label: 'HR & Operations', icon: Users, color: '#ff5555' },
-  { id: 'finance', label: 'Finance & Ledger', icon: Receipt, color: '#f1fa8c' },
-  { id: 'communications', label: 'Omnichannel Chat', icon: MessageSquare, color: '#a6e22e' },
-  { id: 'documents', label: 'Shared Documents', icon: FileSignature, color: '#ae81ff' },
-  { id: 'ai', label: 'AI & Automation', icon: Zap, color: '#01FDF6' },
-  { id: 'admin', label: 'Access & Governance', icon: ShieldCheck, color: '#ff0055' },
+  { id: 'core', label: 'Core Platform', icon: LayoutDashboard, color: '#38BDF8' },
+  { id: 'crm', label: 'CRM Lifecycle', icon: UserCircle2, color: '#6366F1' },
+  { id: 'sales', label: 'Sales & Revenue', icon: TrendingUp, color: '#EC4899' },
+  { id: 'support', label: 'Customer Support', icon: LifeBuoy, color: '#38BDF8' },
+  { id: 'marketing', label: 'Marketing Hub', icon: Mail, color: '#FB923C' },
+  { id: 'projects', label: 'Projects & Sprints', icon: FolderKanban, color: '#10B981' },
+  { id: 'hr', label: 'HR & Operations', icon: Users, color: '#EF4444' },
+  { id: 'finance', label: 'Finance & Ledger', icon: Receipt, color: '#F59E0B' },
+  { id: 'communications', label: 'Omnichannel Chat', icon: MessageSquare, color: '#10B981' },
+  { id: 'documents', label: 'Shared Documents', icon: FileSignature, color: '#6366F1' },
+  { id: 'ai', label: 'AI & Automation', icon: Zap, color: '#38BDF8' },
+  { id: 'admin', label: 'Access & Governance', icon: ShieldCheck, color: '#EF4444' },
 ];
 
 export const WORKSPACE_ITEMS: WorkspaceItem[] = [

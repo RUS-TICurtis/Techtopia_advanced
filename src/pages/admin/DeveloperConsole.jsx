@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
@@ -95,7 +95,7 @@ export default function DeveloperConsole() {
       <PageHeader 
         title="Developer API & Integrations"
         subtitle="Manage secure authorization tokens, visual webhooks subscriptions, and access pre-integrated third-party market connectors"
-        icon={<KeyRound className="text-[#01FDF6]" />}
+        icon={<KeyRound className="text-[#38BDF8]" />}
       />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 flex-grow min-h-0">
@@ -106,7 +106,7 @@ export default function DeveloperConsole() {
           {/* Key Generator Form */}
           <div className="card bg-gray-900/35 border border-gray-850 p-4 rounded-xl">
             <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <KeyRound size={14} className="text-[#01FDF6]" /> Scoped Access Tokens Creator
+              <KeyRound size={14} className="text-[#38BDF8]" /> Scoped Access Tokens Creator
             </h4>
             
             <form onSubmit={handleGenerateToken} className="flex flex-col gap-3">
@@ -118,7 +118,7 @@ export default function DeveloperConsole() {
                   value={newTokenName}
                   onChange={(e) => setNewTokenName(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-gray-950 border border-gray-850 rounded-lg text-white text-xs focus:outline-none focus:border-[#01FDF6]"
+                  className="w-full px-3 py-2 bg-gray-950 border border-gray-850 rounded-lg text-white text-xs focus:outline-none focus:border-[#38BDF8]"
                 />
               </div>
 
@@ -134,7 +134,7 @@ export default function DeveloperConsole() {
                           prev.includes(sc) ? prev.filter(s => s !== sc) : [...prev, sc]
                         );
                       }}
-                      className={`text-[9px] px-2 py-1 rounded-full border transition-all ${selectedScopes.includes(sc) ? 'bg-[#01FDF6]/15 border-[#01FDF6]/45 text-[#01FDF6] font-bold' : 'bg-gray-950 border-gray-850 text-gray-500'}`}
+                      className={`text-[9px] px-2 py-1 rounded-full border transition-all ${selectedScopes.includes(sc) ? 'bg-[#38BDF8]/15 border-[#38BDF8]/45 text-[#38BDF8] font-bold' : 'bg-gray-950 border-gray-850 text-gray-500'}`}
                     >
                       {sc}
                     </button>
@@ -144,7 +144,7 @@ export default function DeveloperConsole() {
 
               <button 
                 type="submit"
-                className="w-full py-2 bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-glow mt-1"
+                className="w-full py-2 bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 shadow-glow mt-1"
               >
                 <Plus size={12} /> Generate Access Key
               </button>
@@ -154,7 +154,7 @@ export default function DeveloperConsole() {
           {/* Tokens List */}
           <div className="card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex-grow overflow-y-auto custom-scrollbar max-h-[300px]">
             <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <CheckCircle size={14} className="text-[#50fa7b]" /> Scoped Active Credentials
+              <CheckCircle size={14} className="text-[#10B981]" /> Scoped Active Credentials
             </h4>
             
             <div className="flex flex-col gap-3">
@@ -167,7 +167,7 @@ export default function DeveloperConsole() {
                     </div>
                     <button 
                       onClick={() => handleDeleteToken(tok.id)}
-                      className="text-gray-600 hover:text-[#ff5555] transition-colors"
+                      className="text-gray-600 hover:text-[#EF4444] transition-colors"
                       title="Revoke Token"
                     >
                       <Trash2 size={12} />
@@ -181,13 +181,13 @@ export default function DeveloperConsole() {
                       className="text-gray-500 hover:text-white"
                       title="Copy Key"
                     >
-                      {copiedTokenId === tok.id ? <Check size={11} className="text-[#50fa7b]" /> : <Copy size={11} />}
+                      {copiedTokenId === tok.id ? <Check size={11} className="text-[#10B981]" /> : <Copy size={11} />}
                     </button>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mt-1">
                     {tok.scopes.map(s => (
-                      <span key={s} className="bg-[#bd93f9]/10 text-[#bd93f9] border border-[#bd93f9]/20 text-[8px] px-1.5 py-0.5 rounded font-mono font-semibold">
+                      <span key={s} className="bg-[#6366F1]/10 text-[#6366F1] border border-[#6366F1]/20 text-[8px] px-1.5 py-0.5 rounded font-mono font-semibold">
                         {s}
                       </span>
                     ))}
@@ -205,8 +205,8 @@ export default function DeveloperConsole() {
             {integrations.map(int => (
               <div 
                 key={int.id} 
-                className={`integration-card premium-card border-l-4 p-4 rounded-xl flex flex-col relative overflow-hidden bg-gray-900/35 border ${int.status === 'disconnected' ? 'opacity-55 border-gray-850' : 'border-[#01FDF6]/45 bg-gray-900/60'}`}
-                style={{ borderLeftColor: int.status === 'connected' ? '#01FDF6' : 'rgba(255,255,255,0.05)' }}
+                className={`integration-card premium-card border-l-4 p-4 rounded-xl flex flex-col relative overflow-hidden bg-gray-900/35 border ${int.status === 'disconnected' ? 'opacity-55 border-gray-850' : 'border-[#38BDF8]/45 bg-gray-900/60'}`}
+                style={{ borderLeftColor: int.status === 'connected' ? '#38BDF8' : 'rgba(255,255,255,0.05)' }}
               >
                 <div className="flex justify-between items-start gap-4 mb-2">
                   <div>
@@ -216,7 +216,7 @@ export default function DeveloperConsole() {
                   <button 
                     onClick={() => toggleIntegration(int.id)}
                     className="cursor-pointer text-gray-600 hover:text-white transition-colors"
-                    style={{ color: int.status === 'connected' ? '#01FDF6' : 'var(--text-muted)' }}
+                    style={{ color: int.status === 'connected' ? '#38BDF8' : 'var(--text-muted)' }}
                   >
                     {int.status === 'connected' ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
                   </button>
@@ -232,7 +232,7 @@ export default function DeveloperConsole() {
                   </div>
                   <div className="flex flex-col text-right font-mono text-[9px] text-gray-400">
                     <span className="text-gray-600 uppercase font-semibold text-[8px]">Dispatch Latency</span>
-                    <span style={{ color: int.status === 'connected' ? '#50fa7b' : 'var(--text-muted)' }}>{int.latency}</span>
+                    <span style={{ color: int.status === 'connected' ? '#10B981' : 'var(--text-muted)' }}>{int.latency}</span>
                   </div>
                 </div>
               </div>

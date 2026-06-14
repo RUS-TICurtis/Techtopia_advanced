@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
@@ -101,7 +101,7 @@ export default function SuperAdminOversight() {
             <span className="pulsing-red-dot"></span>
             <div className="text-xs font-mono">
               <span className="font-bold text-red-500 uppercase tracking-wider mr-2">SECURE IMPERSONATION ACTIVE:</span> 
-              Viewing workspace as Admin for <span className="text-[#01FDF6] font-bold">{impersonatingTenant?.name}</span>. All actions are logged under SOC2 audit claims.
+              Viewing workspace as Admin for <span className="text-[#38BDF8] font-bold">{impersonatingTenant?.name}</span>. All actions are logged under SOC2 audit claims.
             </div>
           </div>
           <button onClick={handleStopImpersonate} className="stop-impersonate-btn">
@@ -113,14 +113,14 @@ export default function SuperAdminOversight() {
       <PageHeader 
         title="Super Admin Oversight"
         subtitle="Global tenant operations, subscription controls, storage quotas, and SOC2 Break-Glass diagnostic impersonations"
-        icon={<ShieldCheck className="text-[#ff0055]" />}
+        icon={<ShieldCheck className="text-[#EF4444]" />}
       />
 
       {/* Global Threat Center & Server Monitor */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
           <div className="icon-box p-3 bg-red-950/20 border border-red-900/30 rounded-xl">
-            <ShieldAlert size={20} className="text-[#ff0055]" />
+            <ShieldAlert size={20} className="text-[#EF4444]" />
           </div>
           <div>
             <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Threat Level</div>
@@ -129,8 +129,8 @@ export default function SuperAdminOversight() {
         </div>
 
         <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
-          <div className="icon-box p-3 bg-[#01FDF6]/10 border border-[#01FDF6]/20 rounded-xl">
-            <Globe size={20} className="text-[#01FDF6]" />
+          <div className="icon-box p-3 bg-[#38BDF8]/10 border border-[#38BDF8]/20 rounded-xl">
+            <Globe size={20} className="text-[#38BDF8]" />
           </div>
           <div>
             <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Blocked IP Vectors</div>
@@ -140,7 +140,7 @@ export default function SuperAdminOversight() {
 
         <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
           <div className="icon-box p-3 bg-green-950/20 border border-green-900/30 rounded-xl">
-            <Server size={20} className="text-[#50fa7b]" />
+            <Server size={20} className="text-[#10B981]" />
           </div>
           <div>
             <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Core Cluster Uptime</div>
@@ -150,7 +150,7 @@ export default function SuperAdminOversight() {
 
         <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
           <div className="icon-box p-3 bg-purple-950/20 border border-purple-900/30 rounded-xl">
-            <Activity size={20} className="text-[#bd93f9]" />
+            <Activity size={20} className="text-[#6366F1]" />
           </div>
           <div>
             <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Global DB Load</div>
@@ -194,26 +194,26 @@ export default function SuperAdminOversight() {
                   <td className="p-4 font-mono text-gray-400">{t.storage}</td>
                   <td className="p-4 font-mono text-gray-400">{t.aiTokens}</td>
                   <td className="p-4 text-center">
-                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${t.status === 'active' ? 'bg-[#50fa7b] shadow-green' : 'bg-[#ff5555] shadow-red'}`} title={t.status} />
+                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${t.status === 'active' ? 'bg-[#10B981] shadow-green' : 'bg-[#EF4444] shadow-red'}`} title={t.status} />
                   </td>
                   <td className="p-4 text-right flex items-center justify-end gap-2">
                     <button 
                       onClick={() => handleStartImpersonate(t)}
-                      className="btn btn-secondary py-1.5 px-3 text-[10px] flex items-center gap-1 hover:text-[#01FDF6] border-gray-800"
+                      className="btn btn-secondary py-1.5 px-3 text-[10px] flex items-center gap-1 hover:text-[#38BDF8] border-gray-800"
                       disabled={t.status === 'suspended'}
                     >
                       <LogIn size={11} /> Impersonate
                     </button>
                     <button 
                       onClick={() => handleRevokeSessions(t.name)}
-                      className="btn btn-secondary py-1.5 px-3 text-[10px] flex items-center gap-1 hover:text-[#bd93f9] border-gray-800"
+                      className="btn btn-secondary py-1.5 px-3 text-[10px] flex items-center gap-1 hover:text-[#6366F1] border-gray-800"
                       disabled={t.status === 'suspended'}
                     >
                       <Key size={11} /> Revoke
                     </button>
                     <button 
                       onClick={() => toggleTenantStatus(t.id)}
-                      className={`btn py-1.5 px-3 text-[10px] font-bold flex items-center gap-1 transition-all ${t.status === 'active' ? 'bg-red-950/20 border border-red-900/30 text-[#ff5555] hover:bg-red-950/50' : 'bg-green-950/20 border border-green-900/30 text-[#50fa7b] hover:bg-green-950/50'}`}
+                      className={`btn py-1.5 px-3 text-[10px] font-bold flex items-center gap-1 transition-all ${t.status === 'active' ? 'bg-red-950/20 border border-red-900/30 text-[#EF4444] hover:bg-red-950/50' : 'bg-green-950/20 border border-green-900/30 text-[#10B981] hover:bg-green-950/50'}`}
                     >
                       <Ban size={11} /> {t.status === 'active' ? 'Suspend' : 'Activate'}
                     </button>
@@ -229,7 +229,7 @@ export default function SuperAdminOversight() {
       {isImpersonating && (
         <div className="impersonation-workspace-monitor card bg-gray-900/20 border border-dashed border-red-900/40 p-5 rounded-xl mt-6 animate-pulse-border">
           <h4 className="text-white text-sm font-bold font-display uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <Server size={16} className="text-[#ff0055]" /> Tenant Diagnostic Workspace
+            <Server size={16} className="text-[#EF4444]" /> Tenant Diagnostic Workspace
           </h4>
           <p className="text-gray-400 text-xs leading-relaxed mb-4">
             You are securely examining the active database tables and storage indexes for **{impersonatingTenant?.name}**. All actions taken will generate cryptographic compliance entries under SOC2 Section 4.1.
@@ -258,7 +258,7 @@ export default function SuperAdminOversight() {
       {/* SOC2 Verification MFA Modal */}
       {showMfaModal && (
         <div className="mfa-oversight-modal-overlay">
-          <div className="mfa-oversight-modal bg-[#0c1224] border border-gray-800 p-6 rounded-xl max-w-sm w-full shadow-2xl relative">
+          <div className="mfa-oversight-modal bg-[#0F172A] border border-gray-800 p-6 rounded-xl max-w-sm w-full shadow-2xl relative">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2 text-red-500 font-bold font-display text-sm tracking-wide">
                 <Lock size={16} /> Break-Glass Authorization
@@ -284,7 +284,7 @@ export default function SuperAdminOversight() {
                   maxLength={6}
                   value={mfaCode}
                   onChange={(e) => setMfaCode(e.target.value)}
-                  className="w-full text-center tracking-widest bg-gray-950 border border-gray-800 rounded-lg p-3 text-white text-lg font-mono focus:outline-none focus:border-[#ff0055]"
+                  className="w-full text-center tracking-widest bg-gray-950 border border-gray-800 rounded-lg p-3 text-white text-lg font-mono focus:outline-none focus:border-[#EF4444]"
                 />
               </div>
 
@@ -304,7 +304,7 @@ export default function SuperAdminOversight() {
                 </button>
                 <button 
                   type="submit"
-                  className="px-4 py-2 bg-[#ff0055] hover:bg-[#e0004b] text-white rounded-lg text-xs font-bold shadow-red flex items-center gap-1.5"
+                  className="px-4 py-2 bg-[#EF4444] hover:bg-[#EF4444] text-white rounded-lg text-xs font-bold shadow-red flex items-center gap-1.5"
                 >
                   <ShieldCheck size={14} /> Authorize Impersonate
                 </button>

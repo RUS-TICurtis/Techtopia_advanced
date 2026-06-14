@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -17,8 +17,8 @@ import './Finance.css';
 const ChartTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div style={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-        <p style={{ color: '#627496', fontWeight: 700, marginBottom: 4, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</p>
+      <div style={{ background: '#1E293B', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
+        <p style={{ color: '#64748B', fontWeight: 700, marginBottom: 4, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</p>
         {payload.map((entry, i) => (
           <p key={i} style={{ color: entry.color, margin: '2px 0' }}>{entry.name}: {formatCurrency(entry.value)}</p>
         ))}
@@ -89,7 +89,7 @@ export default function FinanceOverview() {
       totalApprovedExpenses += (e.amount || 0);
     });
 
-    const colors = ['#01FDF6', '#8A4FFF', '#21FA90', '#E4FF1A', '#FF47DA', '#FF8C42'];
+    const colors = ['#38BDF8', '#6366F1', '#10B981', '#F59E0B', '#EF4444', '#FF8C42'];
     let expenseBreakdown = Object.entries(categorySums).map(([name, val], idx) => ({
       name,
       value: totalApprovedExpenses > 0 ? Math.round((val / totalApprovedExpenses) * 100) : 0,
@@ -99,18 +99,18 @@ export default function FinanceOverview() {
 
     if (expenseBreakdown.length === 0) {
       expenseBreakdown = [
-        { name: 'Infrastructure', value: 45, color: '#01FDF6' },
-        { name: 'Marketing', value: 25, color: '#8A4FFF' },
-        { name: 'Operations', value: 20, color: '#21FA90' },
-        { name: 'Other', value: 10, color: '#FF47DA' }
+        { name: 'Infrastructure', value: 45, color: '#38BDF8' },
+        { name: 'Marketing', value: 25, color: '#6366F1' },
+        { name: 'Operations', value: 20, color: '#10B981' },
+        { name: 'Other', value: 10, color: '#EF4444' }
       ];
     }
 
     const aging = [
-      { range: '0-30 Days', value: 0, color: '#21FA90' },
-      { range: '31-60 Days', value: 0, color: '#01FDF6' },
-      { range: '61-90 Days', value: 0, color: '#E4FF1A' },
-      { range: '90+ Days', value: 0, color: '#FF47DA' },
+      { range: '0-30 Days', value: 0, color: '#10B981' },
+      { range: '31-60 Days', value: 0, color: '#38BDF8' },
+      { range: '61-90 Days', value: 0, color: '#F59E0B' },
+      { range: '90+ Days', value: 0, color: '#EF4444' },
     ];
 
     invoices.filter(i => !['Paid', 'Cancelled', 'Draft'].includes(i.status)).forEach(i => {
@@ -145,9 +145,9 @@ export default function FinanceOverview() {
       INVOICE_AGING: aging,
       RECENT_TRANSACTIONS: sortedPayments,
       AI_INSIGHTS: [
-        { id: 1, text: 'Revenue is up MoM, driven by strong collections via connected payment channels.', icon: TrendingUp, color: '#21FA90' },
-        { id: 2, text: 'Recommend following up on outstanding invoice aging categories.', icon: AlertCircle, color: '#E4FF1A' },
-        { id: 3, text: 'Opex budgets are currently operating within nominal compliance targets.', icon: CheckCircle, color: '#01FDF6' }
+        { id: 1, text: 'Revenue is up MoM, driven by strong collections via connected payment channels.', icon: TrendingUp, color: '#10B981' },
+        { id: 2, text: 'Recommend following up on outstanding invoice aging categories.', icon: AlertCircle, color: '#F59E0B' },
+        { id: 3, text: 'Opex budgets are currently operating within nominal compliance targets.', icon: CheckCircle, color: '#38BDF8' }
       ]
     };
   }, [invoices, expenses, payments]);
@@ -155,7 +155,7 @@ export default function FinanceOverview() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -169,32 +169,32 @@ export default function FinanceOverview() {
   const kpiCards = [
     {
       label: 'Total Revenue (YTD)', value: formatCurrency(totalRevenue), change: '+24.3%', up: true,
-      icon: DollarSign, color: '#21FA90', bg: 'rgba(33,250,144,0.1)',
+      icon: DollarSign, color: '#10B981', bg: 'rgba(33,250,144,0.1)',
       sub: 'vs last year'
     },
     {
       label: 'Outstanding Invoices', value: formatCurrency(outstandingInvoices), change: '+18%', up: false,
-      icon: FileText, color: '#E4FF1A', bg: 'rgba(228,255,26,0.1)',
+      icon: FileText, color: '#F59E0B', bg: 'rgba(228,255,26,0.1)',
       sub: `${pendingInvoiceCount} invoices pending`
     },
     {
       label: 'Collected This Month', value: formatCurrency(collectedThisMonth), change: '+12.7%', up: true,
-      icon: CheckCircle, color: '#01FDF6', bg: 'rgba(1,253,246,0.1)',
+      icon: CheckCircle, color: '#38BDF8', bg: 'rgba(1,253,246,0.1)',
       sub: 'Hubtel + Paystack'
     },
     {
       label: 'Total Expenses (YTD)', value: formatCurrency(totalExpenses), change: '+8.2%', up: false,
-      icon: Receipt, color: '#FF47DA', bg: 'rgba(255,71,218,0.1)',
+      icon: Receipt, color: '#EF4444', bg: 'rgba(255,71,218,0.1)',
       sub: `${operatingRatio} operating ratio`
     },
   ];
 
   const quickActions = [
-    { label: 'New Invoice', icon: FileText, path: '/finance/invoices', color: '#01FDF6' },
-    { label: 'Record Payment', icon: CreditCard, path: '/finance/payments', color: '#21FA90' },
-    { label: 'Submit Expense', icon: Receipt, path: '/finance/expenses', color: '#FF47DA' },
-    { label: 'View Reports', icon: BarChart3, path: '/finance/reports', color: '#8A4FFF' },
-    { label: 'AI Insights', icon: Sparkles, path: '/finance/ai-agent', color: '#E4FF1A' },
+    { label: 'New Invoice', icon: FileText, path: '/finance/invoices', color: '#38BDF8' },
+    { label: 'Record Payment', icon: CreditCard, path: '/finance/payments', color: '#10B981' },
+    { label: 'Submit Expense', icon: Receipt, path: '/finance/expenses', color: '#EF4444' },
+    { label: 'View Reports', icon: BarChart3, path: '/finance/reports', color: '#6366F1' },
+    { label: 'AI Insights', icon: Sparkles, path: '/finance/ai-agent', color: '#F59E0B' },
   ];
 
 
@@ -250,9 +250,9 @@ export default function FinanceOverview() {
           <div className="card-title">
             Revenue & Expenses — FY 2026
             <div className="flex gap-3">
-              <span className="finance-legend-dot" style={{ background: '#01FDF6' }}>Revenue</span>
-              <span className="finance-legend-dot" style={{ background: '#FF47DA' }}>Expenses</span>
-              <span className="finance-legend-dot" style={{ background: '#21FA90' }}>Profit</span>
+              <span className="finance-legend-dot" style={{ background: '#38BDF8' }}>Revenue</span>
+              <span className="finance-legend-dot" style={{ background: '#EF4444' }}>Expenses</span>
+              <span className="finance-legend-dot" style={{ background: '#10B981' }}>Profit</span>
             </div>
           </div>
           <div style={{ height: 280 }}>
@@ -260,25 +260,25 @@ export default function FinanceOverview() {
               <AreaChart data={REVENUE_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#01FDF6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#01FDF6" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#38BDF8" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="gradExp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF47DA" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#FF47DA" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="gradProfit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#21FA90" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#21FA90" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#3d4e6b" tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
+                <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 11 }} />
+                <YAxis stroke="#475569" tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
                 <Tooltip content={<ChartTooltip />} />
-                <Area type="monotone" dataKey="Revenue" stroke="#01FDF6" strokeWidth={2} fill="url(#gradRev)" name="Revenue" />
-                <Area type="monotone" dataKey="Expenses" stroke="#FF47DA" strokeWidth={2} fill="url(#gradExp)" name="Expenses" />
-                <Area type="monotone" dataKey="Profit" stroke="#21FA90" strokeWidth={2} fill="url(#gradProfit)" name="Profit" />
+                <Area type="monotone" dataKey="Revenue" stroke="#38BDF8" strokeWidth={2} fill="url(#gradRev)" name="Revenue" />
+                <Area type="monotone" dataKey="Expenses" stroke="#EF4444" strokeWidth={2} fill="url(#gradExp)" name="Expenses" />
+                <Area type="monotone" dataKey="Profit" stroke="#10B981" strokeWidth={2} fill="url(#gradProfit)" name="Profit" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -297,7 +297,7 @@ export default function FinanceOverview() {
                   ))}
                 </Pie>
                 <Tooltip formatter={(v, name) => [`${v}%`, name]}
-                  contentStyle={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
+                  contentStyle={{ background: '#1E293B', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -327,9 +327,9 @@ export default function FinanceOverview() {
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={INVOICE_AGING} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="range" stroke="#3d4e6b" tick={{ fontSize: 10 }} />
-                <YAxis stroke="#3d4e6b" tick={{ fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
-                <Tooltip contentStyle={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }}
+                <XAxis dataKey="range" stroke="#475569" tick={{ fontSize: 10 }} />
+                <YAxis stroke="#475569" tick={{ fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
+                <Tooltip contentStyle={{ background: '#1E293B', border: '1px solid #222', borderRadius: 8, fontSize: 12 }}
                   formatter={(v) => [formatCurrency(v), 'Outstanding']} />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                   {INVOICE_AGING.map((entry, idx) => (
@@ -365,7 +365,7 @@ export default function FinanceOverview() {
         {/* AI Finance Insights */}
         <div className="card">
           <div className="card-title">
-            <span className="flex items-center gap-2"><Sparkles size={16} style={{ color: '#01FDF6' }} /> AI Finance Insights</span>
+            <span className="flex items-center gap-2"><Sparkles size={16} style={{ color: '#38BDF8' }} /> AI Finance Insights</span>
             <button className="btn btn-secondary text-xs py-1 px-3" onClick={() => navigate('/finance/ai-agent')}>
               Ask AI <ArrowRight size={12} />
             </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { 
   LifeBuoy, 
   Search, 
@@ -276,7 +276,7 @@ export default function Support({ searchValue = '' }) {
       accessorKey: 'id',
       header: 'Ticket ID',
       cell: ({ getValue }) => (
-        <span className="font-mono text-xs font-bold text-[#01FDF6]">
+        <span className="font-mono text-xs font-bold text-[#38BDF8]">
           {getValue()}
         </span>
       )
@@ -291,9 +291,9 @@ export default function Support({ searchValue = '' }) {
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="font-bold text-white text-sm truncate">{ticket.subject}</span>
               {ticket.category === 'Feature Request' ? (
-                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-[#21FA90]/10 text-[#21FA90] border border-[#21FA90]/35 uppercase tracking-wider font-mono">Feature Request</span>
+                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/35 uppercase tracking-wider font-mono">Feature Request</span>
               ) : (
-                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-[#01FDF6]/10 text-[#01FDF6] border border-[#01FDF6]/35 uppercase tracking-wider font-mono">Support</span>
+                <span className="text-[8px] px-1.5 py-0.5 rounded font-black bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/35 uppercase tracking-wider font-mono">Support</span>
               )}
             </div>
             <span className="text-[10px] text-gray-500 truncate">{ticket.message || 'No description recorded'}</span>
@@ -318,8 +318,8 @@ export default function Support({ searchValue = '' }) {
               {ticket.priority}
             </Badge>
             <span className={`text-[9px] font-bold font-mono tracking-wide ${
-              sla.variant === 'error' ? 'text-[#FF47DA]' : 
-              sla.variant === 'warning' ? 'text-[#E4FF1A]' : 'text-gray-500'
+              sla.variant === 'error' ? 'text-[#EF4444]' : 
+              sla.variant === 'warning' ? 'text-[#F59E0B]' : 'text-gray-500'
             }`}>
               {sla.text}
             </span>
@@ -355,7 +355,7 @@ export default function Support({ searchValue = '' }) {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#FF47DA]">⚡</span> Command Center
+            <span className="text-[#EF4444]">⚡</span> Command Center
           </h1>
           <p className="page-subtitle">Manage client requests, SLA commitments, and engineering tickets</p>
         </div>
@@ -392,8 +392,8 @@ export default function Support({ searchValue = '' }) {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${
                 activeTab === tab 
-                  ? 'bg-[#FF47DA] border-[#FF47DA] text-white shadow-glow' 
-                  : 'bg-[#0f1629]/40 border-gray-800 text-gray-400 hover:text-white'
+                  ? 'bg-[#EF4444] border-[#EF4444] text-white shadow-glow' 
+                  : 'bg-[#1E293B]/40 border-gray-800 text-gray-400 hover:text-white'
               }`}
             >
               {tab}
@@ -408,14 +408,14 @@ export default function Support({ searchValue = '' }) {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="bg-[#0f1629]/60 border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#01FDF6] cursor-pointer"
+            className="bg-[#1E293B]/60 border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#38BDF8] cursor-pointer"
           >
             <option value="All">All Categories</option>
             <option value="Support Ticket">Support Escalations</option>
             <option value="Feature Request">Feature Proposals</option>
           </select>
           <div className="text-xs text-gray-500 font-mono ml-2 hidden md:block">
-            SLA win rate: <span className="text-[#21FA90] font-black">98.2%</span>
+            SLA win rate: <span className="text-[#10B981] font-black">98.2%</span>
           </div>
         </div>
       </div>
@@ -424,7 +424,7 @@ export default function Support({ searchValue = '' }) {
       <div className="flex flex-col xl:flex-row gap-6">
         
         {/* Table wrapper */}
-        <div className="flex-1 min-w-0 bg-[#0f1629]/30 border border-gray-800/80 rounded-xl overflow-hidden backdrop-blur-md">
+        <div className="flex-1 min-w-0 bg-[#1E293B]/30 border border-gray-800/80 rounded-xl overflow-hidden backdrop-blur-md">
           <DataTable 
             columns={columns}
             data={filteredTickets}
@@ -436,7 +436,7 @@ export default function Support({ searchValue = '' }) {
 
         {/* Selected Dossier sliding card */}
         {selectedTicket && (
-          <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#0f1629]/80 backdrop-blur-lg">
+          <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#1E293B]/80 backdrop-blur-lg">
             <div className="flex justify-between items-center border-b border-gray-850 pb-4">
               <h3 className="card-title text-white font-black font-display text-base tracking-wide m-0">Ticket Dossier</h3>
               <button 
@@ -449,7 +449,7 @@ export default function Support({ searchValue = '' }) {
 
             {/* Ticket Header Profile */}
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-[#FF47DA]/20 border border-[#FF47DA]/40 text-[#FF47DA] flex items-center justify-center font-display font-black text-sm shadow-glow">
+              <div className="w-14 h-14 rounded-full bg-[#EF4444]/20 border border-[#EF4444]/40 text-[#EF4444] flex items-center justify-center font-display font-black text-sm shadow-glow">
                 {selectedTicket.id}
               </div>
               <div className="min-w-0 flex-1">
@@ -462,7 +462,7 @@ export default function Support({ searchValue = '' }) {
             </div>
 
             {/* Meta details list */}
-            <div className="flex flex-col gap-2.5 p-4 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl">
+            <div className="flex flex-col gap-2.5 p-4 bg-[#0F172A]/80 border border-gray-850 rounded-xl">
               <div className="flex justify-between items-center text-xs text-gray-300">
                 <span className="text-gray-500 font-bold flex items-center gap-1"><Clock size={12} /> Target SLA</span>
                 <Badge variant={getSLAIndicator(selectedTicket).variant}>
@@ -485,17 +485,17 @@ export default function Support({ searchValue = '' }) {
             {(() => {
               const lead = getAccountLead(selectedTicket.client);
               return (
-                <div className="flex flex-col gap-2.5 p-4 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl">
+                <div className="flex flex-col gap-2.5 p-4 bg-[#0F172A]/80 border border-gray-850 rounded-xl">
                   <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Designated Account Lead</div>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-[#01FDF6]/15 border border-[#01FDF6]/35 text-[#01FDF6] flex items-center justify-center font-bold text-xs">
+                    <div className="w-8 h-8 rounded-full bg-[#38BDF8]/15 border border-[#38BDF8]/35 text-[#38BDF8] flex items-center justify-center font-bold text-xs">
                       {lead.avatar}
                     </div>
                     <div>
                       <div className="text-xs font-bold text-white leading-tight">{lead.name}</div>
                       <div className="text-[9px] text-gray-500">{lead.role}</div>
                     </div>
-                    <span className="ml-auto text-[8px] px-1.5 py-0.5 rounded bg-gray-900 border border-gray-850 text-[#01FDF6] font-mono font-bold uppercase tracking-wider">Assigned SLA</span>
+                    <span className="ml-auto text-[8px] px-1.5 py-0.5 rounded bg-gray-900 border border-gray-850 text-[#38BDF8] font-mono font-bold uppercase tracking-wider">Assigned SLA</span>
                   </div>
                 </div>
               );
@@ -515,8 +515,8 @@ export default function Support({ searchValue = '' }) {
                 <MessageSquare size={12} /> SLA History Logs
               </h5>
               <div className="flex flex-col gap-2.5 max-h-36 overflow-y-auto custom-scrollbar pr-1">
-                <div className="flex flex-col gap-1 p-2 bg-[#01FDF6]/5 border-l-2 border-[#01FDF6] rounded-r text-[10px] text-gray-300">
-                  <span className="font-bold text-[#01FDF6]">Curtis Miller (Ops Tech) <span className="text-gray-500 font-normal ml-1">1h ago</span></span>
+                <div className="flex flex-col gap-1 p-2 bg-[#38BDF8]/5 border-l-2 border-[#38BDF8] rounded-r text-[10px] text-gray-300">
+                  <span className="font-bold text-[#38BDF8]">Curtis Miller (Ops Tech) <span className="text-gray-500 font-normal ml-1">1h ago</span></span>
                   <span>Initiated diagnostic sequence. Re-routing cluster configurations.</span>
                 </div>
                 <div className="flex flex-col gap-1 p-2 bg-gray-950 border border-gray-850 rounded text-[10px] text-gray-400">
@@ -558,7 +558,7 @@ export default function Support({ searchValue = '' }) {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Ticket Subject *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
               placeholder="e.g. Inbound API socket leak in production cluster" 
               value={subject} 
               onChange={e => setSubject(e.target.value)} 
@@ -570,7 +570,7 @@ export default function Support({ searchValue = '' }) {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Client Enterprise *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
               placeholder="e.g. Wayne Enterprises" 
               value={client} 
               onChange={e => setClient(e.target.value)} 
@@ -582,7 +582,7 @@ export default function Support({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">SLA Priority Severity</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
                 value={priority} 
                 onChange={e => setPriority(e.target.value)}
               >
@@ -594,7 +594,7 @@ export default function Support({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel / Ticket Status</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
                 value={status} 
                 onChange={e => setStatus(e.target.value)}
               >
@@ -608,7 +608,7 @@ export default function Support({ searchValue = '' }) {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Description & Detailed Message</label>
             <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA] h-24 resize-none" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444] h-24 resize-none" 
               placeholder="Provide a detailed report of diagnostic indicators..." 
               value={message} 
               onChange={e => setMessage(e.target.value)}
@@ -625,7 +625,7 @@ export default function Support({ searchValue = '' }) {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#FF47DA] hover:bg-[#eb32c4] text-white font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#EF4444] hover:bg-[#EF4444] text-white font-bold shadow-glow transition-all"
             >
               Log Ticket
             </button>
@@ -645,7 +645,7 @@ export default function Support({ searchValue = '' }) {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Ticket Subject *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
               value={subject} 
               onChange={e => setSubject(e.target.value)} 
               required 
@@ -656,7 +656,7 @@ export default function Support({ searchValue = '' }) {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Client Enterprise *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
               value={client} 
               onChange={e => setClient(e.target.value)} 
               required 
@@ -667,7 +667,7 @@ export default function Support({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">SLA Priority Severity</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
                 value={priority} 
                 onChange={e => setPriority(e.target.value)}
               >
@@ -679,7 +679,7 @@ export default function Support({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel / Ticket Status</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444]" 
                 value={status} 
                 onChange={e => setStatus(e.target.value)}
               >
@@ -694,7 +694,7 @@ export default function Support({ searchValue = '' }) {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Description & Detailed Message</label>
             <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#FF47DA] h-24 resize-none" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#EF4444] h-24 resize-none" 
               value={message} 
               onChange={e => setMessage(e.target.value)}
             />
@@ -710,7 +710,7 @@ export default function Support({ searchValue = '' }) {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#FF47DA] hover:bg-[#eb32c4] text-white font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#EF4444] hover:bg-[#EF4444] text-white font-bold shadow-glow transition-all"
             >
               Save Changes
             </button>

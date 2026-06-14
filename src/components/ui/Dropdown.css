@@ -1,7 +1,7 @@
-.dropdown-content,
+﻿.dropdown-content,
 .dropdown-subcontent {
   min-width: 180px;
-  background-color: #0f1629;
+  background-color: #1E293B;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 5px;
@@ -40,7 +40,7 @@
 }
 
 .dropdown-item[data-disabled] {
-  color: #3d4e6b;
+  color: #475569;
   pointer-events: none;
 }
 

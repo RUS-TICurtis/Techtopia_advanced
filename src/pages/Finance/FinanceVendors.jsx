@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Building2, Plus, Search, Phone, Mail, Globe, MapPin, Package, X, ExternalLink, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import { useVendors, useVendorCategories } from '../../hooks/useCrmData';
@@ -6,11 +6,11 @@ import './Finance.css';
 
 // Status badge config (API returns 'Active', 'Inactive', etc.)
 const STATUS_COLORS = {
-  Active:   { badge: 'badge-success',  text: '#21FA90' },
-  Inactive: { badge: 'badge-neutral',  text: '#627496' },
-  Suspended:{ badge: 'badge-danger',   text: '#FF4747' },
+  Active:   { badge: 'badge-success',  text: '#10B981' },
+  Inactive: { badge: 'badge-neutral',  text: '#64748B' },
+  Suspended:{ badge: 'badge-danger',   text: '#EF4444' },
 };
-const AVATAR_COLORS = ['#01FDF6', '#8A4FFF', '#FF47DA', '#21FA90', '#E4FF1A', '#3772FF', '#FF6B35'];
+const AVATAR_COLORS = ['#38BDF8', '#6366F1', '#EF4444', '#10B981', '#F59E0B', '#3B82F6', '#FB923C'];
 
 // POST /api/v1/finance/vendors request body
 const EMPTY_VENDOR = {
@@ -65,7 +65,7 @@ export default function FinanceVendors() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }

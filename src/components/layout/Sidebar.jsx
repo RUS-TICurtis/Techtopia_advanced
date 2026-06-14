@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+﻿import React, { useState, useEffect } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { WORKSPACE_GROUPS, WORKSPACE_ITEMS } from './config/sidebar.workspace.config';
 import { hasPermission } from '../../services/auth/authService';
@@ -50,14 +50,33 @@ export default function Sidebar({
     return saved ? JSON.parse(saved) : ['dashboard', 'ai-copilot', 'pipeline'];
   });
 
-  // Collapsible Groups state (Default HR, Admin, Marketing, Finance collapsed)
-  const [collapsedGroups, setCollapsedGroups] = useState({
-    marketing: true,
-    hr: true,
-    finance: true,
-    documents: true,
-    admin: true,
+  const location = useLocation();
+
+  // Find active group from route path
+  const activeItem = WORKSPACE_ITEMS.find(item => 
+    item.url === location.pathname || 
+    (item.url !== '/' && location.pathname.startsWith(item.url))
+  );
+  const activeGroupId = activeItem ? activeItem.group : 'core';
+
+  // Collapsible Groups state (Default all collapsed except the active group)
+  const [collapsedGroups, setCollapsedGroups] = useState(() => {
+    const initial = {};
+    WORKSPACE_GROUPS.forEach(g => {
+      initial[g.id] = g.id !== activeGroupId;
+    });
+    return initial;
   });
+
+  // Auto-expand the active group when route changes
+  useEffect(() => {
+    if (activeGroupId) {
+      setCollapsedGroups(prev => ({
+        ...prev,
+        [activeGroupId]: false
+      }));
+    }
+  }, [activeGroupId]);
 
   // Toggle Collapse Group
   const toggleGroup = (groupId) => {
@@ -123,7 +142,7 @@ export default function Sidebar({
       {/* Brand Header */}
       <div className="sidebar-brand">
           {isCollapsed ? (
-            <span className="logo-icon-only text-2xl text-[#01FDF6] font-bold">
+            <span className="logo-icon-only text-2xl text-[#38BDF8] font-bold">
             <img className="logo" src="favicon.png" alt="T" />
             </span>
           ) : (
@@ -137,11 +156,11 @@ export default function Sidebar({
       {!isCollapsed && (
         <div className="tenant-switcher-wrapper px-3 mb-2 relative">
           <button 
-            className="tenant-selector-btn flex items-center justify-between w-full bg-gray-900/60 border border-gray-800 hover:border-[#01FDF6]/40 px-3 py-2.5 rounded-xl transition-all"
+            className="tenant-selector-btn flex items-center justify-between w-full bg-gray-900/60 border border-gray-800 hover:border-[#38BDF8]/40 px-3 py-2.5 rounded-xl transition-all"
             onClick={() => setShowTenantMenu(!showTenantMenu)}
           >
             <div className="flex items-center gap-2 text-left min-w-0">
-              <Building size={16} className="text-[#01FDF6] flex-shrink-0" />
+              <Building size={16} className="text-[#38BDF8] flex-shrink-0" />
               <div className="min-w-0">
                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block">Workspace</span>
                 <span className="text-white text-xs font-semibold truncate block">{activeTenant}</span>
@@ -151,30 +170,30 @@ export default function Sidebar({
           </button>
 
           {showTenantMenu && (
-            <div className="tenant-dropdown-menu absolute top-[100%] left-3 right-3 bg-[#0a0f1e] border border-gray-800 rounded-xl shadow-2xl z-[900] py-1 mt-1 font-sans text-xs">
+            <div className="tenant-dropdown-menu absolute top-[100%] left-3 right-3 bg-[#0F172A] border border-gray-800 rounded-xl shadow-2xl z-[900] py-1 mt-1 font-sans text-xs">
               <button 
                 onClick={() => handleTenantSwitch('Techtopia Corp')}
-                className={`w-full text-left px-4 py-2.5 hover:bg-gray-850 flex items-center justify-between ${activeTenant === 'Techtopia Corp' ? 'text-[#01FDF6] bg-gray-900/40' : 'text-gray-300'}`}
+                className={`w-full text-left px-4 py-2.5 hover:bg-gray-850 flex items-center justify-between ${activeTenant === 'Techtopia Corp' ? 'text-[#38BDF8] bg-gray-900/40' : 'text-gray-300'}`}
               >
                 <span>Techtopia Corp (HQ)</span>
-                {activeTenant === 'Techtopia Corp' && <span className="w-1.5 h-1.5 rounded-full bg-[#01FDF6]"></span>}
+                {activeTenant === 'Techtopia Corp' && <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]"></span>}
               </button>
               <button 
                 onClick={() => handleTenantSwitch('Acme Enterprises')}
-                className={`w-full text-left px-4 py-2.5 hover:bg-gray-850 flex items-center justify-between ${activeTenant === 'Acme Enterprises' ? 'text-[#01FDF6] bg-gray-900/40' : 'text-gray-300'}`}
+                className={`w-full text-left px-4 py-2.5 hover:bg-gray-850 flex items-center justify-between ${activeTenant === 'Acme Enterprises' ? 'text-[#38BDF8] bg-gray-900/40' : 'text-gray-300'}`}
               >
                 <span>Acme Enterprises</span>
-                {activeTenant === 'Acme Enterprises' && <span className="w-1.5 h-1.5 rounded-full bg-[#01FDF6]"></span>}
+                {activeTenant === 'Acme Enterprises' && <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]"></span>}
               </button>
               {(user?.role === 'super_admin' || user?.role === 'platform_owner') && (
                 <button 
                   onClick={() => handleTenantSwitch('Platform Super Admin')}
-                  className={`w-full text-left px-4 py-2.5 hover:bg-gray-850 flex items-center justify-between ${activeTenant === 'Platform Super Admin' ? 'text-[#ff0055] bg-gray-900/40' : 'text-[#ff0055]/85'}`}
+                  className={`w-full text-left px-4 py-2.5 hover:bg-gray-850 flex items-center justify-between ${activeTenant === 'Platform Super Admin' ? 'text-[#EF4444] bg-gray-900/40' : 'text-[#EF4444]/85'}`}
                 >
                   <span className="font-bold flex items-center gap-1.5">
                     <ShieldCheck size={12} /> Platform Operations
                   </span>
-                  {activeTenant === 'Platform Super Admin' && <span className="w-1.5 h-1.5 rounded-full bg-[#ff0055]"></span>}
+                  {activeTenant === 'Platform Super Admin' && <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></span>}
                 </button>
               )}
             </div>
@@ -192,7 +211,7 @@ export default function Sidebar({
               placeholder="Search workspaces... (/) " 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-gray-950/40 border border-gray-800 rounded-lg text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#01FDF6]/50 transition-all font-sans"
+              className="w-full pl-9 pr-3 py-2 bg-gray-950/40 border border-gray-800 rounded-lg text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#38BDF8]/50 transition-all font-sans"
             />
           </div>
         </div>
@@ -204,7 +223,7 @@ export default function Sidebar({
         {activePinned.length > 0 && !isCollapsed && (
           <div className="sidebar-workspace-group mb-4">
             <div className="sidebar-section-label flex items-center gap-1.5 text-gray-500 font-bold uppercase tracking-wider text-[10px] px-4 py-1">
-              <Pin size={10} className="text-[#01FDF6]" /> Favorites
+              <Pin size={10} className="text-[#38BDF8]" /> Favorites
             </div>
             {activePinned.map(item => (
               <NavLink
@@ -218,7 +237,7 @@ export default function Sidebar({
                 <Pin size={12} className="text-gray-600 mr-2 flex-shrink-0" />
                 <span className="sidebar-item-label text-xs truncate flex-1">{item.label}</span>
                 <button 
-                  className="pin-toggle-btn text-gray-600 hover:text-[#ff3860] opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
+                  className="pin-toggle-btn text-gray-600 hover:text-[#EF4444] opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
                   onClick={(e) => togglePin(e, item.id)}
                   title="Remove from favorites"
                 >
@@ -280,11 +299,11 @@ export default function Sidebar({
                         <>
                           <span className="sidebar-item-label text-xs truncate flex-1">{item.label}</span>
                           <button 
-                            className="pin-toggle-btn p-0.5 text-gray-700 hover:text-[#01FDF6] opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
+                            className="pin-toggle-btn p-0.5 text-gray-700 hover:text-[#38BDF8] opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
                             onClick={(e) => togglePin(e, item.id)}
                             title={pinnedItems.includes(item.id) ? "Unpin workspace" : "Pin workspace to favorites"}
                           >
-                            <Pin size={10} className={pinnedItems.includes(item.id) ? 'text-[#01FDF6]' : ''} />
+                            <Pin size={10} className={pinnedItems.includes(item.id) ? 'text-[#38BDF8]' : ''} />
                           </button>
                         </>
                       )}

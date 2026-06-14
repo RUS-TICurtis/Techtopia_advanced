@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
@@ -66,7 +66,7 @@ export default function Automations() {
       <PageHeader 
         title="Visual Workflow Builder"
         subtitle="Design and dispatch automated systems, conditional action branches, and multi-agent approval dispatches"
-        icon={<Zap className="text-[#01FDF6]" />}
+        icon={<Zap className="text-[#38BDF8]" />}
         actions={
           <button className="btn btn-primary shadow-glow flex items-center gap-1.5" onClick={() => alert("Provisioning a new workflow blueprint...")}>
             <Plus size={14} /> New Workflow
@@ -82,12 +82,12 @@ export default function Automations() {
             {templates.map(flow => (
               <div 
                 key={flow.id} 
-                className={`flow-template-card card bg-gray-900/35 border p-4 rounded-xl cursor-pointer transition-all duration-200 ${activeFlow?.id === flow.id ? 'active-border border-[#01FDF6]/60 bg-gray-900/60' : 'border-gray-850 hover:border-[#01FDF6]/30'}`}
+                className={`flow-template-card card bg-gray-900/35 border p-4 rounded-xl cursor-pointer transition-all duration-200 ${activeFlow?.id === flow.id ? 'active-border border-[#38BDF8]/60 bg-gray-900/60' : 'border-gray-850 hover:border-[#38BDF8]/30'}`}
                 onClick={() => setActiveFlow(flow)}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Zap size={14} className={flow.active ? 'text-[#01FDF6]' : 'text-gray-500'} />
+                    <Zap size={14} className={flow.active ? 'text-[#38BDF8]' : 'text-gray-500'} />
                     <h4 className="text-white text-xs font-bold font-display truncate max-w-[200px]">{flow.name}</h4>
                   </div>
                   <Badge variant={flow.active ? 'success' : 'neutral'}>{flow.active ? 'Active' : 'Hibernating'}</Badge>
@@ -102,7 +102,7 @@ export default function Automations() {
                       e.stopPropagation();
                       handleTestFlow(flow.name);
                     }}
-                    className="btn btn-secondary px-2.5 py-1 text-[9px] hover:text-[#01FDF6] flex items-center gap-1 border-gray-800"
+                    className="btn btn-secondary px-2.5 py-1 text-[9px] hover:text-[#38BDF8] flex items-center gap-1 border-gray-800"
                   >
                     <Play size={8} /> Dry Run
                   </button>
@@ -121,10 +121,10 @@ export default function Automations() {
               <div className="canvas-interactive-grid p-6 flex flex-col items-center justify-center gap-6 h-full relative overflow-y-auto">
                 
                 {/* Node 1: Trigger */}
-                <div className="canvas-node trigger-node bg-gray-900 border border-[#01FDF6]/45 p-4 rounded-xl shadow-glow-cyan max-w-xs w-full">
+                <div className="canvas-node trigger-node bg-gray-900 border border-[#38BDF8]/45 p-4 rounded-xl shadow-glow-cyan max-w-xs w-full">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-[9px] text-[#01FDF6] font-bold uppercase tracking-wider block">Trigger Block</span>
-                    <Clock size={12} className="text-[#01FDF6]" />
+                    <span className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-wider block">Trigger Block</span>
+                    <Clock size={12} className="text-[#38BDF8]" />
                   </div>
                   <h4 className="text-white text-xs font-bold font-mono">{activeFlow.trigger}</h4>
                   <p className="text-gray-500 text-[10px] mt-1">Fires immediately when operational event is detected.</p>
@@ -133,10 +133,10 @@ export default function Automations() {
                 <ArrowRight size={16} className="text-gray-600 rotate-90" />
 
                 {/* Node 2: Condition */}
-                <div className="canvas-node condition-node bg-gray-900 border border-[#bd93f9]/45 p-4 rounded-xl shadow-glow-purple max-w-xs w-full">
+                <div className="canvas-node condition-node bg-gray-900 border border-[#6366F1]/45 p-4 rounded-xl shadow-glow-purple max-w-xs w-full">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-[9px] text-[#bd93f9] font-bold uppercase tracking-wider block">Conditional Branch</span>
-                    <Info size={12} className="text-[#bd93f9]" />
+                    <span className="text-[9px] text-[#6366F1] font-bold uppercase tracking-wider block">Conditional Branch</span>
+                    <Info size={12} className="text-[#6366F1]" />
                   </div>
                   <h4 className="text-white text-xs font-bold font-mono">{activeFlow.condition}</h4>
                   <p className="text-gray-500 text-[10px] mt-1">Evaluates parameters. Stops pipeline if claims return false.</p>
@@ -145,12 +145,12 @@ export default function Automations() {
                 <ArrowRight size={16} className="text-gray-600 rotate-90" />
 
                 {/* Node 3: Actions Group */}
-                <div className="canvas-node actions-node bg-gray-900 border border-[#50fa7b]/45 p-4 rounded-xl shadow-glow-green max-w-xs w-full">
-                  <span className="text-[9px] text-[#50fa7b] font-bold uppercase tracking-wider block mb-2">Dispatched Operations</span>
+                <div className="canvas-node actions-node bg-gray-900 border border-[#10B981]/45 p-4 rounded-xl shadow-glow-green max-w-xs w-full">
+                  <span className="text-[9px] text-[#10B981] font-bold uppercase tracking-wider block mb-2">Dispatched Operations</span>
                   <div className="flex flex-col gap-2">
                     {activeFlow.actions.map((act, idx) => (
                       <div key={idx} className="flex items-start gap-2 bg-gray-950 p-2 rounded-lg border border-gray-900 text-[10px] text-gray-400 leading-snug">
-                        <CheckCircle2 size={12} className="text-[#50fa7b] flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 size={12} className="text-[#10B981] flex-shrink-0 mt-0.5" />
                         <span>{act}</span>
                       </div>
                     ))}

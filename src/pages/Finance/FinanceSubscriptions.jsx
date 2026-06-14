@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Users, TrendingUp, TrendingDown, CheckCircle, AlertCircle,
   Plus, X, ArrowUpCircle, ArrowDownCircle, PauseCircle,
@@ -10,22 +10,22 @@ import { useSubscriptions } from '../../hooks/useCrmData';
 
 const PLANS = [
   {
-    id: 'free', name: 'Free', price: 0, period: 'month', color: '#627496',
+    id: 'free', name: 'Free', price: 0, period: 'month', color: '#64748B',
     features: ['Up to 3 users', '5 projects', 'Basic CRM', 'Email support'],
     badge: null, mrr: 0, seats: 14,
   },
   {
-    id: 'pro', name: 'Pro', price: 499, period: 'month', color: '#01FDF6',
+    id: 'pro', name: 'Pro', price: 499, period: 'month', color: '#38BDF8',
     features: ['Up to 25 users', 'Unlimited projects', 'Full CRM suite', 'Priority support', 'AI Assistant'],
     badge: 'Popular', mrr: 124750, seats: 250,
   },
   {
-    id: 'business', name: 'Business', price: 1299, period: 'month', color: '#8A4FFF',
+    id: 'business', name: 'Business', price: 1299, period: 'month', color: '#6366F1',
     features: ['Up to 100 users', 'Custom workflows', 'Advanced analytics', 'Dedicated success manager', 'White labeling'],
     badge: null, mrr: 389700, seats: 300,
   },
   {
-    id: 'enterprise', name: 'Enterprise', price: null, period: 'custom', color: '#E4FF1A',
+    id: 'enterprise', name: 'Enterprise', price: null, period: 'custom', color: '#F59E0B',
     features: ['Unlimited users', 'Custom integrations', 'SLA guarantees', '24/7 phone support', 'On-prem option'],
     badge: 'Best Value', mrr: 650000, seats: 8,
   },
@@ -69,7 +69,7 @@ export default function FinanceSubscriptions() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -92,10 +92,10 @@ export default function FinanceSubscriptions() {
       {/* MRR / ARR Metrics */}
       <div className="finance-kpi-grid">
         {[
-          { label: 'Monthly Recurring Revenue', value: formatCurrency(metrics.mrr), color: '#21FA90', bg: 'rgba(33,250,144,0.1)', icon: TrendingUp, change: '+14.2%', up: true },
-          { label: 'Annual Recurring Revenue', value: formatCurrency(metrics.arr), color: '#01FDF6', bg: 'rgba(1,253,246,0.1)', icon: TrendingUp, change: '+14.2%', up: true },
-          { label: 'Active Subscriptions', value: metrics.active, color: '#8A4FFF', bg: 'rgba(138,79,255,0.1)', icon: CheckCircle, change: '+3 this month', up: true },
-          { label: 'Churn Risk', value: `${metrics.churnRisk} accounts`, color: '#FF47DA', bg: 'rgba(255,71,218,0.1)', icon: AlertCircle, change: 'Action needed', up: false },
+          { label: 'Monthly Recurring Revenue', value: formatCurrency(metrics.mrr), color: '#10B981', bg: 'rgba(33,250,144,0.1)', icon: TrendingUp, change: '+14.2%', up: true },
+          { label: 'Annual Recurring Revenue', value: formatCurrency(metrics.arr), color: '#38BDF8', bg: 'rgba(1,253,246,0.1)', icon: TrendingUp, change: '+14.2%', up: true },
+          { label: 'Active Subscriptions', value: metrics.active, color: '#6366F1', bg: 'rgba(138,79,255,0.1)', icon: CheckCircle, change: '+3 this month', up: true },
+          { label: 'Churn Risk', value: `${metrics.churnRisk} accounts`, color: '#EF4444', bg: 'rgba(255,71,218,0.1)', icon: AlertCircle, change: 'Action needed', up: false },
         ].map(m => {
           const Icon = m.icon;
           return (

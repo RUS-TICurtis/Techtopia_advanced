@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { UserCircle2, Plus, Search, X, ShieldAlert, Award, Briefcase, Activity } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
 import './Clients.css';
@@ -47,7 +47,7 @@ export default function Clients({ searchValue = '' }) {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <UserCircle2 className="text-[#3772FF]" />
+            <UserCircle2 className="text-[#3B82F6]" />
             Corporate Clients
           </h1>
           <p className="page-subtitle">Manage executive business client accounts & profiles</p>

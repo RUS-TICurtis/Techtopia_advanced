@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Techtopia CRM Hub - Projects & Sprint Stylesheet
    Design Spec: Dark Mode Premium, Glassmorphism, 6-color Neon Gradients
    ========================================================================== */
@@ -25,7 +25,7 @@
 
 /* Progress bar fill gradient */
 .bg-gradient-to-r {
-  background: linear-gradient(90deg, #8A4FFF 0%, #01FDF6 100%);
+  background: linear-gradient(90deg, #6366F1 0%, #38BDF8 100%);
 }
 
 /* Kanban Board additions specific to tasks */

@@ -1,4 +1,4 @@
-.login-container {
+﻿.login-container {
   display: flex;
   min-height: 100vh;
   width: 100%;
@@ -8,7 +8,7 @@
 /* Left Panel */
 .login-branding {
   flex: 1;
-  background-color: #050505; /* Deep dark background */
+  background-color: #0F172A; /* Deep dark background */
   color: white;
   position: relative;
   overflow: hidden;

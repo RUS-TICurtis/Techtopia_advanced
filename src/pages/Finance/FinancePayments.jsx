@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import {
   CreditCard, Search, Download, RefreshCw, Plus, CheckCircle,
   Clock, AlertCircle, X, ArrowUpRight, RotateCcw, Filter
@@ -65,7 +65,7 @@ export default function FinancePayments() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -88,10 +88,10 @@ export default function FinancePayments() {
       {/* KPI Metrics */}
       <div className="finance-kpi-grid">
         {[
-          { label: 'Total Collected', value: formatCurrency(metrics.collected), color: '#21FA90', bg: 'rgba(33,250,144,0.1)', icon: CheckCircle },
-          { label: 'Pending', value: formatCurrency(metrics.pending), color: '#E4FF1A', bg: 'rgba(228,255,26,0.1)', icon: Clock },
-          { label: 'Failed Transactions', value: `${metrics.failed} payments`, color: '#FF47DA', bg: 'rgba(255,71,218,0.1)', icon: AlertCircle },
-          { label: 'Total Refunded', value: formatCurrency(metrics.refunded), color: '#8A4FFF', bg: 'rgba(138,79,255,0.1)', icon: RotateCcw },
+          { label: 'Total Collected', value: formatCurrency(metrics.collected), color: '#10B981', bg: 'rgba(33,250,144,0.1)', icon: CheckCircle },
+          { label: 'Pending', value: formatCurrency(metrics.pending), color: '#F59E0B', bg: 'rgba(228,255,26,0.1)', icon: Clock },
+          { label: 'Failed Transactions', value: `${metrics.failed} payments`, color: '#EF4444', bg: 'rgba(255,71,218,0.1)', icon: AlertCircle },
+          { label: 'Total Refunded', value: formatCurrency(metrics.refunded), color: '#6366F1', bg: 'rgba(138,79,255,0.1)', icon: RotateCcw },
         ].map(m => {
           const Icon = m.icon;
           return (

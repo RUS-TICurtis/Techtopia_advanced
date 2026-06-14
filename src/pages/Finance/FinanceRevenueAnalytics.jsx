@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -20,8 +20,8 @@ const COHORT_DATA = [
 const ChartTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div style={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-        <p style={{ color: '#627496', fontWeight: 700, marginBottom: 4, fontSize: 10, textTransform: 'uppercase' }}>{label}</p>
+      <div style={{ background: '#1E293B', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
+        <p style={{ color: '#64748B', fontWeight: 700, marginBottom: 4, fontSize: 10, textTransform: 'uppercase' }}>{label}</p>
         {payload.map((e, i) => (
           <p key={i} style={{ color: e.color || '#fff' }}>
             {e.name}: {typeof e.value === 'number' && e.value > 100 ? formatCurrency(e.value) : e.value}
@@ -72,23 +72,23 @@ export default function FinanceRevenueAnalytics() {
     }
 
     // 2. Revenue by Stream
-    const colors = { Hubtel: '#01FDF6', Paystack: '#21FA90', Manual: '#8A4FFF', Other: '#627496' };
+    const colors = { Hubtel: '#38BDF8', Paystack: '#10B981', Manual: '#6366F1', Other: '#64748B' };
     const revenueByStream = Object.entries(gatewaySums).map(([name, value]) => {
       const pct = totalRev > 0 ? Math.round((value / totalRev) * 100) : 0;
       return {
         name,
         value,
         pct,
-        color: colors[name] || '#FF47DA',
+        color: colors[name] || '#EF4444',
       };
     });
 
     // Fallback if empty
     if (revenueByStream.length === 0) {
       revenueByStream.push(
-        { name: 'Hubtel', value: 0, pct: 0, color: '#01FDF6' },
-        { name: 'Paystack', value: 0, pct: 0, color: '#21FA90' },
-        { name: 'Manual', value: 0, pct: 0, color: '#8A4FFF' }
+        { name: 'Hubtel', value: 0, pct: 0, color: '#38BDF8' },
+        { name: 'Paystack', value: 0, pct: 0, color: '#10B981' },
+        { name: 'Manual', value: 0, pct: 0, color: '#6366F1' }
       );
     }
 
@@ -125,7 +125,7 @@ export default function FinanceRevenueAnalytics() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -153,10 +153,10 @@ export default function FinanceRevenueAnalytics() {
       {/* Top KPIs */}
       <div className="finance-kpi-grid">
         {[
-          { label: 'Annual Recurring Revenue', value: formatCurrency(currentARR), change: '+38.3%', up: true, icon: DollarSign, color: '#01FDF6', bg: 'rgba(1,253,246,0.1)' },
-          { label: 'Net Revenue Retention', value: '122%', change: '+7% vs Q1', up: true, icon: TrendingUp, color: '#21FA90', bg: 'rgba(33,250,144,0.1)' },
-          { label: 'Total Revenue (YTD)', value: formatCurrency(totalRev), change: '+12.1%', up: true, icon: Users, color: '#8A4FFF', bg: 'rgba(138,79,255,0.1)' },
-          { label: 'Monthly Churn Rate', value: '1.6%', change: '-0.5% vs Q1', up: true, icon: TrendingDown, color: '#FF47DA', bg: 'rgba(255,71,218,0.1)' },
+          { label: 'Annual Recurring Revenue', value: formatCurrency(currentARR), change: '+38.3%', up: true, icon: DollarSign, color: '#38BDF8', bg: 'rgba(1,253,246,0.1)' },
+          { label: 'Net Revenue Retention', value: '122%', change: '+7% vs Q1', up: true, icon: TrendingUp, color: '#10B981', bg: 'rgba(33,250,144,0.1)' },
+          { label: 'Total Revenue (YTD)', value: formatCurrency(totalRev), change: '+12.1%', up: true, icon: Users, color: '#6366F1', bg: 'rgba(138,79,255,0.1)' },
+          { label: 'Monthly Churn Rate', value: '1.6%', change: '-0.5% vs Q1', up: true, icon: TrendingDown, color: '#EF4444', bg: 'rgba(255,71,218,0.1)' },
         ].map(m => {
           const Icon = m.icon;
           return (
@@ -181,8 +181,8 @@ export default function FinanceRevenueAnalytics() {
         <div className="card-title">
           Revenue vs Target — {period}
           <div style={{ display: 'flex', gap: 12 }}>
-            <span className="finance-legend-dot" style={{ background: '#01FDF6' }}>Revenue</span>
-            <span className="finance-legend-dot" style={{ background: '#627496' }}>Target</span>
+            <span className="finance-legend-dot" style={{ background: '#38BDF8' }}>Revenue</span>
+            <span className="finance-legend-dot" style={{ background: '#64748B' }}>Target</span>
           </div>
         </div>
         <div style={{ height: 280 }}>
@@ -190,16 +190,16 @@ export default function FinanceRevenueAnalytics() {
             <AreaChart data={monthlyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="gradRev2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#01FDF6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#01FDF6" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#38BDF8" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 11 }} />
-              <YAxis stroke="#3d4e6b" tick={{ fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
+              <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 11 }} />
+              <YAxis stroke="#475569" tick={{ fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
               <Tooltip content={<ChartTooltip />} />
-              <Area type="monotone" dataKey="Revenue" stroke="#01FDF6" strokeWidth={2.5} fill="url(#gradRev2)" name="Revenue" />
-              <Line type="monotone" dataKey="Target" stroke="#627496" strokeWidth={1.5} strokeDasharray="5 5" dot={false} name="Target" />
+              <Area type="monotone" dataKey="Revenue" stroke="#38BDF8" strokeWidth={2.5} fill="url(#gradRev2)" name="Revenue" />
+              <Line type="monotone" dataKey="Target" stroke="#64748B" strokeWidth={1.5} strokeDasharray="5 5" dot={false} name="Target" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -236,10 +236,10 @@ export default function FinanceRevenueAnalytics() {
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={growthMetrics} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 10 }} />
-                <YAxis stroke="#3d4e6b" tick={{ fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
+                <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 10 }} />
+                <YAxis stroke="#475569" tick={{ fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
                 <Tooltip content={<ChartTooltip />} />
-                <Bar dataKey="ARR" fill="#8A4FFF" radius={[4, 4, 0, 0]} name="ARR" />
+                <Bar dataKey="ARR" fill="#6366F1" radius={[4, 4, 0, 0]} name="ARR" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -275,7 +275,7 @@ export default function FinanceRevenueAnalytics() {
                         <span style={{
                           display: 'inline-block', padding: '4px 10px', borderRadius: 4,
                           background: `rgba(33,250,144,${opacity * 0.6})`,
-                          color: val > 80 ? '#21FA90' : val > 60 ? '#E4FF1A' : '#FF47DA',
+                          color: val > 80 ? '#10B981' : val > 60 ? '#F59E0B' : '#EF4444',
                           fontWeight: 700,
                         }}>{val}%</span>
                       </td>

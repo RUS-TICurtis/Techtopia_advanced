@@ -1,4 +1,4 @@
-.command-palette-overlay {
+﻿.command-palette-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -15,7 +15,7 @@
 .command-palette-modal {
   width: 100%;
   max-width: 600px;
-  background-color: #0f1629;
+  background-color: #1E293B;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
@@ -46,7 +46,7 @@
 }
 
 .command-search-icon {
-  color: #627496;
+  color: #64748B;
   margin-right: 12px;
 }
 
@@ -61,7 +61,7 @@
 }
 
 .command-input::placeholder {
-  color: #627496;
+  color: #64748B;
 }
 
 .command-list {
@@ -73,14 +73,14 @@
 .command-empty {
   padding: 24px 0;
   text-align: center;
-  color: #627496;
+  color: #64748B;
   font-size: 14px;
 }
 
 .command-list [cmdk-group-heading] {
   font-size: 11px;
   text-transform: uppercase;
-  color: #3d4e6b;
+  color: #475569;
   padding: 8px 12px 4px;
   font-family: var(--font-main);
   font-weight: 700;
@@ -111,7 +111,7 @@
   font-size: 10px;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #627496;
+  color: #64748B;
   padding: 2px 6px;
   border-radius: 4px;
   font-family: var(--font-main);

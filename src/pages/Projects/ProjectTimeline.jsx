@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+﻿import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Calendar, 
@@ -43,18 +43,18 @@ export default function ProjectTimeline() {
 
   const getHealthColor = (h) => {
     switch (h) {
-      case 'On Track': return '#21FA90'; // Green
-      case 'At Risk': return '#E4FF1A'; // Yellow
-      case 'Off Track': return '#FF47DA'; // Magenta
-      case 'Completed': return '#3772FF'; // Blue
-      default: return '#627496';
+      case 'On Track': return '#10B981'; // Green
+      case 'At Risk': return '#F59E0B'; // Yellow
+      case 'Off Track': return '#EF4444'; // Magenta
+      case 'Completed': return '#3B82F6'; // Blue
+      default: return '#64748B';
     }
   };
 
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -111,7 +111,7 @@ export default function ProjectTimeline() {
             <Link to="/projects" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span className="text-[#01FDF6]">⚡</span> Portfolio Gantt Timeline
+            <span className="text-[#38BDF8]">⚡</span> Portfolio Gantt Timeline
           </h1>
           <p className="page-subtitle">Visual sprint tracking, project windows, and milestone delivery targets</p>
         </div>
@@ -125,7 +125,7 @@ export default function ProjectTimeline() {
         </div>
       </div>
 
-      <div className="card premium-panel overflow-hidden p-6 bg-[#0f1629]/40 border border-gray-800/80 backdrop-blur-md">
+      <div className="card premium-panel overflow-hidden p-6 bg-[#1E293B]/40 border border-gray-800/80 backdrop-blur-md">
         
         {/* Timeline Header (Months) */}
         <div className="timeline-gantt-wrapper relative mt-4">
@@ -218,7 +218,7 @@ export default function ProjectTimeline() {
                           />
 
                           {/* Hover tooltip showing milestone details */}
-                          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#0f1629] border border-gray-800 text-[10px] text-gray-300 font-bold px-2 py-1.5 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-55 flex flex-col gap-0.5 pointer-events-none">
+                          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#1E293B] border border-gray-800 text-[10px] text-gray-300 font-bold px-2 py-1.5 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-55 flex flex-col gap-0.5 pointer-events-none">
                             <span className="text-white font-black flex items-center gap-1">
                               <Flag size={9} style={{ color }} /> {ms.name}
                             </span>
@@ -240,10 +240,10 @@ export default function ProjectTimeline() {
       </div>
 
       {/* Info card describing timeline capabilities */}
-      <div className="card p-4 bg-[#E4FF1A]/5 border-l-4 border-l-[#E4FF1A] flex gap-3 text-xs leading-relaxed text-gray-300">
-        <Sparkles size={18} className="text-[#E4FF1A] flex-shrink-0 mt-0.5" />
+      <div className="card p-4 bg-[#F59E0B]/5 border-l-4 border-l-[#F59E0B] flex gap-3 text-xs leading-relaxed text-gray-300">
+        <Sparkles size={18} className="text-[#F59E0B] flex-shrink-0 mt-0.5" />
         <div>
-          <span className="font-bold text-white">Timeline Sprint Tracking activated.</span> Hover over the glowing diamond milestone tags inside the Gantt lanes to view detailed target scheduled cutover dates. Drag deliverables in the <Link to="/projects/board" className="text-[#01FDF6] font-bold underline hover:text-white transition-colors">Kanban Board</Link> to adjust completion velocities.
+          <span className="font-bold text-white">Timeline Sprint Tracking activated.</span> Hover over the glowing diamond milestone tags inside the Gantt lanes to view detailed target scheduled cutover dates. Drag deliverables in the <Link to="/projects/board" className="text-[#38BDF8] font-bold underline hover:text-white transition-colors">Kanban Board</Link> to adjust completion velocities.
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-/* AI Assistant Page */
+﻿/* AI Assistant Page */
 .ai-assistant-page { gap: 20px; }
 
 .ai-layout {
@@ -256,7 +256,7 @@
 /* Dark mode overrides */
 [data-theme="dark"] .ai-message.user .ai-message-bubble {
   background: var(--brand-cyan);
-  color: #050D1B;
+  color: #0F172A;
 }
 
 [data-theme="dark"] .ai-message.user .ai-message-avatar {

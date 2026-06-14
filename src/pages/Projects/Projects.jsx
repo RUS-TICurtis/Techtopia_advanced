@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   Plus, 
@@ -96,7 +96,7 @@ export default function Projects() {
       <PageHeader
         title="Project Portfolio"
         subtitle="Track project health, progress bars, budgets, and milestones"
-        icon={<span className="text-[#21FA90] text-xl">⚡</span>}
+        icon={<span className="text-[#10B981] text-xl">⚡</span>}
         actions={
           <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
             <Plus size={18} /> New Project
@@ -113,8 +113,8 @@ export default function Projects() {
               onClick={() => setActiveHealthFilter(tab)}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${
                 activeHealthFilter === tab 
-                  ? 'bg-[#21FA90] border-[#21FA90] text-[#0a0f1e] shadow-glow font-black' 
-                  : 'bg-[#0f1629]/40 border-gray-800 text-gray-400 hover:text-white'
+                  ? 'bg-[#10B981] border-[#10B981] text-[#0F172A] shadow-glow font-black' 
+                  : 'bg-[#1E293B]/40 border-gray-800 text-gray-400 hover:text-white'
               }`}
             >
               {tab}
@@ -140,10 +140,10 @@ export default function Projects() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {isLoading ? (
           <div className="col-span-full flex items-center justify-center min-h-[250px]">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#21FA90]"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#10B981]"></div>
           </div>
         ) : filteredProjects.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-16 bg-[#0f1629]/20 border border-dashed border-gray-800 rounded-2xl">
+          <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-16 bg-[#1E293B]/20 border border-dashed border-gray-800 rounded-2xl">
             <FolderKanban size={36} className="text-gray-600 mb-2 animate-pulse" />
             <span className="font-bold text-sm">No Projects Found</span>
             <span className="text-xs text-gray-600 mt-1">Create a new project deliverable to populate this list.</span>
@@ -153,12 +153,12 @@ export default function Projects() {
             const budgetPercent = proj.budget > 0 ? Math.min(100, Math.floor((proj.spent / proj.budget) * 100)) : 0;
             const projectTitle = proj.title || proj.name;
             return (
-              <div key={proj.id} className="project-portfolio-card card premium-card flex flex-col gap-4 p-5 border border-gray-800/80 bg-[#0f1629]/40 backdrop-blur-md">
+              <div key={proj.id} className="project-portfolio-card card premium-card flex flex-col gap-4 p-5 border border-gray-800/80 bg-[#1E293B]/40 backdrop-blur-md">
                 
                 {/* Header: Title and Health */}
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-extrabold text-base tracking-tight truncate hover:text-[#01FDF6] transition-colors">
+                    <h3 className="text-white font-extrabold text-base tracking-tight truncate hover:text-[#38BDF8] transition-colors">
                       {projectTitle}
                     </h3>
                     <p className="text-xs text-gray-400 font-semibold flex items-center gap-1.5 mt-0.5 truncate">
@@ -180,18 +180,18 @@ export default function Projects() {
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center text-[10px] font-bold text-gray-400">
                     <span>COMPLETION RATE</span>
-                    <span className="text-[#01FDF6] font-mono">{proj.progress || 0}%</span>
+                    <span className="text-[#38BDF8] font-mono">{proj.progress || 0}%</span>
                   </div>
                   <div className="w-full h-2 bg-gray-900 border border-gray-850 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-[#8A4FFF] to-[#01FDF6] rounded-full transition-all duration-500"
+                      className="h-full bg-gradient-to-r from-[#6366F1] to-[#38BDF8] rounded-full transition-all duration-500"
                       style={{ width: `${proj.progress || 0}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Metrics Grid */}
-                <div className="grid grid-cols-2 gap-4 p-3 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl text-xs text-gray-300">
+                <div className="grid grid-cols-2 gap-4 p-3 bg-[#0F172A]/80 border border-gray-850 rounded-xl text-xs text-gray-300">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">BUDGET CONVERSION</span>
                     <span className="font-mono text-white font-extrabold text-xs">
@@ -202,7 +202,7 @@ export default function Projects() {
                   <div className="flex flex-col gap-0.5 border-l border-gray-850 pl-4">
                     <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">PORTFOLIO OWNER</span>
                     <span className="text-xs text-gray-300 font-semibold flex items-center gap-1.5 mt-0.5">
-                      <User size={12} className="text-[#8A4FFF]" />
+                      <User size={12} className="text-[#6366F1]" />
                       {proj.owner || 'Unassigned'}
                     </span>
                   </div>
@@ -227,7 +227,7 @@ export default function Projects() {
                 {/* Date & Timers Footer */}
                 <div className="flex justify-between items-center text-xs text-gray-500 border-t border-gray-850/50 pt-4 mt-auto">
                   <div className="flex items-center gap-1">
-                    <Calendar size={12} className="text-[#01FDF6]" />
+                    <Calendar size={12} className="text-[#38BDF8]" />
                     <span>Due: {proj.dueDate || proj.endDate || 'No due date'}</span>
                   </div>
                   
@@ -235,14 +235,14 @@ export default function Projects() {
                   <div className="flex items-center gap-2">
                     <Link 
                       to={`/projects/board?projectId=${proj.id}`} 
-                      className="w-8 h-8 rounded-lg bg-gray-900 hover:bg-gray-850 text-gray-400 hover:text-[#01FDF6] flex items-center justify-center transition-all border border-gray-850"
+                      className="w-8 h-8 rounded-lg bg-gray-900 hover:bg-gray-850 text-gray-400 hover:text-[#38BDF8] flex items-center justify-center transition-all border border-gray-850"
                       title="Open Kanban Board"
                     >
                       <FolderKanban size={14} />
                     </Link>
                     <Link 
                       to="/projects/timeline" 
-                      className="w-8 h-8 rounded-lg bg-gray-900 hover:bg-gray-850 text-gray-400 hover:text-[#01FDF6] flex items-center justify-center transition-all border border-gray-850"
+                      className="w-8 h-8 rounded-lg bg-gray-900 hover:bg-gray-850 text-gray-400 hover:text-[#38BDF8] flex items-center justify-center transition-all border border-gray-850"
                       title="Open Timeline Gantt"
                     >
                       <Clock size={14} />
@@ -268,7 +268,7 @@ export default function Projects() {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Project Title *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
               placeholder="e.g. Quantum Core Cloud Migration" 
               value={title} 
               onChange={e => setTitle(e.target.value)} 
@@ -280,7 +280,7 @@ export default function Projects() {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Linked Enterprise Company *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
               placeholder="e.g. CloudScale Inc." 
               value={company} 
               onChange={e => setCompany(e.target.value)} 
@@ -293,7 +293,7 @@ export default function Projects() {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Allocated Budget ($)</label>
               <input 
                 type="number" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
                 placeholder="e.g. 50000" 
                 value={budget} 
                 onChange={e => setBudget(e.target.value)} 
@@ -303,7 +303,7 @@ export default function Projects() {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Current Budget Spent ($)</label>
               <input 
                 type="number" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
                 placeholder="e.g. 10000" 
                 value={spent} 
                 onChange={e => setSpent(e.target.value)} 
@@ -316,7 +316,7 @@ export default function Projects() {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Start Date</label>
               <input 
                 type="date" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
                 value={startDate} 
                 onChange={e => setStartDate(e.target.value)} 
               />
@@ -325,7 +325,7 @@ export default function Projects() {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Target Due Date</label>
               <input 
                 type="date" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
                 value={dueDate} 
                 onChange={e => setDueDate(e.target.value)} 
               />
@@ -336,7 +336,7 @@ export default function Projects() {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Initial Health Status</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
                 value={health} 
                 onChange={e => setHealth(e.target.value)}
               >
@@ -348,7 +348,7 @@ export default function Projects() {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Project Portfolio Representative</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981]" 
                 value={owner} 
                 onChange={e => setOwner(e.target.value)}
               >
@@ -361,7 +361,7 @@ export default function Projects() {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Description Overview</label>
             <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#21FA90] h-20 resize-none" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#10B981] h-20 resize-none" 
               placeholder="State the primary targets and scope parameters of this deliverable..." 
               value={description} 
               onChange={e => setDescription(e.target.value)}
@@ -378,7 +378,7 @@ export default function Projects() {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#21FA90] hover:bg-[#1ee081] text-[#0a0f1e] font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#10B981] hover:bg-[#10B981] text-[#0F172A] font-bold shadow-glow transition-all"
             >
               Launch Project
             </button>

@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Super Admin Oversight Platform Stylesheet
    ========================================================================== */
 
@@ -19,11 +19,11 @@
 }
 
 .shadow-green {
-  box-shadow: 0 0 10px #50fa7b;
+  box-shadow: 0 0 10px #10B981;
 }
 
 .shadow-red {
-  box-shadow: 0 0 10px #ff5555;
+  box-shadow: 0 0 10px #EF4444;
 }
 
 /* Impersonation Banner */
@@ -45,13 +45,13 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #ff0055;
-  box-shadow: 0 0 8px #ff0055;
+  background-color: #EF4444;
+  box-shadow: 0 0 8px #EF4444;
   animation: pulseDotRed 1.8s infinite ease-in-out;
 }
 
 .stop-impersonate-btn {
-  background-color: #ff0055;
+  background-color: #EF4444;
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -65,7 +65,7 @@
 }
 
 .stop-impersonate-btn:hover {
-  background-color: #e0004b;
+  background-color: #EF4444;
   transform: translateY(-1px);
 }
 

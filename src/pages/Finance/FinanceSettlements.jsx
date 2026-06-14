@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { CheckCircle, Clock, AlertCircle, ArrowRight, RefreshCw, Download, Filter } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
@@ -23,7 +23,7 @@ export default function FinanceSettlements() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -52,10 +52,10 @@ export default function FinanceSettlements() {
       {/* KPIs */}
       <div className="finance-kpi-grid">
         {[
-          { label: 'Total Gross Volume', value: formatCurrency(totals.gross), color: '#01FDF6', bg: 'rgba(1,253,246,0.1)' },
-          { label: 'Total Gateway Fees', value: formatCurrency(totals.fees), color: '#FF47DA', bg: 'rgba(255,71,218,0.1)' },
-          { label: 'Net Settled', value: formatCurrency(totals.net - totals.pending), color: '#21FA90', bg: 'rgba(33,250,144,0.1)' },
-          { label: 'Pending Settlement', value: formatCurrency(totals.pending), color: '#E4FF1A', bg: 'rgba(228,255,26,0.1)' },
+          { label: 'Total Gross Volume', value: formatCurrency(totals.gross), color: '#38BDF8', bg: 'rgba(1,253,246,0.1)' },
+          { label: 'Total Gateway Fees', value: formatCurrency(totals.fees), color: '#EF4444', bg: 'rgba(255,71,218,0.1)' },
+          { label: 'Net Settled', value: formatCurrency(totals.net - totals.pending), color: '#10B981', bg: 'rgba(33,250,144,0.1)' },
+          { label: 'Pending Settlement', value: formatCurrency(totals.pending), color: '#F59E0B', bg: 'rgba(228,255,26,0.1)' },
         ].map(m => (
           <div key={m.label} className="finance-kpi-card card">
             <div className="finance-kpi-icon" style={{ background: m.bg, color: m.color }}><CheckCircle size={20} /></div>
@@ -97,7 +97,7 @@ export default function FinanceSettlements() {
           <tbody>
             {filtered.map(stl => {
               const cfg = STATUS_CONFIG[stl.status] || { class: 'badge-neutral', icon: Clock, label: stl.status || 'Pending' };
-              const gwCfg = GATEWAY_CONFIG[stl.gateway] || { class: 'badge-neutral', color: '#627496' };
+              const gwCfg = GATEWAY_CONFIG[stl.gateway] || { class: 'badge-neutral', color: '#64748B' };
               const StatusIcon = cfg.icon || Clock;
               return (
                 <tr key={stl.id}>
@@ -107,7 +107,7 @@ export default function FinanceSettlements() {
                   <td className="text-sm">{stl.txnCount} txns</td>
                   <td className="font-semibold">{formatCurrency(stl.grossVol)}</td>
                   <td style={{ color: 'var(--error)', fontWeight: 600 }}>-{formatCurrency(stl.fees)}</td>
-                  <td className="font-semibold" style={{ color: '#21FA90' }}>{formatCurrency(stl.net)}</td>
+                  <td className="font-semibold" style={{ color: '#10B981' }}>{formatCurrency(stl.net)}</td>
                   <td>
                     <span className={`badge badge-sm ${cfg.class}`} style={{ gap: 4 }}>
                       <StatusIcon size={10} /> {cfg.label}
@@ -123,7 +123,7 @@ export default function FinanceSettlements() {
               <td colSpan={4} style={{ padding: '12px', fontWeight: 700, color: 'var(--text-title)', fontSize: 13 }}>Totals</td>
               <td style={{ padding: '12px', fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: 13 }}>{formatCurrency(totals.gross)}</td>
               <td style={{ padding: '12px', fontWeight: 700, color: 'var(--error)', fontFamily: 'var(--font-mono)', fontSize: 13 }}>-{formatCurrency(totals.fees)}</td>
-              <td style={{ padding: '12px', fontWeight: 700, color: '#21FA90', fontFamily: 'var(--font-mono)', fontSize: 13 }}>{formatCurrency(totals.net)}</td>
+              <td style={{ padding: '12px', fontWeight: 700, color: '#10B981', fontFamily: 'var(--font-mono)', fontSize: 13 }}>{formatCurrency(totals.net)}</td>
               <td colSpan={2}></td>
             </tr>
           </tfoot>

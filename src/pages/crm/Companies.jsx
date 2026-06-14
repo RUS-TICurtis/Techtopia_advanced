@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Search, Filter, Plus, MoreVertical, MapPin, Globe, Users, X } from 'lucide-react';
 import { useCompanies } from '../../hooks/useCrmData';
 import './Companies.css';
@@ -52,8 +52,8 @@ export default function Companies({ searchValue }) {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center min-h-[250px] bg-[#0f1629]/20 border border-gray-800 rounded-2xl">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="flex items-center justify-center min-h-[250px] bg-[#1E293B]/20 border border-gray-800 rounded-2xl">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
         </div>
       ) : (
         <div className="card table-container">

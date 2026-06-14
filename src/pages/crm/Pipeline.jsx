@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { 
   Plus, 
   ChevronLeft, 
@@ -292,7 +292,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
       <PageHeader 
         title="Pipeline Manager"
         subtitle="Interactive visual sales funnel with drag-and-drop orchestration"
-        icon={<span className="text-[#01FDF6]">⚡</span>}
+        icon={<span className="text-[#38BDF8]">⚡</span>}
         actions={headerActions}
       />
 
@@ -316,7 +316,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
       </div>
 
       {/* Filter and Control Bar */}
-      <div className="pipeline-controls flex flex-col md:flex-row gap-4 justify-between items-center mb-6 bg-[#0f1629]/40 border border-gray-800/80 rounded-xl p-4 backdrop-blur-md">
+      <div className="pipeline-controls flex flex-col md:flex-row gap-4 justify-between items-center mb-6 bg-[#1E293B]/40 border border-gray-800/80 rounded-xl p-4 backdrop-blur-md">
         <div className="flex flex-1 w-full md:max-w-md items-center relative">
           <Search className="absolute left-3 text-gray-500" size={16} />
           <input 
@@ -324,7 +324,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             placeholder="Search deals by title or company..." 
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[#0a0f1e]/80 border border-gray-800 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#01FDF6] transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-[#0F172A]/80 border border-gray-800 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#38BDF8] transition-all"
           />
         </div>
 
@@ -334,7 +334,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="bg-[#0a0f1e]/80 border border-gray-800 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-[#01FDF6] transition-all"
+              className="bg-[#0F172A]/80 border border-gray-800 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-[#38BDF8] transition-all"
             >
               <option value="All">All Priorities</option>
               <option value="High">High Priority</option>
@@ -348,7 +348,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              className="bg-[#0a0f1e]/80 border border-gray-800 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-[#01FDF6] transition-all"
+              className="bg-[#0F172A]/80 border border-gray-800 text-gray-300 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-[#38BDF8] transition-all"
             >
               <option value="none">Default Sort</option>
               <option value="value-desc">Highest Value</option>
@@ -503,7 +503,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
                       <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="kanban-drop-zone flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-xl p-6 text-gray-500 text-center gap-2 bg-[#090f1e]/40 min-h-[150px] transition-colors"
+                        className="kanban-drop-zone flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-xl p-6 text-gray-500 text-center gap-2 bg-[#0F172A]/40 min-h-[150px] transition-colors"
                         style={{
                           borderColor: isOver ? stageColor : 'rgba(255,255,255,0.03)'
                         }}
@@ -535,7 +535,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Opportunity Title *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               placeholder="e.g. Enterprise CRM License Expansion"
               value={title} 
               onChange={e => setTitle(e.target.value)} 
@@ -546,7 +546,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Linked Customer Contact</label>
             <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={selectedContactId} 
               onChange={e => setSelectedContactId(e.target.value)}
             >
@@ -567,7 +567,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deal Value ($)</label>
               <input 
                 type="number" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 placeholder="e.g. 50000"
                 value={value} 
                 onChange={e => setValue(e.target.value)} 
@@ -577,7 +577,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Target Close Date</label>
               <input 
                 type="date" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={date} 
                 onChange={e => setDate(e.target.value)} 
               />
@@ -588,7 +588,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={stage} 
                 onChange={e => setStage(e.target.value)}
               >
@@ -607,7 +607,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
             >
               Create Opportunity
             </button>
@@ -630,7 +630,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Opportunity Title *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={title} 
               onChange={e => setTitle(e.target.value)} 
               required 
@@ -640,7 +640,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Linked Customer Contact</label>
             <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={selectedContactId} 
               onChange={e => setSelectedContactId(e.target.value)}
             >
@@ -661,7 +661,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deal Value ($)</label>
               <input 
                 type="number" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={value} 
                 onChange={e => setValue(e.target.value)} 
               />
@@ -670,7 +670,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Target Close Date</label>
               <input 
                 type="date" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={date} 
                 onChange={e => setDate(e.target.value)} 
               />
@@ -681,7 +681,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={stage} 
                 onChange={e => setStage(e.target.value)}
               >
@@ -714,7 +714,7 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
               </button>
               <button 
                 type="submit" 
-                className="px-5 py-2.5 rounded-lg text-sm bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] font-bold shadow-glow transition-all"
+                className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
               >
                 Save Changes
               </button>

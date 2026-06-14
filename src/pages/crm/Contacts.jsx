@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { 
   Plus, 
   Edit3, 
@@ -193,10 +193,10 @@ export default function Contacts({ searchValue = '' }) {
         const contact = row.original;
         return (
           <div className="flex items-center gap-3 py-1">
-            <div className="w-8 h-8 rounded-full bg-[#8A4FFF]/10 border border-[#8A4FFF]/25 text-[#8A4FFF] flex items-center justify-center font-bold text-sm">
+            <div className="w-8 h-8 rounded-full bg-[#6366F1]/10 border border-[#6366F1]/25 text-[#6366F1] flex items-center justify-center font-bold text-sm">
               {contact.name.charAt(0)}
             </div>
-            <span className="font-bold text-white text-sm hover:text-[#01FDF6] transition-colors">{contact.name}</span>
+            <span className="font-bold text-white text-sm hover:text-[#38BDF8] transition-colors">{contact.name}</span>
           </div>
         );
       }
@@ -223,7 +223,7 @@ export default function Contacts({ searchValue = '' }) {
       accessorKey: 'value',
       header: 'Deal Value',
       cell: ({ getValue }) => (
-        <span className="font-display font-extrabold text-[#01FDF6] text-xs">
+        <span className="font-display font-extrabold text-[#38BDF8] text-xs">
           ${getValue().toLocaleString()}
         </span>
       )
@@ -262,7 +262,7 @@ export default function Contacts({ searchValue = '' }) {
       <PageHeader
         title="Lead Ledger"
         subtitle="Unified customer records with Radix right-click execution & dossiers"
-        icon={<span className="text-[#8A4FFF] text-xl">⚡</span>}
+        icon={<span className="text-[#6366F1] text-xl">⚡</span>}
         actions={
           <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
             <Plus size={18} /> Add New Lead
@@ -279,8 +279,8 @@ export default function Contacts({ searchValue = '' }) {
               onClick={() => setActiveFilter(tab)}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${
                 activeFilter === tab 
-                  ? 'bg-[#8A4FFF] border-[#8A4FFF] text-white shadow-glow' 
-                  : 'bg-[#0f1629]/40 border-gray-800 text-gray-400 hover:text-white'
+                  ? 'bg-[#6366F1] border-[#6366F1] text-white shadow-glow' 
+                  : 'bg-[#1E293B]/40 border-gray-800 text-gray-400 hover:text-white'
               }`}
             >
               {tab}
@@ -288,7 +288,7 @@ export default function Contacts({ searchValue = '' }) {
           ))}
         </div>
         <div className="text-xs text-gray-500 font-mono">
-          Showing <span className="text-[#01FDF6] font-bold">{filteredContacts.length}</span> leads in roster
+          Showing <span className="text-[#38BDF8] font-bold">{filteredContacts.length}</span> leads in roster
         </div>
       </div>
 
@@ -296,7 +296,7 @@ export default function Contacts({ searchValue = '' }) {
       <div className="contacts-grid-wrapper flex flex-col xl:flex-row gap-6">
         
         {/* Table Container */}
-        <div className="flex-1 min-w-0 bg-[#0f1629]/30 border border-gray-800/80 rounded-xl overflow-hidden backdrop-blur-md">
+        <div className="flex-1 min-w-0 bg-[#1E293B]/30 border border-gray-800/80 rounded-xl overflow-hidden backdrop-blur-md">
           <DataTable 
             columns={columns}
             data={filteredContacts}
@@ -308,7 +308,7 @@ export default function Contacts({ searchValue = '' }) {
 
         {/* Sliding Panel / Drawer style card when contact selected */}
         {selectedContactDetails && (
-          <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#0f1629]/80 backdrop-blur-lg">
+          <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#1E293B]/80 backdrop-blur-lg">
             <div className="flex justify-between items-center border-b border-gray-850 pb-4">
               <h3 className="card-title text-white font-black font-display text-base tracking-wide m-0">Client Dossier</h3>
               <button 
@@ -321,7 +321,7 @@ export default function Contacts({ searchValue = '' }) {
 
             {/* Profile Avatar & Title */}
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-[#8A4FFF]/20 border border-[#8A4FFF]/40 text-[#8A4FFF] flex items-center justify-center font-display font-black text-xl shadow-glow">
+              <div className="w-14 h-14 rounded-full bg-[#6366F1]/20 border border-[#6366F1]/40 text-[#6366F1] flex items-center justify-center font-display font-black text-xl shadow-glow">
                 {selectedContactDetails.name.charAt(0)}
               </div>
               <div className="min-w-0 flex-1">
@@ -334,7 +334,7 @@ export default function Contacts({ searchValue = '' }) {
             </div>
 
             {/* Metadata Fields */}
-            <div className="flex flex-col gap-2.5 p-4 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl">
+            <div className="flex flex-col gap-2.5 p-4 bg-[#0F172A]/80 border border-gray-850 rounded-xl">
               <div className="flex items-center gap-3 text-xs text-gray-300">
                 <Mail size={14} className="text-gray-500 w-4" />
                 <span className="truncate">{selectedContactDetails.email || '—'}</span>
@@ -347,7 +347,7 @@ export default function Contacts({ searchValue = '' }) {
                 <Briefcase size={14} className="text-gray-500 w-4" />
                 <span>
                   Deal Value:{' '}
-                  <strong className="text-[#01FDF6] font-display font-black ml-1">
+                  <strong className="text-[#38BDF8] font-display font-black ml-1">
                     ${(selectedContactDetails.value || 0).toLocaleString()}
                   </strong>
                 </span>
@@ -365,7 +365,7 @@ export default function Contacts({ searchValue = '' }) {
             {/* Notes Section */}
             <div className="flex flex-col gap-1.5">
               <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Administrative Dossier Notes</h5>
-              <div className="p-3 bg-[#E4FF1A]/5 border-l-4 border-[#E4FF1A] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
+              <div className="p-3 bg-[#F59E0B]/5 border-l-4 border-[#F59E0B] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
                 {selectedContactDetails.notes || "No administrative intelligence records filed for this customer."}
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Contact Name *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 placeholder="e.g. Alice Vance" 
                 value={name} 
                 onChange={e => setName(e.target.value)} 
@@ -414,7 +414,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company / Org *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 placeholder="e.g. CloudScale Inc." 
                 value={company} 
                 onChange={e => setCompany(e.target.value)} 
@@ -428,7 +428,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
               <input 
                 type="email" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 placeholder="e.g. alice@cloudscale.com" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
@@ -438,7 +438,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 placeholder="e.g. +1 (555) 234-5678" 
                 value={phone} 
                 onChange={e => setPhone(e.target.value)} 
@@ -450,7 +450,7 @@ export default function Contacts({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 value={status} 
                 onChange={e => setStatus(e.target.value)}
               >
@@ -466,7 +466,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Estimated Account Value ($)</label>
               <input 
                 type="number" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 placeholder="e.g. 45000" 
                 value={value} 
                 onChange={e => setValue(e.target.value)} 
@@ -477,7 +477,7 @@ export default function Contacts({ searchValue = '' }) {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Dossier Intelligence Notes</label>
             <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF] h-20 resize-none" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] h-20 resize-none" 
               placeholder="e.g. Prefers email connection. Requires SOC2 documentation for proposal..." 
               value={notes} 
               onChange={e => setNotes(e.target.value)}
@@ -494,7 +494,7 @@ export default function Contacts({ searchValue = '' }) {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#8A4FFF] hover:bg-[#783eeb] text-white font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#6366F1] hover:bg-[#6366F1] text-white font-bold shadow-glow transition-all"
             >
               Create Dossier
             </button>
@@ -515,7 +515,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Contact Name *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 value={name} 
                 onChange={e => setName(e.target.value)} 
                 required 
@@ -525,7 +525,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company / Org *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 value={company} 
                 onChange={e => setCompany(e.target.value)} 
                 required 
@@ -538,7 +538,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
               <input 
                 type="email" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
               />
@@ -547,7 +547,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 value={phone} 
                 onChange={e => setPhone(e.target.value)} 
               />
@@ -558,7 +558,7 @@ export default function Contacts({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 value={status} 
                 onChange={e => setStatus(e.target.value)}
               >
@@ -574,7 +574,7 @@ export default function Contacts({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Estimated Account Value ($)</label>
               <input 
                 type="number" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1]" 
                 value={value} 
                 onChange={e => setValue(e.target.value)} 
               />
@@ -584,7 +584,7 @@ export default function Contacts({ searchValue = '' }) {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Dossier Intelligence Notes</label>
             <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#8A4FFF] h-20 resize-none" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#6366F1] h-20 resize-none" 
               value={notes} 
               onChange={e => setNotes(e.target.value)}
             />
@@ -600,7 +600,7 @@ export default function Contacts({ searchValue = '' }) {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#8A4FFF] hover:bg-[#783eeb] text-white font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#6366F1] hover:bg-[#6366F1] text-white font-bold shadow-glow transition-all"
             >
               Save Dossier
             </button>

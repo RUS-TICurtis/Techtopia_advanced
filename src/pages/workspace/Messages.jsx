@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Search, Send, Paperclip, MoreVertical, Phone, Video, MessageSquare } from 'lucide-react';
 import { useCommunications, useConversationMessages } from '../../hooks/useCrmData';
 import { useAuthStore } from '../../store/authStore';
@@ -70,7 +70,7 @@ export default function Messages() {
           <div className="messages-list">
             {isLoadingConversations ? (
               <div className="flex items-center justify-center p-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#01FDF6]"></div>
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#38BDF8]"></div>
               </div>
             ) : conversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-gray-500 text-center gap-1">
@@ -127,7 +127,7 @@ export default function Messages() {
               <div className="messages-chat-area">
                 {isLoadingMessages ? (
                   <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-1">

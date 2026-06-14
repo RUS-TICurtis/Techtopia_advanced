@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Developer API & Marketplace Console Stylesheet
    ========================================================================== */
 
@@ -18,7 +18,7 @@
 
 .integration-card.premium-card:hover {
   transform: translateY(-2px);
-  border-color: #01FDF6;
+  border-color: #38BDF8;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
 }
 

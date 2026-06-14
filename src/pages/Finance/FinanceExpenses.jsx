@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import {
   Receipt, Plus, Search, CheckCircle, Clock, X,
   ThumbsUp, ThumbsDown, Download, Send, Trash2
@@ -116,14 +116,23 @@ export default function FinanceExpenses() {
   const handleCreate = async (ev) => {
     ev.preventDefault();
     setFormError('');
+
+    // Guard: categoryId is required (must be a valid UUID)
+    if (!newExpense.categoryId) {
+      setFormError('Please select a category.');
+      return;
+    }
+
     setSubmitting(true);
     // POST /api/v1/finance/expenses
+    // Append T00:00:00 to avoid UTC midnight shift on date-only strings
     const payload = {
-      categoryId: newExpense.categoryId || null,
+      categoryId: newExpense.categoryId,
       vendorId: newExpense.vendorId || null,
+      budgetId: null,
       projectId: null,
       opportunityId: null,
-      expenseDate: new Date(newExpense.expenseDate).toISOString(),
+      expenseDate: new Date(newExpense.expenseDate + 'T00:00:00').toISOString(),
       amount: parseFloat(newExpense.amount) || 0,
       currency: newExpense.currency || 'GHS',
       description: newExpense.description,
@@ -148,7 +157,7 @@ export default function FinanceExpenses() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -176,10 +185,10 @@ export default function FinanceExpenses() {
       {/* Metrics */}
       <div className="finance-kpi-grid">
         {[
-          { label: 'Total Expenses (MTD)', value: formatCurrency(metrics.total), color: '#FF47DA', bg: 'rgba(255,71,218,0.1)' },
-          { label: 'Pending Approval', value: formatCurrency(metrics.pending), color: '#E4FF1A', bg: 'rgba(228,255,26,0.1)' },
-          { label: 'Approved & Paid', value: formatCurrency(metrics.approved), color: '#21FA90', bg: 'rgba(33,250,144,0.1)' },
-          { label: 'Draft Expenses', value: `${metrics.draft} items`, color: '#8A4FFF', bg: 'rgba(138,79,255,0.1)' },
+          { label: 'Total Expenses (MTD)', value: formatCurrency(metrics.total), color: '#EF4444', bg: 'rgba(255,71,218,0.1)' },
+          { label: 'Pending Approval', value: formatCurrency(metrics.pending), color: '#F59E0B', bg: 'rgba(228,255,26,0.1)' },
+          { label: 'Approved & Paid', value: formatCurrency(metrics.approved), color: '#10B981', bg: 'rgba(33,250,144,0.1)' },
+          { label: 'Draft Expenses', value: `${metrics.draft} items`, color: '#6366F1', bg: 'rgba(138,79,255,0.1)' },
         ].map(m => (
           <div key={m.label} className="finance-kpi-card card">
             <div className="finance-kpi-icon" style={{ background: m.bg, color: m.color }}><Receipt size={20} /></div>
@@ -196,7 +205,7 @@ export default function FinanceExpenses() {
         <div className="card">
           <div className="card-title">
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Clock size={16} style={{ color: '#E4FF1A' }} /> Pending Approvals
+              <Clock size={16} style={{ color: '#F59E0B' }} /> Pending Approvals
             </span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -366,10 +375,10 @@ export default function FinanceExpenses() {
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Category</label>
+                  <label>Category *</label>
                   {categories.length > 0 ? (
                     <select
-                      className="form-input"
+                      className="form-input" required
                       value={newExpense.categoryId}
                       onChange={e => setNewExpense(p => ({ ...p, categoryId: e.target.value }))}
                     >
@@ -382,8 +391,8 @@ export default function FinanceExpenses() {
                     </select>
                   ) : (
                     <input
-                      type="text" className="form-input"
-                      placeholder="Category ID (UUID) — optional"
+                      type="text" className="form-input" required
+                      placeholder="Category ID (UUID) *"
                       value={newExpense.categoryId}
                       onChange={e => setNewExpense(p => ({ ...p, categoryId: e.target.value }))}
                     />

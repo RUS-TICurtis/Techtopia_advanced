@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Plus, 
@@ -241,7 +241,7 @@ export default function ProjectBoard() {
             <Link to="/projects" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span className="text-[#01FDF6]">⚡</span> Task Kanban Board {currentProject ? `— ${projectTitle}` : ''}
+            <span className="text-[#38BDF8]">⚡</span> Task Kanban Board {currentProject ? `— ${projectTitle}` : ''}
           </h1>
           <p className="page-subtitle">Track project deliverables, sprint schedules, and development items</p>
         </div>
@@ -367,7 +367,7 @@ export default function ProjectBoard() {
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="kanban-drop-zone flex flex-col items-center justify-center border-2 border-dashed border-gray-850 rounded-xl p-6 text-gray-500 text-center gap-2 bg-[#090f1e]/40 min-h-[150px] transition-colors"
+                      className="kanban-drop-zone flex flex-col items-center justify-center border-2 border-dashed border-gray-850 rounded-xl p-6 text-gray-500 text-center gap-2 bg-[#0F172A]/40 min-h-[150px] transition-colors"
                       style={{
                         borderColor: isOver ? stageColor : 'rgba(255,255,255,0.02)'
                       }}
@@ -398,7 +398,7 @@ export default function ProjectBoard() {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deliverable Title *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               placeholder="e.g. Conduct compliance security review" 
               value={title} 
               onChange={e => setTitle(e.target.value)} 
@@ -409,7 +409,7 @@ export default function ProjectBoard() {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Linked Customer Dossier</label>
             <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={selectedContactId} 
               onChange={e => setSelectedContactId(e.target.value)}
             >
@@ -427,7 +427,7 @@ export default function ProjectBoard() {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Due Date</label>
               <input 
                 type="date" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={dueDate} 
                 onChange={e => setDueDate(e.target.value)} 
               />
@@ -435,7 +435,7 @@ export default function ProjectBoard() {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Task Priority</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={priority} 
                 onChange={e => setPriority(e.target.value)}
               >
@@ -449,7 +449,7 @@ export default function ProjectBoard() {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sprint Board Column</label>
             <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={status} 
               onChange={e => setStatus(e.target.value)}
             >
@@ -460,7 +460,7 @@ export default function ProjectBoard() {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Technical Details</label>
             <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6] h-20 resize-none" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8] h-20 resize-none" 
               placeholder="State the core tasks and steps to fulfill..." 
               value={description} 
               onChange={e => setDescription(e.target.value)}
@@ -477,7 +477,7 @@ export default function ProjectBoard() {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
             >
               Commit Task
             </button>
@@ -500,7 +500,7 @@ export default function ProjectBoard() {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deliverable Title *</label>
             <input 
               type="text" 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={title} 
               onChange={e => setTitle(e.target.value)} 
               required 
@@ -510,7 +510,7 @@ export default function ProjectBoard() {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Linked Customer Dossier</label>
             <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={selectedContactId} 
               onChange={e => setSelectedContactId(e.target.value)}
             >
@@ -528,7 +528,7 @@ export default function ProjectBoard() {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Due Date</label>
               <input 
                 type="date" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={dueDate} 
                 onChange={e => setDueDate(e.target.value)} 
               />
@@ -536,7 +536,7 @@ export default function ProjectBoard() {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Task Priority</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={priority} 
                 onChange={e => setPriority(e.target.value)}
               >
@@ -550,7 +550,7 @@ export default function ProjectBoard() {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sprint Board Column</label>
             <select 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
               value={status} 
               onChange={e => setStatus(e.target.value)}
             >
@@ -561,7 +561,7 @@ export default function ProjectBoard() {
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Technical Details</label>
             <textarea 
-              className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6] h-20 resize-none" 
+              className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8] h-20 resize-none" 
               value={description} 
               onChange={e => setDescription(e.target.value)}
             />
@@ -588,7 +588,7 @@ export default function ProjectBoard() {
               </button>
               <button 
                 type="submit" 
-                className="px-5 py-2.5 rounded-lg text-sm bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] font-bold shadow-glow transition-all"
+                className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
               >
                 Save Deliverable
               </button>

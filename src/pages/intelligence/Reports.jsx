@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
@@ -56,7 +56,7 @@ export default function Reports() {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <FileSpreadsheet className="text-[#21FA90]" />
+            <FileSpreadsheet className="text-[#10B981]" />
             Business Intelligence & Reports
           </h1>
           <p className="page-subtitle">
@@ -78,20 +78,20 @@ export default function Reports() {
               <AreaChart data={FINANCIAL_DATA} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorARR" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#01FDF6" stopOpacity={0.35}/>
-                    <stop offset="95%" stopColor="#01FDF6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="#38BDF8" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#21FA90" stopOpacity={0.35}/>
-                    <stop offset="95%" stopColor="#21FA90" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" opacity={0.3} />
                 <XAxis dataKey="month" stroke="var(--text-muted)" tick={{ fontSize: 12 }} />
                 <YAxis stroke="var(--text-muted)" tick={{ fontSize: 12 }} />
                 <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-light)', color: 'var(--text-title)' }} />
-                <Area type="monotone" dataKey="ARR" stroke="#01FDF6" fillOpacity={1} fill="url(#colorARR)" />
-                <Area type="monotone" dataKey="Profit" stroke="#21FA90" fillOpacity={1} fill="url(#colorProfit)" />
+                <Area type="monotone" dataKey="ARR" stroke="#38BDF8" fillOpacity={1} fill="url(#colorARR)" />
+                <Area type="monotone" dataKey="Profit" stroke="#10B981" fillOpacity={1} fill="url(#colorProfit)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>

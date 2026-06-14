@@ -9,47 +9,47 @@
    ========================================================================== */
 
 :root {
-  --font-main: 'Sora', system-ui, -apple-system, sans-serif;
-  --font-display: 'Sora', system-ui, -apple-system, sans-serif;
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
-  /* Techtopia Brand Palette */
-  --brand-chartreuse: #E4FF1A;
-  --brand-cyan: #01FDF6;
-  --brand-green: #21FA90;
-  --brand-magenta: #FF47DA;
-  --brand-purple: #8A4FFF;
-  --brand-blue: #3772FF;
+  /* Professional Brand Palette */
+  --brand-chartreuse: #F59E0B;   /* Amber — replaces neon chartreuse */
+  --brand-cyan: #38BDF8;         /* Sky blue — replaces electric cyan */
+  --brand-green: #10B981;        /* Emerald — replaces neon green */
+  --brand-magenta: #EF4444;      /* Red — replaces neon magenta */
+  --brand-purple: #6366F1;       /* Indigo — replaces bright purple */
+  --brand-blue: #3B82F6;         /* Blue-500 — refined primary */
 
   /* Theme – Light */
   --primary: var(--brand-blue);
-  --primary-hover: #1e59f2;
-  --primary-rgb: 55, 114, 255;
-  --primary-bg: rgba(var(--primary-rgb), 0.1);
+  --primary-hover: #2563EB;
+  --primary-rgb: 59, 130, 246;
+  --primary-bg: rgba(var(--primary-rgb), 0.08);
   --bg-app: #F5F7FA;
   --bg-sidebar: #FFFFFF;
   --bg-card: #FFFFFF;
 
   --text-main: #232323;
-  --text-title: #343C6A;
-  --text-muted: #718EBF;
-  --text-light: #A3AED0;
+  --text-title: #1E3A5F;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
 
-  --border-light: #E6EFF5;
-  --border-focus: rgba(55, 114, 255, 0.4);
+  --border-light: #E2E8F0;
+  --border-focus: rgba(59, 130, 246, 0.35);
 
-  --success: var(--brand-green);
-  --success-bg: rgba(33, 250, 144, 0.12);
-  --error: var(--brand-magenta);
-  --error-bg: rgba(255, 71, 218, 0.12);
-  --warning: var(--brand-chartreuse);
-  --warning-bg: rgba(228, 255, 26, 0.12);
-  --info: var(--brand-purple);
-  --info-bg: rgba(138, 79, 255, 0.12);
+  --success: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.10);
+  --error: #EF4444;
+  --error-bg: rgba(239, 68, 68, 0.10);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.10);
+  --info: #6366F1;
+  --info-bg: rgba(99, 102, 241, 0.10);
 
-  --shadow-sm: 0 4px 10px rgba(113, 142, 191, 0.04);
-  --shadow-md: 0 10px 30px rgba(113, 142, 191, 0.08);
-  --shadow-lg: 0 20px 40px rgba(113, 142, 191, 0.12);
-  --shadow-glow: 0 8px 20px rgba(55, 114, 255, 0.25);
+  --shadow-sm: 0 4px 10px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.09);
+  --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.14);
+  --shadow-glow: 0 8px 20px rgba(59, 130, 246, 0.18);
 
   --radius-xl: 25px;
   --radius-lg: 15px;
@@ -66,10 +66,10 @@
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Gradient Utilities */
-  --gradient-brand: linear-gradient(135deg, #3772FF 0%, #8A4FFF 50%, #01FDF6 100%);
-  --gradient-warm: linear-gradient(135deg, #FF47DA 0%, #8A4FFF 100%);
-  --gradient-cool: linear-gradient(135deg, #01FDF6 0%, #21FA90 100%);
-  --gradient-gold: linear-gradient(135deg, #E4FF1A 0%, #21FA90 100%);
+  --gradient-brand: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #38BDF8 100%);
+  --gradient-warm: linear-gradient(135deg, #EF4444 0%, #6366F1 100%);
+  --gradient-cool: linear-gradient(135deg, #38BDF8 0%, #10B981 100%);
+  --gradient-gold: linear-gradient(135deg, #F59E0B 0%, #10B981 100%);
 
   /* Spacing tokens */
   --space-xs: 8px;
@@ -79,43 +79,43 @@
   --space-xl: 48px;
 }
 
-/* Dark Mode — matched to Techtopia design screenshots */
+/* Dark Mode — Professional Slate Palette */
 [data-theme="dark"] {
-  --primary: var(--brand-cyan);
-  --primary-hover: #00e5df;
-  --primary-rgb: 1, 253, 246;
-  --primary-bg: rgba(1, 253, 246, 0.1);
+  --primary: #60A5FA;            /* blue-400 — readable on dark bg */
+  --primary-hover: #3B82F6;
+  --primary-rgb: 96, 165, 250;
+  --primary-bg: rgba(96, 165, 250, 0.10);
 
-  /* Backgrounds */
-  --bg-app: #080D1A;         /* deepest bg — page canvas */
-  --bg-sidebar: #0A0F1E;     /* sidebar surface */
-  --bg-card: #0F1629;        /* card / panel surface */
+  /* Backgrounds — slate hierarchy */
+  --bg-app: #0F172A;             /* slate-900 — page canvas */
+  --bg-sidebar: #0F172A;         /* slate-900 — sidebar surface */
+  --bg-card: #1E293B;            /* slate-800 — card / panel surface */
 
   /* Typography */
-  --text-main: #C8D6EF;
-  --text-title: #FFFFFF;
-  --text-muted: #627496;
-  --text-light: #3D4E6B;
+  --text-main: #CBD5E1;          /* slate-300 */
+  --text-title: #F1F5F9;         /* slate-100 */
+  --text-muted: #64748B;         /* slate-500 */
+  --text-light: #334155;         /* slate-700 */
 
   /* Borders */
-  --border-light: rgba(255, 255, 255, 0.06);
-  --border-focus: rgba(1, 253, 246, 0.5);
+  --border-light: rgba(148, 163, 184, 0.12);   /* slate-400 tint */
+  --border-focus: rgba(96, 165, 250, 0.40);
 
-  /* Semantic colours */
-  --success: var(--brand-green);
-  --success-bg: rgba(33, 250, 144, 0.12);
-  --error: var(--brand-magenta);
-  --error-bg: rgba(255, 71, 218, 0.12);
-  --warning: var(--brand-chartreuse);
-  --warning-bg: rgba(228, 255, 26, 0.12);
-  --info: var(--brand-purple);
-  --info-bg: rgba(138, 79, 255, 0.12);
+  /* Semantic colours — professional, not neon */
+  --success: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --error: #EF4444;
+  --error-bg: rgba(239, 68, 68, 0.12);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --info: #6366F1;
+  --info-bg: rgba(99, 102, 241, 0.12);
 
   /* Shadows */
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-md: 0 10px 32px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.75);
-  --shadow-glow: 0 0 24px rgba(1, 253, 246, 0.18);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.40);
+  --shadow-md: 0 10px 32px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.70);
+  --shadow-glow: 0 0 24px rgba(96, 165, 250, 0.14);
 }
 
 /* ==========================================================================
@@ -363,9 +363,7 @@ li {
 }
 
 .card:hover {
-  box-shadow: var(--shadow-md);
   border-color: var(--border-focus);
-  transform: translateY(-1px);
 }
 
 .card-title {
@@ -393,26 +391,9 @@ li {
   overflow: hidden;
 }
 
-.metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--primary), var(--info));
-  opacity: 0;
-  transition: opacity var(--transition-normal);
-}
-
 .metric-card:hover {
   border-color: var(--primary);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.metric-card:hover::before {
-  opacity: 1;
+  background-color: var(--primary-bg);
 }
 
 @media (max-width: 600px) {
@@ -495,12 +476,12 @@ li {
 
 .metric-change.up {
   color: var(--success);
-  background: rgba(33, 250, 144, 0.12);
+  background: var(--success-bg);
 }
 
 .metric-change.down {
   color: var(--error);
-  background: rgba(255, 71, 218, 0.12);
+  background: var(--error-bg);
 }
 
 /* ==========================================================================
@@ -680,55 +661,55 @@ label {
 .badge-success {
   background: var(--success-bg);
   color: var(--success);
-  border-color: rgba(33, 250, 144, 0.3);
+  border-color: rgba(16, 185, 129, 0.25);
 }
 
 .badge-success:hover {
-  box-shadow: 0 4px 12px rgba(33, 250, 144, 0.2);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.18);
   transform: translateY(-1px);
 }
 
 .badge-danger {
   background: var(--error-bg);
   color: var(--error);
-  border-color: rgba(255, 71, 218, 0.3);
+  border-color: rgba(239, 68, 68, 0.25);
 }
 
 .badge-danger:hover {
-  box-shadow: 0 4px 12px rgba(255, 71, 218, 0.2);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.18);
   transform: translateY(-1px);
 }
 
 .badge-warning {
   background: var(--warning-bg);
   color: var(--warning);
-  border-color: rgba(228, 255, 26, 0.3);
+  border-color: rgba(245, 158, 11, 0.25);
 }
 
 .badge-warning:hover {
-  box-shadow: 0 4px 12px rgba(228, 255, 26, 0.15);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.18);
   transform: translateY(-1px);
 }
 
 .badge-info {
   background: var(--info-bg);
   color: var(--info);
-  border-color: rgba(138, 79, 255, 0.3);
+  border-color: rgba(99, 102, 241, 0.25);
 }
 
 .badge-info:hover {
-  box-shadow: 0 4px 12px rgba(138, 79, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.18);
   transform: translateY(-1px);
 }
 
 .badge-neutral {
-  background: rgba(113, 142, 191, 0.1);
+  background: rgba(100, 116, 139, 0.10);
   color: var(--text-muted);
-  border-color: rgba(113, 142, 191, 0.2);
+  border-color: rgba(100, 116, 139, 0.20);
 }
 
 .badge-neutral:hover {
-  box-shadow: 0 4px 12px rgba(113, 142, 191, 0.1);
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.10);
   transform: translateY(-1px);
 }
 
@@ -1291,7 +1272,7 @@ label {
 }
 
 [data-theme="dark"] .btn-primary:hover {
-  background-color: #00e5df;
+  background-color: #2563EB;
   box-shadow: 0 0 28px rgba(1, 253, 246, 0.4);
 }
 
@@ -1391,12 +1372,12 @@ label {
 }
 
 [data-theme="dark"] .skeleton {
-  background: #151e33;
+  background: #1E293B;
   background-image: linear-gradient(
     90deg,
-    #151e33 0px,
-    #1f2a47 40px,
-    #151e33 80px
+    #1E293B 0px,
+    #1E293B 40px,
+    #1E293B 80px
   );
   background-size: 200% 100%;
 }

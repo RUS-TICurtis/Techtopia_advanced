@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip
@@ -11,8 +11,8 @@ import './Finance.css';
 const ChartTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div style={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-        <p style={{ color: '#627496', fontWeight: 700, marginBottom: 6, fontSize: 10, textTransform: 'uppercase' }}>{label}</p>
+      <div style={{ background: '#1E293B', border: '1px solid #222', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
+        <p style={{ color: '#64748B', fontWeight: 700, marginBottom: 6, fontSize: 10, textTransform: 'uppercase' }}>{label}</p>
         {payload.map((e, i) => <p key={i} style={{ color: e.color }}>{e.name}: {formatCurrency(e.value)}</p>)}
       </div>
     );
@@ -20,12 +20,12 @@ const ChartTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const BUDGET_COLORS = ['#01FDF6', '#8A4FFF', '#FF47DA', '#21FA90', '#E4FF1A', '#3772FF', '#FF6B35', '#627496'];
+const BUDGET_COLORS = ['#38BDF8', '#6366F1', '#EF4444', '#10B981', '#F59E0B', '#3B82F6', '#FB923C', '#64748B'];
 
 const EMPTY_BUDGET = {
   name: '',
   description: '',
-  type: 'Quarterly',
+  type: 'Departmental',
   startDate: new Date().toISOString().slice(0, 10),
   endDate: '',
   totalAmount: '',
@@ -35,6 +35,8 @@ export default function FinanceBudgets() {
   const { budgets = [], isLoading, createBudget, deleteBudget } = useBudgets();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBudget, setNewBudget] = useState(EMPTY_BUDGET);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
   // Map API response fields → chart data
   // API returns: totalAmount, consumedAmount, remainingAmount, allocatedAmount
@@ -61,28 +63,52 @@ export default function FinanceBudgets() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    setFormError('');
+
+    // Guard: validate dates before sending
+    if (!newBudget.startDate || !newBudget.endDate) {
+      setFormError('Start date and end date are required.');
+      return;
+    }
+    const startIso = new Date(newBudget.startDate + 'T00:00:00').toISOString();
+    const endIso = new Date(newBudget.endDate + 'T23:59:59').toISOString();
+    if (isNaN(Date.parse(startIso)) || isNaN(Date.parse(endIso))) {
+      setFormError('Invalid date values. Please check start and end dates.');
+      return;
+    }
+
+    setSubmitting(true);
     try {
       // POST /api/v1/finance/budgets
+      // type must be: 'Departmental' | 'Project' | 'Capital'
       await createBudget({
         name: newBudget.name,
-        description: newBudget.description,
+        description: newBudget.description || null,
         type: newBudget.type,
-        startDate: new Date(newBudget.startDate).toISOString(),
-        endDate: new Date(newBudget.endDate).toISOString(),
+        startDate: startIso,
+        endDate: endIso,
         totalAmount: parseFloat(newBudget.totalAmount) || 0,
       });
       setShowCreateModal(false);
       setNewBudget(EMPTY_BUDGET);
+      setFormError('');
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.details || err?.response?.data?.error || 'Failed to create budget.');
+      setFormError(
+        err?.response?.data?.details ||
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        'Failed to create budget. Please check all fields and try again.'
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
  
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -104,10 +130,10 @@ export default function FinanceBudgets() {
       {/* Org-level Metrics */}
       <div className="finance-kpi-grid">
         {[
-          { label: 'Total Budget Allocated', value: formatCurrency(totals.allocated), color: '#01FDF6', bg: 'rgba(1,253,246,0.1)' },
-          { label: 'Total Spent (YTD)', value: formatCurrency(totals.spent), color: '#FF47DA', bg: 'rgba(255,71,218,0.1)' },
-          { label: 'Remaining Budget', value: formatCurrency(totals.remaining), color: '#21FA90', bg: 'rgba(33,250,144,0.1)' },
-          { label: 'Budgets Exceeded', value: `${totals.exceeded} dept/project`, color: '#E4FF1A', bg: 'rgba(228,255,26,0.1)' },
+          { label: 'Total Budget Allocated', value: formatCurrency(totals.allocated), color: '#38BDF8', bg: 'rgba(1,253,246,0.1)' },
+          { label: 'Total Spent (YTD)', value: formatCurrency(totals.spent), color: '#EF4444', bg: 'rgba(255,71,218,0.1)' },
+          { label: 'Remaining Budget', value: formatCurrency(totals.remaining), color: '#10B981', bg: 'rgba(33,250,144,0.1)' },
+          { label: 'Budgets Exceeded', value: `${totals.exceeded} dept/project`, color: '#F59E0B', bg: 'rgba(228,255,26,0.1)' },
         ].map(m => (
           <div key={m.label} className="finance-kpi-card card">
             <div className="finance-kpi-icon" style={{ background: m.bg, color: m.color }}>
@@ -129,11 +155,11 @@ export default function FinanceBudgets() {
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={VARIANCE_DATA} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="name" stroke="#3d4e6b" tick={{ fontSize: 10 }} />
-                <YAxis stroke="#3d4e6b" tick={{ fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
+                <XAxis dataKey="name" stroke="#475569" tick={{ fontSize: 10 }} />
+                <YAxis stroke="#475569" tick={{ fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
                 <Tooltip content={<ChartTooltip />} />
-                <Bar dataKey="Allocated" fill="#3772FF" radius={[4, 4, 0, 0]} name="Allocated" />
-                <Bar dataKey="Spent" fill="#FF47DA" radius={[4, 4, 0, 0]} name="Spent" />
+                <Bar dataKey="Allocated" fill="#3B82F6" radius={[4, 4, 0, 0]} name="Allocated" />
+                <Bar dataKey="Spent" fill="#EF4444" radius={[4, 4, 0, 0]} name="Spent" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -148,7 +174,7 @@ export default function FinanceBudgets() {
                   {budgets.map((b, i) => <Cell key={i} fill={BUDGET_COLORS[i % BUDGET_COLORS.length]} />)}
                 </Pie>
                 <Tooltip formatter={(v) => [formatCurrency(v), 'Spent']}
-                  contentStyle={{ background: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
+                  contentStyle={{ background: '#1E293B', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -233,6 +259,15 @@ export default function FinanceBudgets() {
               <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={18} /></button>
             </div>
             <form onSubmit={handleCreate} className="modal-body">
+              {formError && (
+                <div style={{
+                  background: 'rgba(255,71,71,0.1)', border: '1px solid var(--error)',
+                  borderRadius: 'var(--radius-md)', padding: '10px 14px', marginBottom: 16,
+                  fontSize: 13, color: 'var(--error)'
+                }}>
+                  {formError}
+                </div>
+              )}
               <div className="form-group">
                 <label>Budget Name *</label>
                 <input type="text" className="form-input" required value={newBudget.name}
@@ -250,10 +285,9 @@ export default function FinanceBudgets() {
                   <label>Type</label>
                   <select className="form-input" value={newBudget.type}
                     onChange={e => setNewBudget(p => ({ ...p, type: e.target.value }))}>
-                    <option value="Annual">Annual</option>
-                    <option value="Quarterly">Quarterly</option>
-                    <option value="Monthly">Monthly</option>
+                    <option value="Departmental">Departmental</option>
                     <option value="Project">Project</option>
+                    <option value="Capital">Capital</option>
                   </select>
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
@@ -276,8 +310,16 @@ export default function FinanceBudgets() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary"><Plus size={14} /> Create Budget</button>
+                <button
+                  type="button" className="btn btn-secondary"
+                  onClick={() => { setShowCreateModal(false); setFormError(''); }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  <Plus size={14} />
+                  {submitting ? 'Creating…' : 'Create Budget'}
+                </button>
               </div>
             </form>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   ShoppingCart, Plus, Search, CheckCircle, Clock, X, AlertCircle,
   ThumbsUp, ThumbsDown, FileText, Building2
@@ -15,7 +15,7 @@ const STATUS_CONFIG = {
   Completed: { class: 'badge-info',    icon: CheckCircle },
 };
 
-const PRIORITY_COLORS = { High: '#FF47DA', Medium: '#E4FF1A', Low: '#21FA90' };
+const PRIORITY_COLORS = { High: '#EF4444', Medium: '#F59E0B', Low: '#10B981' };
 const EMPTY_PO = { title: '', vendor: '', dept: '', amount: '', items: 1, priority: 'Medium', notes: '' };
 
 export default function FinanceProcurement() {
@@ -70,7 +70,7 @@ export default function FinanceProcurement() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -110,10 +110,10 @@ export default function FinanceProcurement() {
       {/* Pending Approvals Queue */}
       {pending.length > 0 && (
         <div className="card">
-          <div className="card-title"><Clock size={16} style={{ color: '#E4FF1A' }} /> Awaiting Your Approval</div>
+          <div className="card-title"><Clock size={16} style={{ color: '#F59E0B' }} /> Awaiting Your Approval</div>
           {pending.map(po => (
             <div key={po.id} className="po-card" style={{ marginBottom: 10 }}>
-              <ShoppingCart size={20} style={{ color: '#E4FF1A', flexShrink: 0 }} />
+              <ShoppingCart size={20} style={{ color: '#F59E0B', flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
                 <p className="font-semibold text-sm">{po.title}</p>
                 <p className="text-xs text-muted">{po.vendor} · {po.requestedBy} · {po.date}</p>

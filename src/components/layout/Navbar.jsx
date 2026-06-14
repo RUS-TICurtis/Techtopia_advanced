@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
@@ -110,7 +110,7 @@ export default function Navbar({
 
           {/* AI Quick Button */}
           <button 
-            className="nav-icon-btn text-[#01fdf6] hover:bg-[#01fdf6]/10" 
+            className="nav-icon-btn text-[#38BDF8] hover:bg-[#38BDF8]/10" 
             onClick={() => navigate('/ai')}
             title="Ask AI Assistant"
           >
@@ -138,10 +138,10 @@ export default function Navbar({
                 <img 
                   src={user.avatarUrl} 
                   alt="Avatar" 
-                  className="w-8 h-8 rounded-full object-cover border border-[#00e5ff]/35" 
+                  className="w-8 h-8 rounded-full object-cover border border-[#38BDF8]/35" 
                 />
               ) : (
-                <span className="profile-initials font-bold text-xs bg-[#00e5ff]/20 text-[#00e5ff] w-8 h-8 rounded-full flex items-center justify-center border border-[#00e5ff]/35">
+                <span className="profile-initials font-bold text-xs bg-[#38BDF8]/20 text-[#38BDF8] w-8 h-8 rounded-full flex items-center justify-center border border-[#38BDF8]/35">
                   {user?.avatar || 'U'}
                 </span>
               )}

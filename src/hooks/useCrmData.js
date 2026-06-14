@@ -725,10 +725,10 @@ export function useExpenses() {
     queryFn: () => expensesApi.list(),
   });
 
-  // GET /api/v1/finance/expenses/categories
+  // GET /api/v1/finance/vendor-categories
   const categoriesQuery = useQuery({
     queryKey: ['expenseCategories'],
-    queryFn: () => apiClient.get('/api/v1/finance/expenses/categories').then(r => r.data).catch(() => []),
+    queryFn: () => vendorCategoriesApi.list().catch(() => []),
     staleTime: 5 * 60 * 1000,
   });
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 // ==========================================================================
 // 1. Weekly Activity Chart (Bar Chart)
@@ -30,7 +30,7 @@ export const WeeklyActivityChart = ({ data: propData }) => {
           <span>Sales Revenue ($)</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ width: '12px', height: '12px', borderRadius: '4px', backgroundColor: 'var(--brand-cyan, #FFBB38)', display: 'inline-block' }}></span>
+          <span style={{ width: '12px', height: '12px', borderRadius: '4px', backgroundColor: 'var(--brand-cyan, #F59E0B)', display: 'inline-block' }}></span>
           <span>New Leads</span>
         </div>
       </div>
@@ -106,7 +106,7 @@ export const WeeklyActivityChart = ({ data: propData }) => {
                 width={barWidth}
                 height={leadsHeight}
                 rx="6"
-                fill="var(--brand-cyan, var(--accent-orange, #FFBB38))"
+                fill="var(--brand-cyan, var(--accent-orange, #F59E0B))"
                 opacity={hoveredBar === null || isHovered ? 1 : 0.6}
                 style={{ transition: 'all 0.22s cubic-bezier(.2,.9,.3,1)' }}
                 filter="url(#dropShadow)"
@@ -152,7 +152,7 @@ export const WeeklyActivityChart = ({ data: propData }) => {
                     x={x + sectionWidth / 2}
                     y={Math.min(revY, leadsY) - 20}
                     textAnchor="middle"
-                    fill="var(--accent-orange, #FFBB38)"
+                    fill="var(--accent-orange, #F59E0B)"
                     fontSize="10"
                     fontWeight="700"
                     fontFamily="var(--font-main)"
@@ -178,8 +178,8 @@ export const DealPipelineChart = ({ deals = [] }) => {
   const stages = {
     "Lead": { count: 0, color: "var(--text-light)" },
     "In Progress": { count: 0, color: "var(--info, #1814F3)" },
-    "Proposal": { count: 0, color: "var(--accent-orange, #FFBB38)" },
-    "Won": { count: 0, color: "var(--success, #41D430)" }
+    "Proposal": { count: 0, color: "var(--accent-orange, #F59E0B)" },
+    "Won": { count: 0, color: "var(--success, #10B981)" }
   };
 
   deals.forEach(deal => {

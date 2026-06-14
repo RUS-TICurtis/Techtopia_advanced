@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
@@ -48,7 +48,7 @@ export default function ExecutiveIntelligence() {
       <PageHeader 
         title="Revenue & Document Intelligence"
         subtitle="Predictive financial forecasting, client health index maps, and AI-powered optical contract parsers"
-        icon={<BarChart3 className="text-[#01FDF6]" />}
+        icon={<BarChart3 className="text-[#38BDF8]" />}
       />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 flex-grow min-h-0">
@@ -59,19 +59,19 @@ export default function ExecutiveIntelligence() {
           {/* SVG Forecasting Chart */}
           <div className="card bg-gray-900/35 border border-gray-850 p-4 rounded-xl">
             <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider mb-4 flex items-center gap-1.5">
-              <TrendingUp size={14} className="text-[#01FDF6]" /> Executive Revenue Forecasting (Q3 - Q4)
+              <TrendingUp size={14} className="text-[#38BDF8]" /> Executive Revenue Forecasting (Q3 - Q4)
             </h4>
             
             <div className="svg-forecast-wrapper h-44 bg-gray-950/40 rounded-xl border border-gray-900 p-3 relative overflow-hidden flex items-center justify-center">
               <svg viewBox="0 0 400 120" className="w-full h-full">
                 <defs>
                   <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#01FDF6" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#01FDF6" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.0" />
                   </linearGradient>
                   <linearGradient id="areaWorst" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ff5555" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#ff5555" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#EF4444" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#EF4444" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 
@@ -81,11 +81,11 @@ export default function ExecutiveIntelligence() {
                 <line x1="20" y1="100" x2="380" y2="100" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
                 
                 {/* Worst Case Forecast */}
-                <path d="M 20 100 Q 100 90 200 85 T 380 75" fill="none" stroke="#ff5555" strokeWidth="1.5" strokeDasharray="3 3" />
+                <path d="M 20 100 Q 100 90 200 85 T 380 75" fill="none" stroke="#EF4444" strokeWidth="1.5" strokeDasharray="3 3" />
                 <path d="M 20 100 Q 100 90 200 85 T 380 75 L 380 110 L 20 110 Z" fill="url(#areaWorst)" />
 
                 {/* Optimistic Forecast */}
-                <path d="M 20 100 Q 100 70 200 55 T 380 25" fill="none" stroke="#01FDF6" strokeWidth="2.5" className="stroke-glow" />
+                <path d="M 20 100 Q 100 70 200 55 T 380 25" fill="none" stroke="#38BDF8" strokeWidth="2.5" className="stroke-glow" />
                 <path d="M 20 100 Q 100 70 200 55 T 380 25 L 380 110 L 20 110 Z" fill="url(#areaGrad)" />
                 
                 {/* Labels */}
@@ -100,7 +100,7 @@ export default function ExecutiveIntelligence() {
           <div className="card bg-gray-900/35 border border-gray-850 rounded-xl overflow-hidden flex-grow">
             <div className="p-4 border-b border-gray-850 bg-gray-950/20">
               <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider flex items-center gap-1.5">
-                <Activity size={14} className="text-[#bd93f9]" /> Client Health Index Scoring
+                <Activity size={14} className="text-[#6366F1]" /> Client Health Index Scoring
               </h4>
             </div>
             
@@ -122,13 +122,13 @@ export default function ExecutiveIntelligence() {
                     <tr key={c.id} className="border-b border-gray-950 hover:bg-gray-900/20 transition-colors">
                       <td className="p-3 font-bold text-white">{c.name}</td>
                       <td className="p-3 text-gray-400">{c.category}</td>
-                      <td className="p-3 text-center font-mono font-bold" style={{ color: c.score > 80 ? '#50fa7b' : c.score > 60 ? '#f1fa8c' : '#ff5555' }}>
+                      <td className="p-3 text-center font-mono font-bold" style={{ color: c.score > 80 ? '#10B981' : c.score > 60 ? '#F59E0B' : '#EF4444' }}>
                         {c.score} / 100
                       </td>
                       <td className="p-3 font-semibold text-gray-300">{c.status}</td>
                       <td className="p-3 text-center text-gray-400 font-mono">{c.tickets}</td>
                       <td className="p-3 font-mono text-gray-400">{c.billingDelay}</td>
-                      <td className="p-3 text-right font-bold" style={{ color: c.risk === 'LOW' ? '#50fa7b' : c.risk === 'MEDIUM' ? '#f1fa8c' : '#ff5555' }}>
+                      <td className="p-3 text-right font-bold" style={{ color: c.risk === 'LOW' ? '#10B981' : c.risk === 'MEDIUM' ? '#F59E0B' : '#EF4444' }}>
                         {c.risk}
                       </td>
                     </tr>
@@ -145,7 +145,7 @@ export default function ExecutiveIntelligence() {
           <div className="card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex-grow flex flex-col min-h-[350px]">
             
             <h4 className="text-white text-xs font-bold font-display uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <FileText size={14} className="text-[#01FDF6]" /> AI OCR Scanner
+              <FileText size={14} className="text-[#38BDF8]" /> AI OCR Scanner
             </h4>
             
             <p className="text-gray-500 text-[10px] leading-relaxed mb-4">
@@ -155,15 +155,15 @@ export default function ExecutiveIntelligence() {
             {/* Upload Area */}
             <div 
               onClick={handleSimulateScan}
-              className={`ocr-drop-zone border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-3 min-h-[140px] ${isScanning ? 'border-[#01FDF6] bg-[#01FDF6]/5' : 'border-gray-800 hover:border-[#01FDF6]/40 bg-gray-950/20'}`}
+              className={`ocr-drop-zone border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-3 min-h-[140px] ${isScanning ? 'border-[#38BDF8] bg-[#38BDF8]/5' : 'border-gray-800 hover:border-[#38BDF8]/40 bg-gray-950/20'}`}
             >
               {isScanning ? (
                 <>
                   <div className="relative w-10 h-10 flex items-center justify-center">
-                    <RefreshCw size={22} className="text-[#01FDF6] animate-spin" />
+                    <RefreshCw size={22} className="text-[#38BDF8] animate-spin" />
                     <div className="scanner-laser-glow"></div>
                   </div>
-                  <span className="text-xs text-[#01FDF6] font-bold font-mono tracking-wider animate-pulse">EXTRACTING METADATA CORES...</span>
+                  <span className="text-xs text-[#38BDF8] font-bold font-mono tracking-wider animate-pulse">EXTRACTING METADATA CORES...</span>
                 </>
               ) : (
                 <>
@@ -189,7 +189,7 @@ export default function ExecutiveIntelligence() {
             {scannedResult && (
               <div className="scanned-metadata-panel bg-gray-950/80 border border-gray-900 p-4 rounded-xl mt-4 flex flex-col gap-3 font-mono text-[10px] text-gray-400 leading-snug animate-fadeIn">
                 <div className="flex items-center gap-1.5 text-white font-bold text-xs uppercase tracking-wider mb-1 border-b border-gray-900 pb-2">
-                  <FileCheck size={14} className="text-[#50fa7b]" /> Extracted Structured Metadata
+                  <FileCheck size={14} className="text-[#10B981]" /> Extracted Structured Metadata
                 </div>
                 
                 <div className="flex justify-between">
@@ -204,7 +204,7 @@ export default function ExecutiveIntelligence() {
 
                 <div className="flex justify-between">
                   <span className="text-gray-600">Contract Value:</span>
-                  <span className="text-[#50fa7b] font-bold">{scannedResult.contractValue}</span>
+                  <span className="text-[#10B981] font-bold">{scannedResult.contractValue}</span>
                 </div>
 
                 <div className="flex justify-between">
@@ -226,7 +226,7 @@ export default function ExecutiveIntelligence() {
 
                 <div className="flex justify-between items-center mt-1 border-t border-gray-950 pt-2 text-[9.5px]">
                   <span className="text-gray-600">AI Risk Assessment:</span>
-                  <span className="text-[#50fa7b] font-bold">{scannedResult.aiAssessedRisk}</span>
+                  <span className="text-[#10B981] font-bold">{scannedResult.aiAssessedRisk}</span>
                 </div>
               </div>
             )}

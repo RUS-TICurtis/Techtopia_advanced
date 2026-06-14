@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import {
   Plus, Search, Filter, Download, Send, CheckCircle, Clock, AlertCircle,
   FileText, MoreVertical, X, Eye, Copy, Trash2, ChevronDown, RefreshCw
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
-import { useInvoices } from '../../hooks/useCrmData';
+import { useInvoices, useCompanies } from '../../hooks/useCrmData';
 import './Finance.css';
 
 // ── Status Config ─────────────────────────────────────────────────────────
@@ -21,9 +21,20 @@ const STATUS_CONFIG = {
 };
 
 const EMPTY_INVOICE = {
-  client: '', project: '', email: '', phone: '', address: '',
+  companyId: '',
+  contactId: '',
+  opportunityId: '',
+  client: '',
+  project: '',
+  email: '',
+  phone: '',
+  address: '',
   issueDate: new Date().toISOString().slice(0, 10),
-  dueDate: '', currency: 'GHS', notes: '', taxRate: 0, discount: 0,
+  dueDate: '',
+  currency: 'GHS',
+  notes: '',
+  taxRate: 0,
+  discount: 0,
   items: [{ description: '', qty: 1, unitPrice: 0 }],
 };
 
@@ -39,12 +50,16 @@ export default function FinanceInvoices() {
     duplicateInvoice 
   } = useInvoices();
 
+  const { companies = [] } = useCompanies();
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [newInvoice, setNewInvoice] = useState(EMPTY_INVOICE);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
   // Sync selectedInvoice when invoices list updates
   const activeSelectedInvoice = useMemo(() => {
@@ -85,26 +100,42 @@ export default function FinanceInvoices() {
   // ── Create Invoice ────────────────────────────────────────────────────────
   const handleCreate = async (e) => {
     e.preventDefault();
-    try {
-      await createInvoice({
-        client: newInvoice.client,
-        project: newInvoice.project,
-        email: newInvoice.email,
-        phone: newInvoice.phone,
-        address: newInvoice.address,
-        currency: newInvoice.currency,
-        issueDate: newInvoice.issueDate,
-        dueDate: newInvoice.dueDate,
-        notes: newInvoice.notes,
+    setFormError('');
+    setSubmitting(true);
+
+    const payload = {
+      companyId: newInvoice.companyId || null,
+      contactId: newInvoice.contactId || null,
+      opportunityId: newInvoice.opportunityId || null,
+      phone: newInvoice.phone || null,
+      address: newInvoice.address || null,
+      currency: newInvoice.currency || 'GHS',
+      issueDate: newInvoice.issueDate ? new Date(newInvoice.issueDate + 'T00:00:00').toISOString() : null,
+      dueDate: newInvoice.dueDate ? new Date(newInvoice.dueDate + 'T00:00:00').toISOString() : null,
+      notes: newInvoice.notes || null,
+      items: newInvoice.items.map(item => ({
+        description: item.description || '',
+        quantity: parseFloat(item.qty) || 0,
+        unitPrice: parseFloat(item.unitPrice) || 0,
         taxRate: parseFloat(newInvoice.taxRate) || 0,
-        discount: parseFloat(newInvoice.discount) || 0,
-        items: newInvoice.items,
-        amount: total,
-      });
+        discountRate: parseFloat(newInvoice.discount) || 0,
+      })),
+    };
+
+    try {
+      await createInvoice(payload);
       setShowCreateModal(false);
       setNewInvoice(EMPTY_INVOICE);
     } catch (err) {
       console.error(err);
+      setFormError(
+        err?.response?.data?.details ||
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        'Failed to create invoice.'
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -142,10 +173,10 @@ export default function FinanceInvoices() {
       {/* Metrics */}
       <div className="finance-kpi-grid">
         {[
-          { label: 'Total Outstanding', value: formatCurrency(metrics.outstanding), color: '#E4FF1A', bg: 'rgba(228,255,26,0.1)' },
-          { label: 'Overdue', value: formatCurrency(metrics.overdue), color: '#FF47DA', bg: 'rgba(255,71,218,0.1)' },
-          { label: 'Draft Invoices', value: `${metrics.draft} invoices`, color: '#8A4FFF', bg: 'rgba(138,79,255,0.1)' },
-          { label: 'Collected This Month', value: formatCurrency(metrics.paid), color: '#21FA90', bg: 'rgba(33,250,144,0.1)' },
+          { label: 'Total Outstanding', value: formatCurrency(metrics.outstanding), color: '#F59E0B', bg: 'rgba(228,255,26,0.1)' },
+          { label: 'Overdue', value: formatCurrency(metrics.overdue), color: '#EF4444', bg: 'rgba(255,71,218,0.1)' },
+          { label: 'Draft Invoices', value: `${metrics.draft} invoices`, color: '#6366F1', bg: 'rgba(138,79,255,0.1)' },
+          { label: 'Collected This Month', value: formatCurrency(metrics.paid), color: '#10B981', bg: 'rgba(33,250,144,0.1)' },
         ].map(m => (
           <div key={m.label} className="finance-kpi-card card">
             <div className="finance-kpi-icon" style={{ background: m.bg, color: m.color }}>
@@ -313,9 +344,9 @@ export default function FinanceInvoices() {
               </div>
               <div className="finance-timeline">
                 {[
-                  { label: 'Invoice Created', time: activeSelectedInvoice.issueDate, color: '#8A4FFF' },
-                  { label: 'Invoice Sent to Client', time: activeSelectedInvoice.issueDate, color: '#01FDF6' },
-                  { label: activeSelectedInvoice.status === 'Paid' ? 'Payment Received' : 'Awaiting Payment', time: activeSelectedInvoice.dueDate, color: activeSelectedInvoice.status === 'Paid' ? '#21FA90' : '#E4FF1A' },
+                  { label: 'Invoice Created', time: activeSelectedInvoice.issueDate, color: '#6366F1' },
+                  { label: 'Invoice Sent to Client', time: activeSelectedInvoice.issueDate, color: '#38BDF8' },
+                  { label: activeSelectedInvoice.status === 'Paid' ? 'Payment Received' : 'Awaiting Payment', time: activeSelectedInvoice.dueDate, color: activeSelectedInvoice.status === 'Paid' ? '#10B981' : '#F59E0B' },
                 ].map((evt, i) => (
                   <div key={i} className="finance-timeline-item">
                     <div className="finance-timeline-dot" style={{ background: `${evt.color}20`, color: evt.color, fontSize: 12, fontWeight: 700 }}>
@@ -349,11 +380,39 @@ export default function FinanceInvoices() {
               <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={18} /></button>
             </div>
             <form onSubmit={handleCreate} className="modal-body">
+              {formError && (
+                <div style={{
+                  background: 'rgba(255,71,71,0.1)', border: '1px solid var(--error)',
+                  borderRadius: 'var(--radius-md)', padding: '10px 14px', marginBottom: 16,
+                  fontSize: 13, color: 'var(--error)'
+                }}>
+                  {formError}
+                </div>
+              )}
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Client Name *</label>
-                  <input type="text" className="form-input" required value={newInvoice.client}
-                    onChange={e => setNewInvoice(p => ({ ...p, client: e.target.value }))} placeholder="Acme Corp" />
+                  <label>Client Company *</label>
+                  <select
+                    className="form-input" required
+                    value={newInvoice.companyId}
+                    onChange={e => {
+                      const selectedCo = companies.find(c => String(c.id) === e.target.value);
+                      setNewInvoice(p => ({
+                        ...p,
+                        companyId: e.target.value,
+                        client: selectedCo?.name || '',
+                        phone: selectedCo?.phone || p.phone,
+                        address: selectedCo?.address || p.address,
+                      }));
+                    }}
+                  >
+                    <option value="">Select company…</option>
+                    {companies.map(c => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label>Project / Description</label>
@@ -395,7 +454,7 @@ export default function FinanceInvoices() {
               <div style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                   <label style={{ margin: 0 }}>Invoice Items</label>
-                  <button type="button" className="btn btn-secondary" style={{ fontSize: 12, padding: '6px 12px' }} onClick={addLineItem}>
+                  <button type="button" className="btn btn-secondary" style={{ fontSize: 12, padding: '6px 12px' }} onClick={addLineItem} disabled={submitting}>
                     <Plus size={13} /> Add Item
                   </button>
                 </div>
@@ -415,20 +474,20 @@ export default function FinanceInvoices() {
                         <td>
                           <input type="text" className="form-input" style={{ padding: '8px 10px', fontSize: 13 }}
                             value={item.description} onChange={e => updateLineItem(idx, 'description', e.target.value)}
-                            placeholder="Service or product description" />
+                            placeholder="Service or product description" required />
                         </td>
                         <td>
                           <input type="number" className="form-input" style={{ padding: '8px 10px', fontSize: 13 }} min={1}
-                            value={item.qty} onChange={e => updateLineItem(idx, 'qty', parseFloat(e.target.value) || 0)} />
+                            value={item.qty} onChange={e => updateLineItem(idx, 'qty', parseFloat(e.target.value) || 0)} required />
                         </td>
                         <td>
                           <input type="number" className="form-input" style={{ padding: '8px 10px', fontSize: 13 }} min={0} step="0.01"
-                            value={item.unitPrice} onChange={e => updateLineItem(idx, 'unitPrice', parseFloat(e.target.value) || 0)} />
+                            value={item.unitPrice} onChange={e => updateLineItem(idx, 'unitPrice', parseFloat(e.target.value) || 0)} required />
                         </td>
                         <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(item.qty * item.unitPrice, newInvoice.currency)}</td>
                         <td>
                           {newInvoice.items.length > 1 && (
-                            <button type="button" className="btn-icon" onClick={() => removeLineItem(idx)}>
+                            <button type="button" className="btn-icon" onClick={() => removeLineItem(idx)} disabled={submitting}>
                               <X size={13} style={{ color: 'var(--error)' }} />
                             </button>
                           )}
@@ -465,9 +524,10 @@ export default function FinanceInvoices() {
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-secondary">Save as Draft</button>
-                <button type="submit" className="btn btn-primary"><Send size={14} /> Create & Send</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)} disabled={submitting}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  <Send size={14} /> {submitting ? 'Creating…' : 'Create & Send'}
+                </button>
               </div>
             </form>
           </div>

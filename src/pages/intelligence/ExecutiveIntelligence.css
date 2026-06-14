@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Executive Revenue & OCR Intelligence Stylesheet
    ========================================================================== */
 
@@ -8,7 +8,7 @@
 }
 
 .stroke-glow {
-  filter: drop-shadow(0 0 8px #01FDF6);
+  filter: drop-shadow(0 0 8px #38BDF8);
 }
 
 /* Health index table */
@@ -39,8 +39,8 @@
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #01FDF6;
-  box-shadow: 0 0 10px #01FDF6, 0 0 20px #01FDF6;
+  background-color: #38BDF8;
+  box-shadow: 0 0 10px #38BDF8, 0 0 20px #38BDF8;
   animation: scanLaser 2s linear infinite;
   z-index: 10;
   pointer-events: none;

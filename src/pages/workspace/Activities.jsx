@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+﻿import { useState, useEffect, useMemo } from 'react';
 import { 
   Clock, 
   Search, 
@@ -77,11 +77,11 @@ export default function Activities() {
 
   const getModuleColor = (mod) => {
     switch (mod.toLowerCase()) {
-      case 'pipeline': return '#01FDF6'; // Cyan
-      case 'leads': return '#E4FF1A'; // Yellow
-      case 'billing': return '#FF47DA'; // Magenta
-      case 'support': return '#8A4FFF'; // Purple
-      default: return '#21FA90'; // Green
+      case 'pipeline': return '#38BDF8'; // Cyan
+      case 'leads': return '#F59E0B'; // Yellow
+      case 'billing': return '#EF4444'; // Magenta
+      case 'support': return '#6366F1'; // Purple
+      default: return '#10B981'; // Green
     }
   };
 
@@ -101,7 +101,7 @@ export default function Activities() {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01FDF6]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
       </div>
     );
   }
@@ -111,7 +111,7 @@ export default function Activities() {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#E4FF1A]">⚡</span> Operation Timeline
+            <span className="text-[#F59E0B]">⚡</span> Operation Timeline
           </h1>
           <p className="page-subtitle">Cross-module transaction streams, diagnostic compliance & live audit trails</p>
         </div>

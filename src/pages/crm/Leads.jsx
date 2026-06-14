@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { 
   Plus, 
   Search, 
@@ -250,11 +250,11 @@ export default function Leads({ searchValue = '' }) {
         const name = `${lead.firstName || ''} ${lead.lastName || ''}`.trim() || lead.email;
         return (
           <div className="flex items-center gap-3 py-1">
-            <div className="w-8 h-8 rounded-full bg-[#01FDF6]/10 border border-[#01FDF6]/25 text-[#01FDF6] flex items-center justify-center font-bold text-sm">
+            <div className="w-8 h-8 rounded-full bg-[#38BDF8]/10 border border-[#38BDF8]/25 text-[#38BDF8] flex items-center justify-center font-bold text-sm">
               {name.charAt(0)}
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-white text-sm hover:text-[#01FDF6] transition-colors">{name}</span>
+              <span className="font-bold text-white text-sm hover:text-[#38BDF8] transition-colors">{name}</span>
               <span className="text-[10px] text-gray-500 font-mono">{lead.email}</span>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function Leads({ searchValue = '' }) {
           <div className="flex flex-col">
             <span className="font-semibold text-gray-300 text-xs">{lead.companyName || '—'}</span>
             <span className="text-[10px] text-gray-500 flex items-center gap-1">
-              Source: <span className="text-[#8A4FFF] font-bold">{lead.source}</span>
+              Source: <span className="text-[#6366F1] font-bold">{lead.source}</span>
             </span>
           </div>
         );
@@ -283,10 +283,10 @@ export default function Leads({ searchValue = '' }) {
         const lead = row.original;
         // Mock a consistent high-fidelity AI score derived from lead fields
         const score = ((lead.id * 7) % 31) + 68;
-        const scoreColor = score >= 90 ? 'text-[#21FA90]' : score >= 70 ? 'text-[#E4FF1A]' : 'text-[#FF47DA]';
+        const scoreColor = score >= 90 ? 'text-[#10B981]' : score >= 70 ? 'text-[#F59E0B]' : 'text-[#EF4444]';
         return (
           <div className="flex items-center gap-1.5">
-            <Sparkles size={12} className="text-[#E4FF1A]" />
+            <Sparkles size={12} className="text-[#F59E0B]" />
             <span className={`font-mono font-black text-xs ${scoreColor}`}>{score}/100</span>
           </div>
         );
@@ -361,7 +361,7 @@ export default function Leads({ searchValue = '' }) {
       <PageHeader
         title="Inbound Leads"
         subtitle="Prospect enrichment engine with integrated clearbit lookup & RBAC promotion"
-        icon={<span className="text-[#01FDF6] text-xl">⚡</span>}
+        icon={<span className="text-[#38BDF8] text-xl">⚡</span>}
         actions={
           <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => { clearForm(); setIsAddModalOpen(true); }}>
             <Plus size={18} /> New Prospect
@@ -377,8 +377,8 @@ export default function Leads({ searchValue = '' }) {
             onClick={() => setActiveFilter(s === activeFilter ? 'All' : s)}
             className={`leads-status-pill card flex justify-between items-center p-3 border transition-all cursor-pointer ${
               activeFilter === s 
-                ? 'bg-[#01FDF6]/10 border-[#01FDF6] shadow-glow text-[#01FDF6]' 
-                : 'border-gray-800 bg-[#0f1629]/40 hover:border-gray-700'
+                ? 'bg-[#38BDF8]/10 border-[#38BDF8] shadow-glow text-[#38BDF8]' 
+                : 'border-gray-800 bg-[#1E293B]/40 hover:border-gray-700'
             }`}
           >
             <span className="text-xs font-bold text-gray-300">{s}</span>
@@ -391,7 +391,7 @@ export default function Leads({ searchValue = '' }) {
       <div className="flex flex-col xl:flex-row gap-6">
         
         {/* Table wrapper */}
-        <div className="flex-1 min-w-0 bg-[#0f1629]/30 border border-gray-800/80 rounded-xl overflow-hidden backdrop-blur-md">
+        <div className="flex-1 min-w-0 bg-[#1E293B]/30 border border-gray-800/80 rounded-xl overflow-hidden backdrop-blur-md">
           {isLoading ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '240px', color: 'var(--text-muted)' }}>
               <span>Loading prospects...</span>
@@ -418,7 +418,7 @@ export default function Leads({ searchValue = '' }) {
           const enrichStatus = selectedLead.source.includes('Enriched') ? 'Enriched' : 'Pending';
 
           return (
-            <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#0f1629]/80 backdrop-blur-lg">
+            <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#1E293B]/80 backdrop-blur-lg">
               <div className="flex justify-between items-center border-b border-gray-850 pb-4">
                 <h3 className="card-title text-white font-black font-display text-base tracking-wide m-0">Inbound Dossier</h3>
                 <button 
@@ -431,7 +431,7 @@ export default function Leads({ searchValue = '' }) {
 
               {/* Profile Header */}
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-[#01FDF6]/20 border border-[#01FDF6]/40 text-[#01FDF6] flex items-center justify-center font-display font-black text-xl shadow-glow">
+                <div className="w-14 h-14 rounded-full bg-[#38BDF8]/20 border border-[#38BDF8]/40 text-[#38BDF8] flex items-center justify-center font-display font-black text-xl shadow-glow">
                   {leadName.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -444,19 +444,19 @@ export default function Leads({ searchValue = '' }) {
               </div>
 
               {/* AI Fit indicators */}
-              <div className="grid grid-cols-2 gap-3 p-3 bg-[#0a0f1e]/80 border border-gray-850 rounded-xl">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-[#0F172A]/80 border border-gray-850 rounded-xl">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">AI Lead Match</span>
-                  <span className="font-mono text-sm font-black text-[#21FA90]">{score}/100</span>
+                  <span className="font-mono text-sm font-black text-[#10B981]">{score}/100</span>
                 </div>
                 <div className="flex flex-col gap-0.5 border-l border-gray-850 pl-3">
                   <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Acquisition Source</span>
-                  <span className="font-mono text-sm font-black text-[#8A4FFF]">{selectedLead.source}</span>
+                  <span className="font-mono text-sm font-black text-[#6366F1]">{selectedLead.source}</span>
                 </div>
               </div>
 
               {/* Contact metadata */}
-              <div className="flex flex-col gap-2.5 p-4 bg-[#0a0f1e]/40 border border-gray-850/50 rounded-xl">
+              <div className="flex flex-col gap-2.5 p-4 bg-[#0F172A]/40 border border-gray-850/50 rounded-xl">
                 <div className="flex items-center gap-3 text-xs text-gray-300">
                   <Mail size={14} className="text-gray-500 w-4" />
                   <span className="truncate">{selectedLead.email}</span>
@@ -470,7 +470,7 @@ export default function Leads({ searchValue = '' }) {
               {/* Notes Section */}
               <div className="flex flex-col gap-1.5">
                 <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Inbound Intelligence Notes</h5>
-                <div className="p-3 bg-[#E4FF1A]/5 border-l-4 border-[#E4FF1A] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
+                <div className="p-3 bg-[#F59E0B]/5 border-l-4 border-[#F59E0B] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
                   {enrichStatus === 'Enriched' ? 'AI System: LinkedIn verified and enriched contact details.' : 'Pending enrichment check.'}
                 </div>
               </div>
@@ -490,7 +490,7 @@ export default function Leads({ searchValue = '' }) {
                     onClick={(e) => triggerEnrichment(selectedLead, e)}
                     title="Trigger AI Data Enrichment"
                   >
-                    <Sparkles size={14} className="text-[#E4FF1A]" />
+                    <Sparkles size={14} className="text-[#F59E0B]" />
                   </button>
                 </div>
                 <div className="flex gap-2">
@@ -527,7 +527,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Prospect Full Name *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 placeholder="e.g. Sarah Connor" 
                 value={fullName} 
                 onChange={e => setFullName(e.target.value)} 
@@ -538,7 +538,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company Name *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 placeholder="e.g. Cyberdyne Systems" 
                 value={company} 
                 onChange={e => setCompany(e.target.value)} 
@@ -552,7 +552,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address *</label>
               <input 
                 type="email" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 placeholder="e.g. s.connor@cyberdyne.jp" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
@@ -563,7 +563,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 placeholder="e.g. +81 3 5555 0199" 
                 value={phone} 
                 onChange={e => setPhone(e.target.value)} 
@@ -575,7 +575,7 @@ export default function Leads({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Lead Acquisition Source</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={source} 
                 onChange={e => setSource(e.target.value)}
               >
@@ -585,7 +585,7 @@ export default function Leads({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={status} 
                 onChange={e => setStatus(e.target.value)}
               >
@@ -604,7 +604,7 @@ export default function Leads({ searchValue = '' }) {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
             >
               Add Prospect
             </button>
@@ -625,7 +625,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Prospect Full Name *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={fullName} 
                 onChange={e => setFullName(e.target.value)} 
                 required 
@@ -635,7 +635,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company Name *</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={company} 
                 onChange={e => setCompany(e.target.value)} 
                 required 
@@ -648,7 +648,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address *</label>
               <input 
                 type="email" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
                 required
@@ -658,7 +658,7 @@ export default function Leads({ searchValue = '' }) {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
               <input 
                 type="text" 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={phone} 
                 onChange={e => setPhone(e.target.value)} 
               />
@@ -669,7 +669,7 @@ export default function Leads({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Lead Acquisition Source</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={source} 
                 onChange={e => setSource(e.target.value)}
               >
@@ -679,7 +679,7 @@ export default function Leads({ searchValue = '' }) {
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
               <select 
-                className="w-full bg-[#0a0f1e] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#01FDF6]" 
+                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
                 value={status} 
                 onChange={e => setStatus(e.target.value)}
               >
@@ -698,7 +698,7 @@ export default function Leads({ searchValue = '' }) {
             </button>
             <button 
               type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#01FDF6] hover:bg-[#00e5df] text-[#0a0f1e] font-bold shadow-glow transition-all"
+              className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
             >
               Save Changes
             </button>

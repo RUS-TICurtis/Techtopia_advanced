@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export const useTenantStore = create(
@@ -11,7 +11,7 @@ export const useTenantStore = create(
         logo: '⚡',
         plan: 'Enterprise',
         settings: {
-          primaryColor: '#00e5ff', // cyan
+          primaryColor: '#38BDF8', // cyan
           allowSelfSignOn: true,
           requireMfa: true,
           aiFeaturesEnabled: true,
@@ -40,7 +40,7 @@ export const useTenantStore = create(
                 ...tenant,
                 logo: tenantId === 'tenant-2' ? '💡' : tenantId === 'tenant-3' ? '🛡️' : '⚡',
                 settings: {
-                  primaryColor: tenantId === 'tenant-2' ? '#a6e22e' : tenantId === 'tenant-3' ? '#f92672' : '#00e5ff',
+                  primaryColor: tenantId === 'tenant-2' ? '#10B981' : tenantId === 'tenant-3' ? '#EF4444' : '#38BDF8',
                   allowSelfSignOn: true,
                   requireMfa: tenantId !== 'tenant-2',
                   aiFeaturesEnabled: true,

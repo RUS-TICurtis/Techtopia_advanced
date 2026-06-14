@@ -1,0 +1,24 @@
+async function test() {
+  const loginUrl = 'https://techtopiagh-crm.onrender.com/api/v1/auth/login';
+  const credentials = { email: 'admin@techtopia.com', password: 'Admin123!' };
+  
+  const loginRes = await fetch(loginUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  const data = await loginRes.json();
+  const token = data.accessToken;
+
+  const res = await fetch('https://techtopiagh-crm.onrender.com/api/v1/finance/vendors', {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Tenant-Id': 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+    }
+  });
+
+  console.log('Status:', res.status);
+  const json = await res.json();
+  console.log('Response (first vendor):', JSON.stringify(json[0] || json, null, 2));
+}
+test();

@@ -18,15 +18,17 @@ import {
   ArrowRight, AlertTriangle, Activity
 } from 'lucide-react';
 import './Dashboard.css';
+import Skeleton, { CardSkeleton } from '../components/ui/Skeleton';
+import EmptyState from '../components/ui/EmptyState';
 
 const CUSTOM_TOOLTIP = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div style={{
-        backgroundColor: '#0f1629', border: '1px solid #222', borderRadius: 8,
+        backgroundColor: '#1E293B', border: '1px solid #222', borderRadius: 8,
         padding: '10px 14px', fontSize: 13, color: '#fff'
       }}>
-        <p style={{ marginBottom: 4, color: '#627496', fontWeight: 700, fontSize: 11, textTransform: 'uppercase' }}>{label}</p>
+        <p style={{ marginBottom: 4, color: '#64748B', fontWeight: 700, fontSize: 11, textTransform: 'uppercase' }}>{label}</p>
         {payload.map((entry, i) => (
           <p key={i} style={{ color: entry.color }}>
             {entry.name}: {entry.name === 'Revenue' ? `$${entry.value.toLocaleString()}` : entry.value}
@@ -60,10 +62,10 @@ export default function Dashboard({ setCurrentTab }) {
   };
 
   const quickActions = [
-    { label: 'AI Assistant', icon: Sparkles, color: '#01FDF6', desc: 'Get AI-powered insights and automate tasks', path: '/ai' },
-    { label: 'Sales Pipeline', icon: GitBranch, color: '#21FA90', desc: 'Manage deals and track opportunities', path: '/pipeline' },
-    { label: 'Security & Audit', icon: ShieldCheck, color: '#8A4FFF', desc: 'View logs and monitor system activity', path: '/audit-logs' },
-    { label: 'Automations', icon: Zap, color: '#FF47DA', desc: 'Build smart workflows and triggers', path: '/automations' },
+    { label: 'AI Assistant', icon: Sparkles, color: '#38BDF8', desc: 'Get AI-powered insights and automate tasks', path: '/ai' },
+    { label: 'Sales Pipeline', icon: GitBranch, color: '#10B981', desc: 'Manage deals and track opportunities', path: '/pipeline' },
+    { label: 'Security & Audit', icon: ShieldCheck, color: '#6366F1', desc: 'View logs and monitor system activity', path: '/audit-logs' },
+    { label: 'Automations', icon: Zap, color: '#EF4444', desc: 'Build smart workflows and triggers', path: '/automations' },
   ];
 
   const metrics = [
@@ -138,20 +140,20 @@ export default function Dashboard({ setCurrentTab }) {
     }
 
     const colors = {
-      'Qualification': '#01FDF6',
-      'Proposal': '#8A4FFF',
-      'Negotiation': '#FF47DA',
-      'Closed Won': '#21FA90',
-      'Closed Lost': '#FF4B4B'
+      'Qualification': '#38BDF8',
+      'Proposal': '#6366F1',
+      'Negotiation': '#EF4444',
+      'Closed Won': '#10B981',
+      'Closed Lost': '#EF4444'
     };
 
     const data = Object.entries(stageCounts).map(([name, value]) => ({
       name,
       value,
-      color: colors[name] || '#627496'
+      color: colors[name] || '#64748B'
     }));
 
-    return data.length > 0 ? data : [{ name: 'No Deals', value: 0, color: '#627496' }];
+    return data.length > 0 ? data : [{ name: 'No Deals', value: 0, color: '#64748B' }];
   };
 
   const pieData = getPieData();
@@ -214,23 +216,27 @@ export default function Dashboard({ setCurrentTab }) {
 
       {/* KPI Metrics */}
       <div className="metrics-grid">
-        {metrics.map((m) => {
-          const Icon = m.icon;
-          return (
-            <div key={m.label} className={`card metric-card ${m.accentClass}`}>
-              <div className="metric-icon-wrapper" style={{ backgroundColor: m.bgVar, color: m.colorVar }}>
-                <Icon size={24} />
+        {isLoadingSummary ? (
+          Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)
+        ) : (
+          metrics.map((m) => {
+            const Icon = m.icon;
+            return (
+              <div key={m.label} className={`card metric-card ${m.accentClass}`}>
+                <div className="metric-icon-wrapper" style={{ backgroundColor: m.bgVar, color: m.colorVar }}>
+                  <Icon size={24} />
+                </div>
+                <div className="metric-info">
+                  <span className="metric-label">{m.label}</span>
+                  <span className="metric-value" style={{ color: 'var(--text-title)' }}>{m.value}</span>
+                  <span className="metric-change up">
+                    <TrendingUp size={12} /> {m.change}
+                  </span>
+                </div>
               </div>
-              <div className="metric-info">
-                <span className="metric-label">{m.label}</span>
-                <span className="metric-value" style={{ color: 'var(--text-title)' }}>{m.value}</span>
-                <span className="metric-change up">
-                  <TrendingUp size={12} /> {m.change}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       {/* Main 2-column grid */}
@@ -241,29 +247,33 @@ export default function Dashboard({ setCurrentTab }) {
           <div className="card">
             <div className="card-title">Revenue & Lead Acquisition (6 Months)</div>
             <div style={{ height: 240 }}>
-              {leads.length === 0 && payments.length === 0 ? (
-                <div className="empty-state-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
-                  <span>No data recorded for the selected period.</span>
-                </div>
+              {isLoadingLeads || isLoadingFinance ? (
+                <Skeleton className="w-full h-full min-h-[200px]" />
+              ) : leads.length === 0 && payments.length === 0 ? (
+                <EmptyState 
+                  title="No data recorded" 
+                  description="Add your first deal or lead to start tracking revenue." 
+                  action={<button className="btn btn-primary text-sm" onClick={() => nav('/pipeline')}>Go to Pipeline</button>} 
+                />
               ) : (
                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#01FDF6" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#01FDF6" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="#38BDF8" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#21FA90" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#21FA90" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 12 }} />
-                    <YAxis stroke="#3d4e6b" tick={{ fontSize: 12 }} />
+                    <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 12 }} />
+                    <YAxis stroke="#475569" tick={{ fontSize: 12 }} />
                     <Tooltip content={<CUSTOM_TOOLTIP />} />
-                    <Area type="monotone" dataKey="Revenue" stroke="#01FDF6" strokeWidth={2} fill="url(#gradRevenue)" />
-                    <Area type="monotone" dataKey="Leads" stroke="#21FA90" strokeWidth={2} fill="url(#gradLeads)" />
+                    <Area type="monotone" dataKey="Revenue" stroke="#38BDF8" strokeWidth={2} fill="url(#gradRevenue)" />
+                    <Area type="monotone" dataKey="Leads" stroke="#10B981" strokeWidth={2} fill="url(#gradLeads)" />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
@@ -274,11 +284,15 @@ export default function Dashboard({ setCurrentTab }) {
           <div className="dashboard-charts-grid">
             <div className="card">
               <div className="card-title">Deal Pipeline Stages</div>
-              <div style={{ height: 210, display: 'flex', alignItems: 'center' }}>
-                {opportunities.length === 0 ? (
-                  <div className="empty-state-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
-                    <span>0 opportunities in pipeline</span>
-                  </div>
+              <div style={{ height: 210, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {isLoadingOpps ? (
+                  <Skeleton className="h-[180px] w-[180px] rounded-full" />
+                ) : opportunities.length === 0 ? (
+                  <EmptyState 
+                    title="Empty Pipeline" 
+                    description="You have 0 opportunities in your pipeline." 
+                    action={<button className="btn btn-outline text-sm" onClick={() => nav('/pipeline')}>Add Deal</button>} 
+                  />
                 ) : (
                   <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <PieChart>
@@ -295,7 +309,7 @@ export default function Dashboard({ setCurrentTab }) {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(v, name) => [v, name]} contentStyle={{ backgroundColor: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
+                      <Tooltip formatter={(v, name) => [v, name]} contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
                       <Legend iconSize={10} formatter={(val) => <span style={{ color: '#c8d6ef', fontSize: 12 }}>{val}</span>} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -306,18 +320,21 @@ export default function Dashboard({ setCurrentTab }) {
             <div className="card">
               <div className="card-title">Monthly Conversion Trend</div>
               <div style={{ height: 180 }}>
-                {leads.length === 0 ? (
-                  <div className="empty-state-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
-                    <span>0 leads converted</span>
-                  </div>
+                {isLoadingLeads ? (
+                  <Skeleton className="w-full h-full" />
+                ) : leads.length === 0 ? (
+                  <EmptyState 
+                    title="No Conversions" 
+                    description="0 leads converted." 
+                  />
                 ) : (
                   <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <BarChart data={chartData.slice(-4)} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="month" stroke="#3d4e6b" tick={{ fontSize: 12 }} />
-                      <YAxis stroke="#3d4e6b" tick={{ fontSize: 12 }} />
-                      <Tooltip contentStyle={{ backgroundColor: '#0f1629', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
-                      <Bar dataKey="Leads" fill="#8A4FFF" radius={[4, 4, 0, 0]} />
+                      <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 12 }} />
+                      <YAxis stroke="#475569" tick={{ fontSize: 12 }} />
+                      <Tooltip contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #222', borderRadius: 8, fontSize: 12 }} />
+                      <Bar dataKey="Leads" fill="#6366F1" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
