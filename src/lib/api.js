@@ -168,6 +168,7 @@ export const budgetsApi = {
   cancel: (id) => apiClient.post(`/api/v1/finance/budgets/${id}/cancel`).then(r => r.data),
   listAllocations: (id) => apiClient.get(`/api/v1/finance/budgets/${id}/allocations`).then(r => r.data),
   createAllocation: (id, data) => apiClient.post(`/api/v1/finance/budgets/${id}/allocations`, data).then(r => r.data),
+  variance: (id) => apiClient.get(`/api/v1/finance/budgets/${id}/variance`).then(r => r.data),
 };
 
 export const expensesApi = {
@@ -177,6 +178,7 @@ export const expensesApi = {
   reject: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/reject`, data).then(r => r.data),
   recordPayment: (id, data) => apiClient.post(`/api/v1/finance/expenses/${id}/payment`, data).then(r => r.data),
   getActivities: (id) => apiClient.get(`/api/v1/finance/expenses/${id}/activities`).then(r => r.data),
+  cancel: (id) => apiClient.post(`/api/v1/finance/expenses/${id}/cancel`).then(r => r.data),
 };
 
 export const vendorsApi = {

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { WORKSPACE_GROUPS, WORKSPACE_ITEMS } from './config/sidebar.workspace.config';
@@ -229,6 +229,7 @@ export default function Sidebar({
               <NavLink
                 key={`pinned-${item.id}`}
                 to={item.url}
+                end={item.url === '/' || item.url === '/finance'}
                 className={({ isActive }) => `sidebar-item sidebar-item-sub active-pinned ${isActive ? 'active' : ''}`}
                 onClick={() => {
                   if (setMobileOpen) setMobileOpen(false);
@@ -288,6 +289,7 @@ export default function Sidebar({
                     <NavLink
                       key={item.id}
                       to={item.url}
+                      end={item.url === '/' || item.url === '/finance'}
                       className={({ isActive }) => `sidebar-item group ${isActive ? 'active' : ''}`}
                       onClick={() => {
                         if (setMobileOpen) setMobileOpen(false);

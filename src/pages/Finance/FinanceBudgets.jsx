@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip
@@ -32,7 +32,7 @@ const EMPTY_BUDGET = {
 };
 
 export default function FinanceBudgets() {
-  const { budgets = [], isLoading, createBudget, deleteBudget } = useBudgets();
+  const { budgets = [], isLoading, createBudget, updateBudget, deleteBudget } = useBudgets();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBudget, setNewBudget] = useState(EMPTY_BUDGET);
   const [submitting, setSubmitting] = useState(false);
@@ -79,16 +79,20 @@ export default function FinanceBudgets() {
 
     setSubmitting(true);
     try {
-      // POST /api/v1/finance/budgets
-      // type must be: 'Departmental' | 'Project' | 'Capital'
-      await createBudget({
+      const payload = {
         name: newBudget.name,
         description: newBudget.description || null,
         type: newBudget.type,
         startDate: startIso,
         endDate: endIso,
         totalAmount: parseFloat(newBudget.totalAmount) || 0,
-      });
+      };
+
+      if (newBudget.id) {
+        await updateBudget({ id: newBudget.id, data: payload });
+      } else {
+        await createBudget(payload);
+      }
       setShowCreateModal(false);
       setNewBudget(EMPTY_BUDGET);
       setFormError('');
@@ -98,11 +102,24 @@ export default function FinanceBudgets() {
         err?.response?.data?.details ||
         err?.response?.data?.error ||
         err?.response?.data?.message ||
-        'Failed to create budget. Please check all fields and try again.'
+        `Failed to ${newBudget.id ? 'update' : 'create'} budget. Please check all fields and try again.`
       );
     } finally {
       setSubmitting(false);
     }
+  };
+ 
+  const openEditModal = (budget) => {
+    setNewBudget({
+      id: budget.id,
+      name: budget.name || '',
+      description: budget.description || '',
+      type: budget.type || 'Departmental',
+      startDate: budget.startDate ? budget.startDate.slice(0, 10) : '',
+      endDate: budget.endDate ? budget.endDate.slice(0, 10) : '',
+      totalAmount: budget.totalAmount || '',
+    });
+    setShowCreateModal(true);
   };
  
   if (isLoading) {
@@ -121,7 +138,7 @@ export default function FinanceBudgets() {
           <p className="page-subtitle">Track budget allocation, spending, and variance across departments and projects</p>
         </div>
         <div className="page-actions">
-          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+          <button className="btn btn-primary" onClick={() => { setNewBudget(EMPTY_BUDGET); setShowCreateModal(true); }}>
             <Plus size={16} /><span>New Budget</span>
           </button>
         </div>
@@ -221,8 +238,14 @@ export default function FinanceBudgets() {
                   </span>
                   <span className="text-xs text-muted">({pct}%)</span>
                   <button
+                    onClick={() => openEditModal(budget)}
+                    className="btn-icon" style={{ color: 'var(--text-main)' }} title="Edit"
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button
                     onClick={() => { if (window.confirm('Delete this budget?')) deleteBudget(budget.id); }}
-                    className="btn-icon" style={{ color: 'var(--error)' }}
+                    className="btn-icon" style={{ color: 'var(--error)' }} title="Delete"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -255,7 +278,7 @@ export default function FinanceBudgets() {
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Create Budget</h2>
+              <h2>{newBudget.id ? 'Edit Budget' : 'Create Budget'}</h2>
               <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={18} /></button>
             </div>
             <form onSubmit={handleCreate} className="modal-body">
@@ -318,7 +341,7 @@ export default function FinanceBudgets() {
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
                   <Plus size={14} />
-                  {submitting ? 'Creating…' : 'Create Budget'}
+                  {submitting ? 'Saving…' : (newBudget.id ? 'Save Changes' : 'Create Budget')}
                 </button>
               </div>
             </form>

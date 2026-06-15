@@ -1,7 +1,7 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Receipt, Plus, Search, CheckCircle, Clock, X,
-  ThumbsUp, ThumbsDown, Download, Send, Trash2
+  ThumbsUp, ThumbsDown, Download, Send, Trash2, Edit3
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
@@ -37,6 +37,7 @@ export default function FinanceExpenses() {
     submitExpense,
     approveExpense,
     rejectExpense,
+    updateExpense,
     deleteExpense,
   } = useExpenses();
 
@@ -117,15 +118,12 @@ export default function FinanceExpenses() {
     ev.preventDefault();
     setFormError('');
 
-    // Guard: categoryId is required (must be a valid UUID)
     if (!newExpense.categoryId) {
       setFormError('Please select a category.');
       return;
     }
 
     setSubmitting(true);
-    // POST /api/v1/finance/expenses
-    // Append T00:00:00 to avoid UTC midnight shift on date-only strings
     const payload = {
       categoryId: newExpense.categoryId,
       vendorId: newExpense.vendorId || null,
@@ -137,8 +135,13 @@ export default function FinanceExpenses() {
       currency: newExpense.currency || 'GHS',
       description: newExpense.description,
     };
+    
     try {
-      await createExpense(payload);
+      if (newExpense.id) {
+        await updateExpense({ id: newExpense.id, data: payload });
+      } else {
+        await createExpense(payload);
+      }
       setShowCreateModal(false);
       setNewExpense(EMPTY_EXPENSE);
     } catch (err) {
@@ -147,11 +150,24 @@ export default function FinanceExpenses() {
         err?.response?.data?.details ||
         err?.response?.data?.error ||
         err?.response?.data?.message ||
-        'Failed to create expense.'
+        `Failed to ${newExpense.id ? 'update' : 'create'} expense.`
       );
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const openEditModal = (exp) => {
+    setNewExpense({
+      id: exp.id,
+      categoryId: exp.categoryId || '',
+      vendorId: exp.vendorId || '',
+      expenseDate: exp.expenseDate ? exp.expenseDate.slice(0, 10) : new Date().toISOString().slice(0, 10),
+      amount: exp.amount || '',
+      currency: exp.currency || 'GHS',
+      description: exp.description || '',
+    });
+    setShowCreateModal(true);
   };
 
   if (isLoading) {
@@ -176,7 +192,7 @@ export default function FinanceExpenses() {
               <span>Approvals ({pendingApprovals.length})</span>
             </button>
           )}
-          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+          <button className="btn btn-primary" onClick={() => { setNewExpense(EMPTY_EXPENSE); setShowCreateModal(true); }}>
             <Plus size={16} /><span>New Expense</span>
           </button>
         </div>
@@ -300,6 +316,9 @@ export default function FinanceExpenses() {
                     <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
                       {exp.status === 'Draft' && (
                         <>
+                          <button className="btn-icon" title="Edit" onClick={() => openEditModal(exp)}>
+                            <Edit3 size={13} style={{ color: 'var(--text-main)' }} />
+                          </button>
                           <button
                             className="btn-icon" title="Submit for Approval"
                             onClick={() => handleSubmitForApproval(exp.id)}
@@ -322,9 +341,14 @@ export default function FinanceExpenses() {
                         </>
                       )}
                       {['Rejected', 'Cancelled'].includes(exp.status) && (
-                        <button className="btn-icon" title="Delete" onClick={() => handleDelete(exp.id)}>
-                          <Trash2 size={13} style={{ color: 'var(--error)' }} />
-                        </button>
+                        <>
+                          <button className="btn-icon" title="Edit" onClick={() => openEditModal(exp)}>
+                            <Edit3 size={13} style={{ color: 'var(--text-main)' }} />
+                          </button>
+                          <button className="btn-icon" title="Delete" onClick={() => handleDelete(exp.id)}>
+                            <Trash2 size={13} style={{ color: 'var(--error)' }} />
+                          </button>
+                        </>
                       )}
                     </div>
                   </td>
@@ -351,7 +375,7 @@ export default function FinanceExpenses() {
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" style={{ maxWidth: 540 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>New Expense</h2>
+              <h2>{newExpense.id ? 'Edit Expense' : 'New Expense'}</h2>
               <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={18} /></button>
             </div>
             <form onSubmit={handleCreate} className="modal-body">
@@ -436,7 +460,7 @@ export default function FinanceExpenses() {
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
                   <Receipt size={14} />
-                  {submitting ? 'Creating…' : 'Create Expense (Draft)'}
+                  {submitting ? 'Saving…' : (newExpense.id ? 'Save Changes' : 'Create Expense (Draft)')}
                 </button>
               </div>
             </form>

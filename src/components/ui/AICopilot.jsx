@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sparkles, X, Send, Play, Check, Trash2, Command, 
-  HelpCircle, ChevronUp, AlertCircle, ShieldAlert, Cpu
+  HelpCircle, ChevronUp, ChevronRight, ChevronLeft, AlertCircle, ShieldAlert, Cpu
 } from 'lucide-react';
 import './AICopilot.css';
 
@@ -10,6 +10,7 @@ export default function AICopilot() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [isRetracted, setIsRetracted] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -152,16 +153,25 @@ export default function AICopilot() {
 
   return (
     <>
-      {/* Floating launcher launcher launcher button */}
-      <button 
-        className={`ai-copilot-launcher ${isOpen ? 'active' : ''}`}
-        onClick={() => setIsOpen(!isOpen)}
-        title="Open AI Neural Copilot (Alt+A)"
-      >
-        <div className="glow-ring"></div>
-        <Sparkles size={22} className="text-[#38BDF8]" />
-        <span className="tooltip-hint">Alt+A</span>
-      </button>
+      {/* Floating launcher wrapper */}
+      <div className={`ai-copilot-container ${isRetracted ? 'retracted' : ''}`}>
+        <button 
+          className="ai-copilot-retract-btn"
+          onClick={() => setIsRetracted(!isRetracted)}
+          title={isRetracted ? "Expand Copilot Button" : "Retract Copilot Button"}
+        >
+          {isRetracted ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        </button>
+        <button 
+          className={`ai-copilot-launcher ${isOpen ? 'active' : ''}`}
+          onClick={() => setIsOpen(!isOpen)}
+          title="Open AI Neural Copilot (Alt+A)"
+        >
+          <div className="glow-ring"></div>
+          <Sparkles size={22} className="text-[#38BDF8]" />
+          <span className="tooltip-hint">Alt+A</span>
+        </button>
+      </div>
 
       {/* Floating Copilot Console Sidebar Panel */}
       {isOpen && (

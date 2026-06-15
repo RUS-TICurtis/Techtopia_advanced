@@ -15,7 +15,22 @@
 }
 
 @media (max-width: 600px) {
-  .finance-kpi-grid { grid-template-columns: 1fr; }
+  .finance-kpi-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px;
+  }
+  .finance-kpi-card {
+    padding: 14px;
+    gap: 10px;
+    flex-direction: column;
+  }
+  .finance-kpi-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .finance-kpi-value {
+    font-size: 16px;
+  }
 }
 
 .finance-kpi-card {
@@ -616,6 +631,19 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .finance-metric-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .finance-metric-mini {
+    padding: 12px;
+  }
+  .finance-metric-mini-value {
+    font-size: 16px;
+  }
 }
 
 .finance-metric-mini {

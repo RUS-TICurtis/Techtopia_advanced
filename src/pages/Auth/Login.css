@@ -1,4 +1,4 @@
-﻿.login-container {
+.login-container {
   display: flex;
   min-height: 100vh;
   width: 100%;
@@ -33,15 +33,26 @@
 }
 
 .logo-symbol {
-  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
   color: var(--brand-cyan);
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.2);
 }
 
 .logo-text {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 800;
   font-family: var(--font-display);
   letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff 0%, #A3AED0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .login-hero-text h1 {
@@ -125,7 +136,23 @@
 .login-form-container {
   width: 100%;
   max-width: 440px;
-  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-in {
+  opacity: 0;
+  animation: staggerFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(0.1s + var(--delay, 1) * 0.1s);
 }
 
 .login-header {
@@ -267,6 +294,43 @@
   }
 }
 
+@media (max-width: 600px) {
+  .login-branding {
+    padding: 24px 16px;
+  }
+
+  .login-logo {
+    margin-bottom: 8px;
+  }
+
+  .logo-symbol {
+    font-size: 24px;
+  }
+  
+  .logo-text {
+    font-size: 20px;
+  }
+
+  .login-hero-text h1 {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  .login-hero-text p {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  /* Hide features completely on very small screens to keep form in view without scrolling */
+  .login-features {
+    display: none;
+  }
+  
+  .login-form-wrapper {
+    padding: 16px;
+  }
+}
+
 /* Dark mode login overrides with beautiful premium effects */
 [data-theme="dark"] .login-form-wrapper {
   background: radial-gradient(circle at 50% 0%, rgba(1, 253, 246, 0.03), transparent 60%), var(--bg-card);
@@ -283,11 +347,12 @@
 
 @media (max-width: 480px) {
   [data-theme="dark"] .login-form-container {
-    padding: 20px 16px;
-    border: none;
-    background: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
+    padding: 24px 20px;
+    background: rgba(15, 22, 41, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
   }
 }
 

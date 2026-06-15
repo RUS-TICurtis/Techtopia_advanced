@@ -1,12 +1,55 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Neural AI Copilot Floating Dashboard Styles
    ========================================================================== */
 
-/* Floating Launcher */
-.ai-copilot-launcher {
+/* Floating Launcher Wrapper */
+.ai-copilot-container {
   position: fixed;
   bottom: 24px;
   right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ai-copilot-container.retracted {
+  transform: translateX(calc(100% + 24px));
+}
+
+.ai-copilot-retract-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.ai-copilot-retract-btn:hover {
+  background: rgba(15, 23, 42, 1);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #38BDF8;
+}
+
+.ai-copilot-container.retracted .ai-copilot-retract-btn {
+  transform: translateX(-38px);
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38BDF8;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+}
+
+.ai-copilot-launcher {
+  position: relative;
   width: 54px;
   height: 54px;
   border-radius: 50%;
@@ -17,7 +60,6 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 1000;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -230,9 +272,11 @@
 }
 
 @media (max-width: 1024px) {
-  .ai-copilot-launcher {
+  .ai-copilot-container {
     bottom: 70px !important;
     right: 16px !important;
+  }
+  .ai-copilot-launcher {
     width: 48px !important;
     height: 48px !important;
   }

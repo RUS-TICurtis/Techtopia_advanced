@@ -500,6 +500,12 @@ export function useBudgets() {
     onSuccess: invalidate,
   });
 
+  // GET /api/v1/finance/budgets/{id}/allocations and /variance
+  const createAllocationMutation = useMutation({
+    mutationFn: ({ id, data }) => budgetsApi.createAllocation(id, data),
+    onSuccess: invalidate,
+  });
+
   return {
     ...query,
     budgets: query.data || [],
@@ -512,6 +518,9 @@ export function useBudgets() {
     activateBudget: activateMutation.mutateAsync,
     closeBudget: closeMutation.mutateAsync,
     cancelBudget: cancelMutation.mutateAsync,
+    listAllocations: budgetsApi.listAllocations,
+    createAllocation: createAllocationMutation.mutateAsync,
+    getVariance: budgetsApi.variance,
   };
 }
 
@@ -574,10 +583,13 @@ export function useVendors() {
     createVendor: createMutation.mutateAsync,
     updateVendor: updateMutation.mutateAsync,
     deleteVendor: deleteMutation.mutateAsync,
+    listVendorContacts: vendorsApi.listContacts,
     createVendorContact: createContactMutation.mutateAsync,
     updateVendorContact: updateContactMutation.mutateAsync,
     deleteVendorContact: deleteContactMutation.mutateAsync,
+    listVendorContracts: vendorsApi.listContracts,
     createVendorContract: createContractMutation.mutateAsync,
+    listVendorDocuments: vendorsApi.listDocuments,
     createVendorDocument: createDocumentMutation.mutateAsync,
   };
 }
@@ -768,6 +780,12 @@ export function useExpenses() {
     onSuccess: invalidate,
   });
 
+  // POST /api/v1/finance/expenses/{id}/cancel
+  const cancelMutation = useMutation({
+    mutationFn: (id) => expensesApi.cancel(id),
+    onSuccess: invalidate,
+  });
+
   // DELETE /api/v1/finance/expenses/{id}  — only Draft or Rejected
   const deleteMutation = useMutation({
     mutationFn: (id) => expensesApi.delete(id),
@@ -784,6 +802,7 @@ export function useExpenses() {
     approveExpense: approveMutation.mutateAsync,
     rejectExpense: rejectMutation.mutateAsync,
     recordExpensePayment: recordPaymentMutation.mutateAsync,
+    cancelExpense: cancelMutation.mutateAsync,
     deleteExpense: deleteMutation.mutateAsync,
   };
 }

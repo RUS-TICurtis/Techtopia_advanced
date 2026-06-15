@@ -1,5 +1,5 @@
-﻿import React, { useState } from 'react';
-import { Building2, Plus, Search, Phone, Mail, Globe, MapPin, Package, X, ExternalLink, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Building2, Plus, Search, Phone, Mail, Globe, MapPin, Package, X, ExternalLink, Trash2, Edit3 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import { useVendors, useVendorCategories } from '../../hooks/useCrmData';
 import './Finance.css';
@@ -26,7 +26,7 @@ const EMPTY_VENDOR = {
 };
 
 export default function FinanceVendors() {
-  const { vendors = [], isLoading, createVendor, deleteVendor } = useVendors();
+  const { vendors = [], isLoading, createVendor, updateVendor, deleteVendor } = useVendors();
   const [search, setSearch] = useState('');
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -42,8 +42,7 @@ export default function FinanceVendors() {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      // POST /api/v1/finance/vendors
-      await createVendor({
+      const payload = {
         name: newVendor.name,
         registrationNumber: newVendor.registrationNumber || null,
         taxIdentificationNumber: newVendor.taxIdentificationNumber || null,
@@ -53,13 +52,39 @@ export default function FinanceVendors() {
         address: newVendor.address || null,
         country: newVendor.country || 'Ghana',
         city: newVendor.city || 'Accra',
-      });
+      };
+      
+      if (newVendor.id) {
+        await updateVendor({ id: newVendor.id, data: payload });
+        if (selectedVendor && selectedVendor.id === newVendor.id) {
+          setSelectedVendor({ ...selectedVendor, ...payload });
+        }
+      } else {
+        await createVendor(payload);
+      }
       setShowAddModal(false);
       setNewVendor(EMPTY_VENDOR);
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.details || err?.response?.data?.error || 'Failed to create vendor.');
+      alert(err?.response?.data?.details || err?.response?.data?.error || `Failed to ${newVendor.id ? 'update' : 'create'} vendor.`);
     }
+  };
+
+  const openEditModal = () => {
+    if (!selectedVendor) return;
+    setNewVendor({
+      id: selectedVendor.id,
+      name: selectedVendor.name || '',
+      registrationNumber: selectedVendor.registrationNumber || '',
+      taxIdentificationNumber: selectedVendor.taxIdentificationNumber || '',
+      email: selectedVendor.email || '',
+      phone: selectedVendor.phone || '',
+      website: selectedVendor.website || '',
+      address: selectedVendor.address || '',
+      country: selectedVendor.country || 'Ghana',
+      city: selectedVendor.city || 'Accra',
+    });
+    setShowAddModal(true);
   };
 
   if (isLoading) {
@@ -78,7 +103,7 @@ export default function FinanceVendors() {
           <p className="page-subtitle">Manage supplier directory, contacts, and procurement relationships</p>
         </div>
         <div className="page-actions">
-          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+          <button className="btn btn-primary" onClick={() => { setNewVendor(EMPTY_VENDOR); setShowAddModal(true); }}>
             <Plus size={16} /><span>Add Vendor</span>
           </button>
         </div>
@@ -188,7 +213,8 @@ export default function FinanceVendors() {
               </div>
             </div>
             <div className="finance-drawer-footer">
-              <button className="btn btn-secondary" style={{ color: 'var(--error)' }} onClick={() => { if(window.confirm('Delete this vendor?')) { deleteVendor(selectedVendor.id); setSelectedVendor(null); } }}>Delete Vendor</button>
+              <button className="btn btn-secondary" style={{ color: 'var(--error)' }} onClick={() => { if(window.confirm('Delete this vendor?')) { deleteVendor(selectedVendor.id); setSelectedVendor(null); } }}>Delete</button>
+              <button className="btn btn-secondary" onClick={openEditModal}><Edit3 size={14} /> Edit</button>
               <button className="btn btn-primary"><Package size={14} /> New PO</button>
             </div>
           </div>
@@ -200,7 +226,7 @@ export default function FinanceVendors() {
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Add Vendor</h2>
+              <h2>{newVendor.id ? 'Edit Vendor' : 'Add Vendor'}</h2>
               <button className="btn-icon" onClick={() => setShowAddModal(false)}><X size={18} /></button>
             </div>
             <form onSubmit={handleAdd} className="modal-body">
@@ -266,7 +292,7 @@ export default function FinanceVendors() {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary"><Building2 size={14} /> Add Vendor</button>
+                <button type="submit" className="btn btn-primary"><Building2 size={14} /> {newVendor.id ? 'Save Changes' : 'Add Vendor'}</button>
               </div>
             </form>
           </div>

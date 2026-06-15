@@ -1,7 +1,7 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Plus, Search, Filter, Download, Send, CheckCircle, Clock, AlertCircle,
-  FileText, MoreVertical, X, Eye, Copy, Trash2, ChevronDown, RefreshCw
+  FileText, MoreVertical, X, Eye, Copy, Trash2, ChevronDown, RefreshCw, Edit3
 } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import { useInvoices, useCompanies } from '../../hooks/useCrmData';
@@ -123,7 +123,11 @@ export default function FinanceInvoices() {
     };
 
     try {
-      await createInvoice(payload);
+      if (newInvoice.id) {
+        await updateInvoice({ id: newInvoice.id, data: payload });
+      } else {
+        await createInvoice(payload);
+      }
       setShowCreateModal(false);
       setNewInvoice(EMPTY_INVOICE);
     } catch (err) {
@@ -132,11 +136,37 @@ export default function FinanceInvoices() {
         err?.response?.data?.details ||
         err?.response?.data?.error ||
         err?.response?.data?.message ||
-        'Failed to create invoice.'
+        `Failed to ${newInvoice.id ? 'update' : 'create'} invoice.`
       );
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const openEditModal = (inv) => {
+    setNewInvoice({
+      id: inv.id,
+      companyId: inv.companyId || '',
+      contactId: inv.contactId || '',
+      opportunityId: inv.opportunityId || '',
+      client: inv.client || '',
+      project: inv.project || '',
+      email: inv.email || '',
+      phone: inv.phone || '',
+      address: inv.address || '',
+      issueDate: inv.issueDate ? inv.issueDate.slice(0, 10) : '',
+      dueDate: inv.dueDate ? inv.dueDate.slice(0, 10) : '',
+      currency: inv.currency || 'GHS',
+      notes: inv.notes || '',
+      taxRate: inv.taxRate || 0,
+      discount: inv.discount || 0,
+      items: (inv.items && inv.items.length > 0) ? inv.items.map(i => ({
+        description: i.description || '',
+        qty: i.quantity || 1,
+        unitPrice: i.unitPrice || 0,
+      })) : [{ description: '', qty: 1, unitPrice: 0 }],
+    });
+    setShowCreateModal(true);
   };
 
   const handleStatusChange = async (id, newStatus) => {
@@ -164,7 +194,7 @@ export default function FinanceInvoices() {
         </div>
         <div className="page-actions">
           <button className="btn btn-secondary"><RefreshCw size={16} /><span>Export</span></button>
-          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+          <button className="btn btn-primary" onClick={() => { setNewInvoice(EMPTY_INVOICE); setShowCreateModal(true); }}>
             <Plus size={16} /><span>Create Invoice</span>
           </button>
         </div>
@@ -252,6 +282,9 @@ export default function FinanceInvoices() {
                     <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end', position: 'relative' }}>
                       <button className="btn-icon" title="Download PDF"><Download size={15} /></button>
                       <button className="btn-icon" title="Send" onClick={() => handleStatusChange(inv.id, 'Sent')}><Send size={15} /></button>
+                      {inv.status === 'Draft' && (
+                        <button className="btn-icon" title="Edit" onClick={(e) => { e.stopPropagation(); openEditModal(inv); }}><Edit3 size={15} /></button>
+                      )}
                       <button className="btn-icon" title="More" onClick={() => setActiveDropdown(activeDropdown === inv.id ? null : inv.id)}>
                         <MoreVertical size={15} />
                       </button>
@@ -376,7 +409,7 @@ export default function FinanceInvoices() {
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" style={{ maxWidth: 700, maxHeight: '90vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Create Invoice</h2>
+              <h2>{newInvoice.id ? 'Edit Invoice' : 'Create Invoice'}</h2>
               <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={18} /></button>
             </div>
             <form onSubmit={handleCreate} className="modal-body">
@@ -526,7 +559,7 @@ export default function FinanceInvoices() {
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)} disabled={submitting}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  <Send size={14} /> {submitting ? 'Creating…' : 'Create & Send'}
+                  <Send size={14} /> {submitting ? 'Saving…' : (newInvoice.id ? 'Save Changes' : 'Create & Send')}
                 </button>
               </div>
             </form>

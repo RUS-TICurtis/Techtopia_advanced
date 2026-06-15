@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { Sparkles, ArrowRight, ShieldCheck, Mail, Lock } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Mail, Lock, Cpu } from 'lucide-react';
 import './Login.css';
 
 export default function AuthLogin() {
@@ -42,7 +42,9 @@ export default function AuthLogin() {
       <div className="login-branding">
         <div className="login-branding-content">
           <div className="login-logo">
-            <span className="logo-symbol">⚡</span>
+            <div className="logo-symbol">
+              <Cpu size={28} />
+            </div>
             <span className="logo-text">Techtopia CRM</span>
           </div>
           <div className="login-hero-text">
@@ -68,7 +70,7 @@ export default function AuthLogin() {
       {/* Right Form Panel */}
       <div className="login-form-wrapper">
         <div className="login-form-container">
-          <div className="login-header">
+          <div className="login-header stagger-in" style={{ '--delay': 1 }}>
             <h2>Welcome back</h2>
             <p>Please enter your details to sign in.</p>
           </div>
@@ -76,7 +78,7 @@ export default function AuthLogin() {
           {error && <div className="login-error">{error}</div>}
 
           <form onSubmit={handleLogin} className="login-form">
-            <div className="form-group">
+            <div className="form-group stagger-in" style={{ '--delay': 2 }}>
               <label className="form-label">Email</label>
               <div className="input-with-icon">
                 <Mail className="input-icon" size={18} />
@@ -92,7 +94,7 @@ export default function AuthLogin() {
               </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group stagger-in" style={{ '--delay': 3 }}>
               <label className="form-label">Password</label>
               <div className="input-with-icon">
                 <Lock className="input-icon" size={18} />
@@ -108,7 +110,7 @@ export default function AuthLogin() {
               </div>
             </div>
 
-            <div className="login-options">
+            <div className="login-options stagger-in" style={{ '--delay': 4 }}>
               <label className="remember-me">
                 <input type="checkbox" />
                 <span>Remember for 30 days</span>
@@ -118,7 +120,8 @@ export default function AuthLogin() {
 
             <button 
               type="submit" 
-              className="btn btn-primary login-btn"
+              className="btn btn-primary login-btn stagger-in"
+              style={{ '--delay': 5 }}
               disabled={isLoading}
             >
               {isLoading ? 'Authenticating...' : 'Sign In'}
