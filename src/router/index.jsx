@@ -1,4 +1,4 @@
-﻿import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PERMISSIONS } from '../constants/permissions';
 import ProtectedRoute from '../components/guards/ProtectedRoute';
@@ -14,6 +14,10 @@ const Pipeline = lazy(() => import('../pages/crm/Pipeline'));
 const Clients = lazy(() => import('../pages/crm/Clients'));
 const Billing = lazy(() => import('../pages/crm/Billing'));
 const Contracts = lazy(() => import('../pages/crm/Contracts'));
+const Tickets = lazy(() => import('../pages/crm/Tickets'));
+const Quotes = lazy(() => import('../pages/crm/Quotes'));
+const Catalog = lazy(() => import('../pages/crm/Catalog'));
+const Campaigns = lazy(() => import('../pages/crm/Campaigns'));
 
 // ─── Workspace Pages ──────────────────────────────────────────────────────
 const Tasks = lazy(() => import('../pages/workspace/Tasks'));
@@ -47,6 +51,9 @@ const ProjectTimeline = lazy(() => import('../pages/Projects/ProjectTimeline'));
 
 // ─── Finance Module Pages ─────────────────────────────────────────────────
 const FinanceOverview = lazy(() => import('../pages/Finance/FinanceOverview'));
+const FinanceGeneralLedger = lazy(() => import('../pages/Finance/FinanceGeneralLedger'));
+const FinanceBankReconciliation = lazy(() => import('../pages/Finance/FinanceBankReconciliation'));
+const FinanceAssets = lazy(() => import('../pages/Finance/FinanceAssets'));
 const FinanceInvoices = lazy(() => import('../pages/Finance/FinanceInvoices'));
 const FinancePayments = lazy(() => import('../pages/Finance/FinancePayments'));
 const FinanceSubscriptions = lazy(() => import('../pages/Finance/FinanceSubscriptions'));
@@ -130,6 +137,9 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_PIPELINE} />}>
             <Route path="/pipeline" element={<Pipeline searchValue={searchValue} />} />
+            <Route path="/crm/quotes" element={<Quotes />} />
+            <Route path="/crm/catalog" element={<Catalog />} />
+            <Route path="/crm/campaigns" element={<Campaigns />} />
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_CLIENTS} />}>
@@ -144,6 +154,7 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_SUPPORT} />}>
             <Route path="/support" element={<Support />} />
+            <Route path="/crm/tickets" element={<Tickets />} />
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_BILLING} />}>
@@ -192,6 +203,9 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
           {/* ── Finance Module Routes ────────────────────────────────── */}
           <Route element={<ProtectedRoute permission={PERMISSIONS.FINANCE_VIEW} />}>
             <Route path="/finance" element={<FinanceOverview />} />
+            <Route path="/finance/gl" element={<FinanceGeneralLedger />} />
+            <Route path="/finance/bank" element={<FinanceBankReconciliation />} />
+            <Route path="/finance/assets" element={<FinanceAssets />} />
             <Route path="/finance/invoices" element={<FinanceInvoices />} />
             <Route path="/finance/payments" element={<FinancePayments />} />
             <Route path="/finance/subscriptions" element={<FinanceSubscriptions />} />

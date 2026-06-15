@@ -1,4 +1,4 @@
-﻿import { 
+import { 
   LayoutDashboard, Sparkles, Bell, Clock, Search, ShieldCheck,
   TrendingUp, Users, Building2, UserCircle2, GitBranch, FileText, FileSignature,
   DollarSign, BarChart3, Receipt, LifeBuoy, MessageSquare, Zap, ShieldAlert, Settings,
@@ -50,13 +50,17 @@ export const WORKSPACE_ITEMS: WorkspaceItem[] = [
 
   // Sales Group
   { id: 'pipeline', label: 'Sales Pipelines', url: '/pipeline', group: 'sales' },
+  { id: 'quotes', label: 'Quotes & Proposals', url: '/crm/quotes', group: 'sales' },
+  { id: 'catalog', label: 'Product Catalog', url: '/crm/catalog', group: 'sales' },
   { id: 'intelligence', label: 'Revenue Intelligence', url: '/intelligence', group: 'sales' },
 
   // Support Group
   { id: 'support', label: 'SLA Tickets', url: '/support', group: 'support' },
+  { id: 'tickets', label: 'Support Tickets', url: '/crm/tickets', group: 'support' },
 
   // Marketing Group
   { id: 'automations-mktg', label: 'Marketing Builders', url: '/automations', group: 'marketing' },
+  { id: 'campaigns', label: 'Campaigns', url: '/crm/campaigns', group: 'marketing' },
 
   // Projects Group
   { id: 'projects', label: 'Workspaces', url: '/projects', group: 'projects' },
@@ -68,6 +72,9 @@ export const WORKSPACE_ITEMS: WorkspaceItem[] = [
 
   // Finance Group
   { id: 'finance-overview', label: 'Finance Overview', url: '/finance', group: 'finance' },
+  { id: 'finance-gl', label: 'General Ledger', url: '/finance/gl', group: 'finance' },
+  { id: 'finance-bank', label: 'Bank Reconciliation', url: '/finance/bank', group: 'finance' },
+  { id: 'finance-assets', label: 'Fixed Assets', url: '/finance/assets', group: 'finance' },
   { id: 'finance-invoices', label: 'Invoices', url: '/finance/invoices', group: 'finance' },
   { id: 'finance-payments', label: 'Payments', url: '/finance/payments', group: 'finance' },
   { id: 'finance-subscriptions', label: 'Subscriptions', url: '/finance/subscriptions', group: 'finance' },
