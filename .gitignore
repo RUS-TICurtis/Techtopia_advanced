@@ -28,5 +28,6 @@ dist-ssr
 
 refer/*
 LOCAL_TESTING.md
+recent_features.md
 
 .agyignore
