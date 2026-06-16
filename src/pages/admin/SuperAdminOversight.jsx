@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
@@ -285,6 +285,7 @@ export default function SuperAdminOversight() {
                   value={mfaCode}
                   onChange={(e) => setMfaCode(e.target.value)}
                   className="w-full text-center tracking-widest bg-gray-950 border border-gray-800 rounded-lg p-3 text-white text-lg font-mono focus:outline-none focus:border-[#EF4444]"
+                  autoComplete="one-time-code"
                 />
               </div>
 

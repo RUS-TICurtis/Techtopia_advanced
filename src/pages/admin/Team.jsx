@@ -54,7 +54,8 @@ export default function Team() {
     setErrorUsers('');
     try {
       const data = await usersApi.list();
-      setUsers(Array.isArray(data) ? data : []);
+      const usersList = Array.isArray(data) ? data : (data?.data || data?.items || data?.users || []);
+      setUsers(usersList);
     } catch (err) {
       console.error('Failed to fetch users:', err);
       setErrorUsers('Failed to load team members from server.');
@@ -68,7 +69,8 @@ export default function Team() {
     setErrorRoles('');
     try {
       const data = await rolesApi.list();
-      setRoles(Array.isArray(data) ? data : []);
+      const rolesList = Array.isArray(data) ? data : (data?.data || data?.items || data?.roles || []);
+      setRoles(rolesList);
     } catch (err) {
       console.error('Failed to fetch roles:', err);
       setErrorRoles('Failed to load roles from server.');
@@ -532,15 +534,18 @@ export default function Team() {
                         required 
                         value={userForm.password}
                         onChange={e => setUserForm({...userForm, password: e.target.value})} 
+                        autoComplete="new-password"
                       />
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
                       <label>Role Assignment *</label>
                       <select 
                         className="form-input" 
+                        required
                         value={userForm.roleId}
                         onChange={e => setUserForm({...userForm, roleId: e.target.value})}
                       >
+                        <option value="">Select a role...</option>
                         {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                       </select>
                     </div>

@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { FileText, Plus, FileSignature, Send, Download, Search, Filter } from 'lucide-react';
+import { FileText, Plus, FileSignature, Send, Download, Search, Filter, X } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 
 export default function Quotes() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newQuote, setNewQuote] = useState({ client: '', value: '', validUntil: '' });
 
   const quotes = [];
+
+  const handleCreateQuote = (e) => {
+    e.preventDefault();
+    alert(`Generating Quote for: ${newQuote.client}`);
+    setShowCreateModal(false);
+  };
 
   const filteredQuotes = quotes.filter(q => 
     q.client.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -13,14 +21,15 @@ export default function Quotes() {
   );
 
   return (
-    <div className="page-container">
+    <>
+      <div className="page-container">
       <div className="page-header">
         <div>
           <h1 className="page-title">Quotes & Proposals</h1>
           <p className="page-subtitle">Create and track sales proposals</p>
         </div>
         <div className="page-actions">
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <Plus size={16} />
             <span>New Quote</span>
           </button>
@@ -117,5 +126,59 @@ export default function Quotes() {
         </div>
       </div>
     </div>
+
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Draft New Quote / Proposal</h2>
+              <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateQuote} className="modal-body">
+              <div className="form-group">
+                <label>Client Name *</label>
+                <input 
+                  className="form-input" 
+                  required 
+                  placeholder="Enter client or prospect name"
+                  value={newQuote.client}
+                  onChange={e => setNewQuote({...newQuote, client: e.target.value})} 
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Total Value ($) *</label>
+                  <input 
+                    type="number"
+                    step="0.01"
+                    className="form-input" 
+                    required
+                    placeholder="0.00"
+                    value={newQuote.value}
+                    onChange={e => setNewQuote({...newQuote, value: e.target.value})} 
+                  />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Valid Until *</label>
+                  <input 
+                    type="date"
+                    className="form-input" 
+                    required
+                    value={newQuote.validUntil}
+                    onChange={e => setNewQuote({...newQuote, validUntil: e.target.value})} 
+                  />
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Generate Proposal</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

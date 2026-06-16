@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import { Book, Plus, Filter, Download, Search, RefreshCw } from 'lucide-react';
+import { Book, Plus, Filter, Download, Search, RefreshCw, X } from 'lucide-react';
 import './Finance.css';
 import { formatCurrency } from '../../services/finance/financeService';
 
 export default function FinanceGeneralLedger() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newEntry, setNewEntry] = useState({ account: '', debit: '', credit: '', description: '' });
 
   const ledgerAccounts = [];
+
+  const handleCreateEntry = (e) => {
+    e.preventDefault();
+    alert(`Journal Entry Recorded: ${newEntry.description}`);
+    setShowCreateModal(false);
+  };
 
   const filteredAccounts = ledgerAccounts.filter(account => 
     account.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -15,7 +23,8 @@ export default function FinanceGeneralLedger() {
   );
 
   return (
-    <div className="page-container">
+    <>
+      <div className="page-container">
       <div className="page-header">
         <div>
           <h1 className="page-title">General Ledger</h1>
@@ -26,7 +35,7 @@ export default function FinanceGeneralLedger() {
             <Download size={16} />
             <span>Export Trial Balance</span>
           </button>
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <Plus size={16} />
             <span>New Journal Entry</span>
           </button>
@@ -91,5 +100,75 @@ export default function FinanceGeneralLedger() {
         </div>
       </div>
     </div>
+      
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>New Journal Entry</h2>
+              <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateEntry} className="modal-body">
+              <div className="form-group">
+                <label>Account *</label>
+                <select 
+                  className="form-input" 
+                  required
+                  value={newEntry.account}
+                  onChange={e => setNewEntry({...newEntry, account: e.target.value})}
+                >
+                  <option value="">Select account...</option>
+                  <option value="cash">1000 - Cash</option>
+                  <option value="ar">1200 - Accounts Receivable</option>
+                  <option value="revenue">4000 - Sales Revenue</option>
+                  <option value="expense">5000 - General Expenses</option>
+                </select>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Debit Amount</label>
+                  <input 
+                    type="number"
+                    step="0.01"
+                    className="form-input" 
+                    placeholder="0.00"
+                    value={newEntry.debit}
+                    onChange={e => setNewEntry({...newEntry, debit: e.target.value})} 
+                  />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Credit Amount</label>
+                  <input 
+                    type="number"
+                    step="0.01"
+                    className="form-input" 
+                    placeholder="0.00"
+                    value={newEntry.credit}
+                    onChange={e => setNewEntry({...newEntry, credit: e.target.value})} 
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Description / Memo *</label>
+                <input 
+                  className="form-input" 
+                  required 
+                  placeholder="e.g. Monthly software subscriptions"
+                  value={newEntry.description}
+                  onChange={e => setNewEntry({...newEntry, description: e.target.value})} 
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Record Entry</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

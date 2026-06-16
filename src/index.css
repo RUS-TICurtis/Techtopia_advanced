@@ -530,6 +530,11 @@ label {
   color: var(--text-light);
 }
 
+.form-input option, .form-select option {
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
 .form-input:hover,
 .form-select:hover,
 .form-textarea:hover {

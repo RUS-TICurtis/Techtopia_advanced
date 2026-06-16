@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { LifeBuoy, Plus, MessageSquare, Clock, CheckCircle, Search, Filter } from 'lucide-react';
+import { LifeBuoy, Plus, MessageSquare, Clock, CheckCircle, Search, Filter, X } from 'lucide-react';
 
 export default function Tickets() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newTicket, setNewTicket] = useState({ subject: '', client: '', priority: 'Medium', description: '' });
 
   const tickets = [];
+
+  const handleCreateTicket = (e) => {
+    e.preventDefault();
+    alert(`Ticket created: ${newTicket.subject}`);
+    setShowCreateModal(false);
+  };
 
   const filteredTickets = tickets.filter(t => 
     t.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -13,14 +21,15 @@ export default function Tickets() {
   );
 
   return (
-    <div className="page-container">
+    <>
+      <div className="page-container">
       <div className="page-header">
         <div>
           <h1 className="page-title">Support Tickets</h1>
           <p className="page-subtitle">Manage customer issues and requests</p>
         </div>
         <div className="page-actions">
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <Plus size={16} />
             <span>New Ticket</span>
           </button>
@@ -131,5 +140,72 @@ export default function Tickets() {
         </div>
       </div>
     </div>
+
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Create New Support Ticket</h2>
+              <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateTicket} className="modal-body">
+              <div className="form-group">
+                <label>Subject *</label>
+                <input 
+                  className="form-input" 
+                  required 
+                  placeholder="Brief summary of the issue"
+                  value={newTicket.subject}
+                  onChange={e => setNewTicket({...newTicket, subject: e.target.value})} 
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Client / Contact *</label>
+                  <input 
+                    className="form-input" 
+                    required
+                    placeholder="Search client..."
+                    value={newTicket.client}
+                    onChange={e => setNewTicket({...newTicket, client: e.target.value})} 
+                  />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Priority</label>
+                  <select 
+                    className="form-input" 
+                    value={newTicket.priority}
+                    onChange={e => setNewTicket({...newTicket, priority: e.target.value})}
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Description *</label>
+                <textarea 
+                  className="form-input" 
+                  rows={4}
+                  required
+                  placeholder="Detailed description of the issue..."
+                  value={newTicket.description}
+                  onChange={e => setNewTicket({...newTicket, description: e.target.value})} 
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Submit Ticket</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { Package, Plus, Calculator, Settings, Edit3, Trash2 } from 'lucide-react';
+import { Package, Plus, Calculator, Settings, Edit3, Trash2, X } from 'lucide-react';
 import './Finance.css';
 import { formatCurrency } from '../../services/finance/financeService';
 
 export default function FinanceAssets() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newAsset, setNewAsset] = useState({ name: '', category: '', purchaseValue: '', date: '' });
+
+  const handleCreateAsset = (e) => {
+    e.preventDefault();
+    alert(`Registering Asset: ${newAsset.name}`);
+    setShowCreateModal(false);
+  };
 
   const assets = [];
 
@@ -16,7 +24,8 @@ export default function FinanceAssets() {
   const totalAssetsValue = assets.reduce((sum, a) => sum + a.currentValue, 0);
 
   return (
-    <div className="page-container">
+    <>
+      <div className="page-container">
       <div className="page-header">
         <div>
           <h1 className="page-title">Fixed Assets</h1>
@@ -27,7 +36,7 @@ export default function FinanceAssets() {
             <Calculator size={16} />
             <span>Run Depreciation</span>
           </button>
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <Plus size={16} />
             <span>Add Asset</span>
           </button>
@@ -126,5 +135,75 @@ export default function FinanceAssets() {
         </div>
       </div>
     </div>
+
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Register Fixed Asset</h2>
+              <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateAsset} className="modal-body">
+              <div className="form-group">
+                <label>Asset Name *</label>
+                <input 
+                  className="form-input" 
+                  required 
+                  placeholder="e.g. MacBook Pro M3"
+                  value={newAsset.name}
+                  onChange={e => setNewAsset({...newAsset, name: e.target.value})} 
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Category *</label>
+                  <select 
+                    className="form-input" 
+                    required
+                    value={newAsset.category}
+                    onChange={e => setNewAsset({...newAsset, category: e.target.value})}
+                  >
+                    <option value="">Select category...</option>
+                    <option value="IT Equipment">IT Equipment</option>
+                    <option value="Furniture">Office Furniture</option>
+                    <option value="Vehicles">Vehicles</option>
+                    <option value="Software">Software & IP</option>
+                  </select>
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Purchase Date *</label>
+                  <input 
+                    type="date"
+                    className="form-input" 
+                    required
+                    value={newAsset.date}
+                    onChange={e => setNewAsset({...newAsset, date: e.target.value})} 
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Purchase Value ($) *</label>
+                <input 
+                  type="number"
+                  step="0.01"
+                  className="form-input" 
+                  required 
+                  placeholder="0.00"
+                  value={newAsset.purchaseValue}
+                  onChange={e => setNewAsset({...newAsset, purchaseValue: e.target.value})} 
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Register Asset</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

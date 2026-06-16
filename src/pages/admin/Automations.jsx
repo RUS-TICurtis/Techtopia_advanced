@@ -1,11 +1,11 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import Badge from '../../components/ui/Badge';
 import { 
   Play, Plus, ArrowRight, Settings, Info, CheckCircle2, 
   Trash2, ShieldCheck, Zap, ToggleLeft, ToggleRight,
-  TrendingUp, Clock, AlertTriangle, ShieldAlert
+  TrendingUp, Clock, AlertTriangle, ShieldAlert, X
 } from 'lucide-react';
 import './Automations.css';
 
@@ -61,14 +61,24 @@ export default function Automations() {
     alert(`⚙️ [Simulation Triggered] - Simulated dry-run event for "${flowName}". Successfully evaluated conditional branches and executed action chains.`);
   };
 
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newBlueprint, setNewBlueprint] = useState({ name: '', trigger: '', description: '' });
+
+  const handleCreateBlueprint = (e) => {
+    e.preventDefault();
+    alert(`Provisioning Blueprint: ${newBlueprint.name}`);
+    setShowCreateModal(false);
+  };
+
   return (
-    <PageContainer className="automations-page">
+    <>
+      <PageContainer className="automations-page">
       <PageHeader 
         title="Visual Workflow Builder"
         subtitle="Design and dispatch automated systems, conditional action branches, and multi-agent approval dispatches"
         icon={<Zap className="text-[#38BDF8]" />}
         actions={
-          <button className="btn btn-primary shadow-glow flex items-center gap-1.5" onClick={() => alert("Provisioning a new workflow blueprint...")}>
+          <button className="btn btn-primary shadow-glow flex items-center gap-1.5" onClick={() => setShowCreateModal(true)}>
             <Plus size={14} /> New Workflow
           </button>
         }
@@ -191,5 +201,61 @@ export default function Automations() {
         </div>
       </div>
     </PageContainer>
+
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Design Workflow Blueprint</h2>
+              <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateBlueprint} className="modal-body">
+              <div className="form-group">
+                <label>Blueprint Name *</label>
+                <input 
+                  className="form-input" 
+                  required 
+                  placeholder="e.g. VIP Onboarding Flow"
+                  value={newBlueprint.name}
+                  onChange={e => setNewBlueprint({...newBlueprint, name: e.target.value})} 
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Operational Trigger *</label>
+                <select 
+                  className="form-input" 
+                  required
+                  value={newBlueprint.trigger}
+                  onChange={e => setNewBlueprint({...newBlueprint, trigger: e.target.value})}
+                >
+                  <option value="">Select an event trigger...</option>
+                  <option value="user.created">User Created</option>
+                  <option value="deal.won">Deal Won</option>
+                  <option value="ticket.high_priority">High Priority Ticket Created</option>
+                  <option value="invoice.paid">Invoice Paid</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Description</label>
+                <textarea 
+                  className="form-input" 
+                  rows={3}
+                  placeholder="Summarize what this automation accomplishes."
+                  value={newBlueprint.description}
+                  onChange={e => setNewBlueprint({...newBlueprint, description: e.target.value})} 
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Initialize Node Canvas</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

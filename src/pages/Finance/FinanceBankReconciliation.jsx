@@ -1,26 +1,35 @@
 import React, { useState } from 'react';
-import { Building, Plus, Upload, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Building, Plus, Upload, CheckCircle, AlertCircle, RefreshCw, X } from 'lucide-react';
 import './Finance.css';
 import { formatCurrency } from '../../services/finance/financeService';
 
 export default function FinanceBankReconciliation() {
   const [activeTab, setActiveTab] = useState('unreconciled');
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState('');
 
   const transactions = [];
+
+  const handleImport = (e) => {
+    e.preventDefault();
+    alert("Importing bank statement...");
+    setShowImportModal(false);
+  };
 
   const filteredTransactions = activeTab === 'unreconciled' 
     ? transactions.filter(t => !t.matched)
     : transactions.filter(t => t.matched);
 
   return (
-    <div className="page-container">
+    <>
+      <div className="page-container">
       <div className="page-header">
         <div>
           <h1 className="page-title">Bank Reconciliation</h1>
           <p className="page-subtitle">Match bank feeds to internal transactions</p>
         </div>
         <div className="page-actions">
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary" onClick={() => setShowImportModal(true)}>
             <Upload size={16} />
             <span>Import Statement</span>
           </button>
@@ -138,5 +147,43 @@ export default function FinanceBankReconciliation() {
         </div>
       </div>
     </div>
+
+      {showImportModal && (
+        <div className="modal-overlay" onClick={() => setShowImportModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Import Bank Statement</h2>
+              <button className="btn-icon" onClick={() => setShowImportModal(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleImport} className="modal-body">
+              <div className="form-group">
+                <label>Select Bank Account *</label>
+                <select className="form-input" required>
+                  <option value="">Select account...</option>
+                  <option value="chase">Chase Business Checking (...1234)</option>
+                  <option value="svb">SVB Operating Account (...9988)</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Statement File (CSV, QBO, OFX) *</label>
+                <input 
+                  type="file"
+                  className="form-input" 
+                  required 
+                  accept=".csv,.qbo,.ofx"
+                  onChange={e => setImportFile(e.target.value)}
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowImportModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Upload & Parse</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
-import { Mail, Plus, Users, TrendingUp, Search, Filter, Play, Pause } from 'lucide-react';
+import { Mail, Plus, Users, TrendingUp, Search, Filter, Play, Pause, X } from 'lucide-react';
 
 export default function Campaigns() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newCampaign, setNewCampaign] = useState({ name: '', type: '', audience: '' });
 
   const campaigns = [];
+
+  const handleCreateCampaign = (e) => {
+    e.preventDefault();
+    alert(`Creating campaign: ${newCampaign.name}`);
+    setShowCreateModal(false);
+  };
 
   const filteredCampaigns = campaigns.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="page-container">
+    <>
+      <div className="page-container">
       <div className="page-header">
         <div>
           <h1 className="page-title">Marketing Campaigns</h1>
           <p className="page-subtitle">Manage and track email marketing efforts</p>
         </div>
         <div className="page-actions">
-          <button className="btn btn-primary">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
             <Plus size={16} />
             <span>Create Campaign</span>
           </button>
@@ -127,5 +136,64 @@ export default function Campaigns() {
         </div>
       </div>
     </div>
+      
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Create New Campaign</h2>
+              <button className="btn-icon" onClick={() => setShowCreateModal(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateCampaign} className="modal-body">
+              <div className="form-group">
+                <label>Campaign Name *</label>
+                <input 
+                  className="form-input" 
+                  required 
+                  placeholder="e.g. Q4 Black Friday Promo"
+                  value={newCampaign.name}
+                  onChange={e => setNewCampaign({...newCampaign, name: e.target.value})} 
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Campaign Type *</label>
+                <select 
+                  className="form-input" 
+                  required
+                  value={newCampaign.type}
+                  onChange={e => setNewCampaign({...newCampaign, type: e.target.value})}
+                >
+                  <option value="">Select type...</option>
+                  <option value="Email">Email Broadcast</option>
+                  <option value="SMS">SMS Marketing</option>
+                  <option value="Drip">Automated Drip</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Target Audience *</label>
+                <select 
+                  className="form-input" 
+                  required
+                  value={newCampaign.audience}
+                  onChange={e => setNewCampaign({...newCampaign, audience: e.target.value})}
+                >
+                  <option value="">Select audience...</option>
+                  <option value="All">All Contacts</option>
+                  <option value="Leads">Active Leads Only</option>
+                  <option value="Clients">Existing Clients</option>
+                </select>
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Create Campaign</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

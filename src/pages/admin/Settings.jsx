@@ -413,6 +413,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                       value={currentPassword}
                       onChange={e => setCurrentPassword(e.target.value)}
                       required
+                      autoComplete="current-password"
                     />
                     <button 
                       type="button"
@@ -433,6 +434,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                     value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
                     required
+                    autoComplete="new-password"
                   />
                 </div>
 
