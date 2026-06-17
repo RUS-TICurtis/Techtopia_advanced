@@ -111,6 +111,9 @@ export const authApi = {
   refresh: (token, refreshToken) => apiClient.post('/api/v1/auth/refresh', { token, refreshToken }).then(r => r.data),
   me: () => apiClient.get('/api/v1/users/me').then(r => r.data),
   updateProfile: (data) => apiClient.put('/api/v1/users/me', data).then(r => r.data),
+  uploadProfileImage: (formData) => apiClient.post('/api/v1/users/me/profile-image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then(r => r.data),
 };
 
 export const usersApi = {
@@ -238,6 +241,40 @@ export const filesApi = {
   list: (params) => apiClient.get('/files', { params }).then(r => r.data),
   delete: (id) => apiClient.delete(`/files/${id}`).then(r => r.data),
   getSignedUrl: (id) => apiClient.get(`/files/${id}/url`).then(r => r.data),
+};
+
+export const tenantsApi = createPutResourceService('/api/v1/system/tenants');
+
+export const permissionsApi = {
+  list: () => apiClient.get('/api/v1/permissions').then(r => r.data),
+};
+
+export const accountsApi = {
+  ...createPutResourceService('/api/v1/finance/accounts'),
+};
+
+export const journalEntriesApi = {
+  list: (params) => apiClient.get('/api/v1/finance/journal-entries', { params }).then(r => r.data),
+  get: (id) => apiClient.get(`/api/v1/finance/journal-entries/${id}`).then(r => r.data),
+  create: (data) => apiClient.post('/api/v1/finance/journal-entries', data).then(r => r.data),
+};
+
+export const reconciliationApi = {
+  createStatement: (data) => apiClient.post('/api/v1/finance/reconciliation/statements', data).then(r => r.data),
+  reconcileLine: (lineId, data) => apiClient.post(`/api/v1/finance/reconciliation/lines/${lineId}/reconcile`, data).then(r => r.data),
+};
+
+export const purchaseRequisitionsApi = {
+  ...createPutResourceService('/api/v1/finance/purchase-requisitions'),
+  submit: (id) => apiClient.post(`/api/v1/finance/purchase-requisitions/${id}/submit`).then(r => r.data),
+  approve: (id, data) => apiClient.post(`/api/v1/finance/purchase-requisitions/${id}/approve`, data).then(r => r.data),
+  reject: (id, data) => apiClient.post(`/api/v1/finance/purchase-requisitions/${id}/reject`, data).then(r => r.data),
+};
+
+export const vendorQuotesApi = {
+  ...createPutResourceService('/api/v1/finance/vendor-quotes'),
+  evaluate: (id, data) => apiClient.post(`/api/v1/finance/vendor-quotes/${id}/evaluate`, data).then(r => r.data),
+  select: (id, data) => apiClient.post(`/api/v1/finance/vendor-quotes/${id}/select`, data).then(r => r.data),
 };
 
 export default apiClient;

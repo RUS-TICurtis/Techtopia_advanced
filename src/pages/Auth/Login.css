@@ -290,7 +290,8 @@
 
   .login-form-wrapper {
     flex: 1 0 auto;
-    padding: 24px 16px;
+    padding: 40px 16px 24px;
+    justify-content: flex-start;
   }
 }
 
@@ -369,3 +370,6 @@
 [data-theme="dark"] .remember-me input {
   accent-color: var(--brand-cyan);
 }
+  /* .login-branding {
+    padding: 2;
+  } */

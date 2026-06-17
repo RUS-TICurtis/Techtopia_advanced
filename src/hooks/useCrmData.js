@@ -17,8 +17,18 @@ import {
   expensesApi,
   vendorsApi,
   invitationsApi,
-  vendorCategoriesApi
+  vendorCategoriesApi,
+  usersApi,
+  rolesApi,
+  tenantsApi,
+  permissionsApi,
+  accountsApi,
+  journalEntriesApi,
+  reconciliationApi,
+  purchaseRequisitionsApi,
+  vendorQuotesApi
 } from '../lib/api';
+
 
 // Leads Hook
 export function useLeads() {
@@ -887,4 +897,339 @@ export function useVendorCategories() {
     updateCategory: updateMutation.mutateAsync,
   };
 }
+
+// Users Hook
+export function useUsers() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['users'],
+    queryFn: () => usersApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => usersApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => usersApi.update(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['user', id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => usersApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+  });
+
+  return {
+    ...query,
+    users: query.data || [],
+    createUser: createMutation.mutateAsync,
+    updateUser: updateMutation.mutateAsync,
+    deleteUser: deleteMutation.mutateAsync,
+  };
+}
+
+// Roles Hook
+export function useRoles() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => rolesApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => rolesApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => rolesApi.update(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+      queryClient.invalidateQueries({ queryKey: ['role', id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => rolesApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['roles'] }),
+  });
+
+  return {
+    ...query,
+    roles: query.data || [],
+    createRole: createMutation.mutateAsync,
+    updateRole: updateMutation.mutateAsync,
+    deleteRole: deleteMutation.mutateAsync,
+  };
+}
+
+// Invitations Hook
+export function useInvitations() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['invitationsDevTokens'],
+    queryFn: () => invitationsApi.getDevTokens().catch(() => []),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => invitationsApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invitationsDevTokens'] }),
+  });
+
+  const acceptMutation = useMutation({
+    mutationFn: (data) => invitationsApi.accept(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['invitationsDevTokens'] });
+    },
+  });
+
+  const resendMutation = useMutation({
+    mutationFn: (id) => invitationsApi.resend(id),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => invitationsApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invitationsDevTokens'] }),
+  });
+
+  return {
+    ...query,
+    devTokens: query.data || [],
+    createInvitation: createMutation.mutateAsync,
+    acceptInvitation: acceptMutation.mutateAsync,
+    resendInvitation: resendMutation.mutateAsync,
+    deleteInvitation: deleteMutation.mutateAsync,
+  };
+}
+
+// Permissions Hook
+export function usePermissions() {
+  const query = useQuery({
+    queryKey: ['permissions'],
+    queryFn: () => permissionsApi.list(),
+  });
+
+  return {
+    ...query,
+    permissions: query.data || [],
+  };
+}
+
+// Tenants Hook
+export function useTenants() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['tenants'],
+    queryFn: () => tenantsApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => tenantsApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tenants'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => tenantsApi.update(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant', id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => tenantsApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tenants'] }),
+  });
+
+  return {
+    ...query,
+    tenants: query.data || [],
+    createTenant: createMutation.mutateAsync,
+    updateTenant: updateMutation.mutateAsync,
+    deleteTenant: deleteMutation.mutateAsync,
+  };
+}
+
+// General Ledger Accounts Hook
+export function useAccounts() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['financeAccounts'],
+    queryFn: () => accountsApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => accountsApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['financeAccounts'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => accountsApi.update(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['financeAccounts'] });
+      queryClient.invalidateQueries({ queryKey: ['financeAccount', id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => accountsApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['financeAccounts'] }),
+  });
+
+  return {
+    ...query,
+    accounts: query.data || [],
+    createAccount: createMutation.mutateAsync,
+    updateAccount: updateMutation.mutateAsync,
+    deleteAccount: deleteMutation.mutateAsync,
+  };
+}
+
+// Journal Entries Hook
+export function useJournalEntries() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['journalEntries'],
+    queryFn: () => journalEntriesApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => journalEntriesApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journalEntries'] });
+      queryClient.invalidateQueries({ queryKey: ['financeAccounts'] });
+    },
+  });
+
+  return {
+    ...query,
+    entries: query.data || [],
+    createJournalEntry: createMutation.mutateAsync,
+  };
+}
+
+// Bank Reconciliation Hook
+export function useReconciliation() {
+  const queryClient = useQueryClient();
+
+  const createStatementMutation = useMutation({
+    mutationFn: (data) => reconciliationApi.createStatement(data),
+  });
+
+  const reconcileLineMutation = useMutation({
+    mutationFn: ({ lineId, data }) => reconciliationApi.reconcileLine(lineId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['financeAccounts'] });
+    },
+  });
+
+  return {
+    createStatement: createStatementMutation.mutateAsync,
+    reconcileLine: reconcileLineMutation.mutateAsync,
+  };
+}
+
+// Purchase Requisitions Hook
+export function usePurchaseRequisitions() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['purchaseRequisitions'],
+    queryFn: () => purchaseRequisitionsApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => purchaseRequisitionsApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['purchaseRequisitions'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => purchaseRequisitionsApi.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['purchaseRequisitions'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => purchaseRequisitionsApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['purchaseRequisitions'] }),
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: (id) => purchaseRequisitionsApi.submit(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['purchaseRequisitions'] }),
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: ({ id, data }) => purchaseRequisitionsApi.approve(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['purchaseRequisitions'] }),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: ({ id, data }) => purchaseRequisitionsApi.reject(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['purchaseRequisitions'] }),
+  });
+
+  return {
+    ...query,
+    requisitions: query.data || [],
+    createRequisition: createMutation.mutateAsync,
+    updateRequisition: updateMutation.mutateAsync,
+    deleteRequisition: deleteMutation.mutateAsync,
+    submitRequisition: submitMutation.mutateAsync,
+    approveRequisition: approveMutation.mutateAsync,
+    rejectRequisition: rejectMutation.mutateAsync,
+  };
+}
+
+// Vendor Quotes Hook
+export function useVendorQuotes() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['vendorQuotes'],
+    queryFn: () => vendorQuotesApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => vendorQuotesApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendorQuotes'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => vendorQuotesApi.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendorQuotes'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => vendorQuotesApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendorQuotes'] }),
+  });
+
+  const evaluateMutation = useMutation({
+    mutationFn: ({ id, data }) => vendorQuotesApi.evaluate(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendorQuotes'] }),
+  });
+
+  const selectMutation = useMutation({
+    mutationFn: ({ id, data }) => vendorQuotesApi.select(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vendorQuotes'] });
+      queryClient.invalidateQueries({ queryKey: ['procurement'] });
+    },
+  });
+
+  return {
+    ...query,
+    quotes: query.data || [],
+    createQuote: createMutation.mutateAsync,
+    updateQuote: updateMutation.mutateAsync,
+    deleteQuote: deleteMutation.mutateAsync,
+    evaluateQuote: evaluateMutation.mutateAsync,
+    selectQuote: selectMutation.mutateAsync,
+  };
+}
+
 
