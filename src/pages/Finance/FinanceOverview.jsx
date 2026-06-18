@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -256,7 +256,7 @@ export default function FinanceOverview() {
             </div>
           </div>
           <div style={{ height: 280 }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={REVENUE_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradRev" x1="0" y1="0" x2="0" y2="1">
@@ -288,7 +288,7 @@ export default function FinanceOverview() {
         <div className="card">
           <div className="card-title">Expense Breakdown</div>
           <div style={{ height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie data={EXPENSE_BREAKDOWN} cx="50%" cy="50%" innerRadius={55} outerRadius={85}
                   paddingAngle={3} dataKey="value">
@@ -324,7 +324,7 @@ export default function FinanceOverview() {
             </button>
           </div>
           <div style={{ height: 180 }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={INVOICE_AGING} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                 <XAxis dataKey="range" stroke="#475569" tick={{ fontSize: 10 }} />

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { UserCircle2, Plus, Search, X, ShieldAlert, Award, Briefcase, Activity } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
 import './Clients.css';
@@ -29,8 +29,8 @@ export default function Clients({ searchValue = '' }) {
   };
 
   const filtered = clients.filter(c => {
-    const matchesSearch = c.companyName.toLowerCase().includes(searchValue.toLowerCase()) ||
-      c.contactName.toLowerCase().includes(searchValue.toLowerCase());
+    const matchesSearch = (c.companyName || '').toLowerCase().includes((searchValue || '').toLowerCase()) ||
+      (c.contactName || '').toLowerCase().includes((searchValue || '').toLowerCase());
     const matchesTab = activeTab === 'All' || c.status === activeTab;
     return matchesSearch && matchesTab;
   });

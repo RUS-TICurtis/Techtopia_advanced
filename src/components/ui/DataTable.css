@@ -9,17 +9,38 @@
 }
 
 .table-wrapper {
+  display: block;
+  width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  max-width: 100%;
-  width: 100%;
+  position: relative;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-light);
   background-color: var(--bg-card);
 }
 
+/* Custom horizontal scrollbar styles for the table wrapper */
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 3px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
 .enterprise-table {
   width: 100%;
+  min-width: 800px; /* Force overflow on screens smaller than 800px */
   border-collapse: collapse;
   text-align: left;
 }

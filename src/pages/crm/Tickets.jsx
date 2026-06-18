@@ -1,24 +1,47 @@
 import React, { useState } from 'react';
 import { LifeBuoy, Plus, MessageSquare, Clock, CheckCircle, Search, Filter, X } from 'lucide-react';
+import { useTickets } from '../../hooks/useCrmData';
 
 export default function Tickets() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTicket, setNewTicket] = useState({ subject: '', client: '', priority: 'Medium', description: '' });
 
-  const tickets = [];
+  const { tickets = [], isLoading, createTicket } = useTickets();
 
-  const handleCreateTicket = (e) => {
+  const handleCreateTicket = async (e) => {
     e.preventDefault();
-    alert(`Ticket created: ${newTicket.subject}`);
-    setShowCreateModal(false);
+    try {
+      await createTicket({
+        subject: newTicket.subject,
+        client: newTicket.client,
+        priority: newTicket.priority,
+        description: newTicket.description,
+        status: 'Open',
+        createdBy: 'Curtis Miller',
+        assignee: 'Support Team',
+        created: new Date().toLocaleDateString()
+      });
+      setShowCreateModal(false);
+      setNewTicket({ subject: '', client: '', priority: 'Medium', description: '' });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const filteredTickets = tickets.filter(t => 
-    t.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    t.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.id.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTickets = (tickets || []).filter(t => 
+    (t.subject || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (t.client || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    String(t.id).toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (isLoading) {
+    return (
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   Plus, 
   ChevronLeft, 
@@ -28,8 +28,16 @@ import './Pipeline.css';
 
 export default function Pipeline({ searchValue: externalSearchValue = '' }) {
   // Database API hooks
-  const { opportunities, isLoading: isLoadingDeals, createOpportunity, updateOpportunity, deleteOpportunity } = useOpportunities();
+  const { opportunities: rawOpportunities, isLoading: isLoadingDeals, createOpportunity, updateOpportunity, deleteOpportunity } = useOpportunities();
   const { contacts, isLoading: isLoadingContacts } = useContacts();
+
+  const opportunities = useMemo(() => {
+    return (rawOpportunities || []).map(deal => ({
+      ...deal,
+      amount: parseFloat(deal.amount) || 0,
+      name: deal.name || 'Untitled Deal',
+    }));
+  }, [rawOpportunities]);
   
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -170,10 +178,10 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
   const openEditModal = (deal, e) => {
     e.stopPropagation();
     setSelectedDeal(deal);
-    setTitle(deal.name);
+    setTitle(deal.name || '');
     setCompanyNameStr(deal.company?.name || '');
-    setValue(deal.amount.toString());
-    setStage(deal.stage);
+    setValue((deal.amount || 0).toString());
+    setStage(deal.stage || 'Lead');
     setDate(deal.closeDate || '');
     setSelectedContactId(deal.contact?.id?.toString() || '');
     setIsEditModalOpen(true);
@@ -224,12 +232,12 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
   // Filter and Sort deals
   let filteredDeals = opportunities.map(deal => {
     // Dynamic high-fidelity priority based on deal amount
-    const computedPriority = deal.amount >= 100000 ? 'High' : deal.amount >= 30000 ? 'Medium' : 'Low';
+    const computedPriority = (deal.amount || 0) >= 100000 ? 'High' : (deal.amount || 0) >= 30000 ? 'Medium' : 'Low';
     return { ...deal, priority: computedPriority };
   }).filter(deal => {
     const matchesSearch = 
-      deal.name.toLowerCase().includes(activeSearch.toLowerCase()) ||
-      (deal.company?.name || '').toLowerCase().includes(activeSearch.toLowerCase());
+      (deal.name || '').toLowerCase().includes((activeSearch || '').toLowerCase()) ||
+      (deal.company?.name || '').toLowerCase().includes((activeSearch || '').toLowerCase());
     
     const matchesPriority = 
       priorityFilter === 'All' || deal.priority === priorityFilter;

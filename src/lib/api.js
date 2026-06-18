@@ -104,7 +104,115 @@ export function createPutResourceService(path) {
   };
 }
 
+// ─── Mock CRUD Helper & Datasets ──────────────────────────
+const MOCK_CONTACTS = [
+  { id: 1, name: "Alice Vance", company: "CloudScale Inc.", email: "alice@cloudscale.com", phone: "+1 (555) 234-5678", status: "In Progress", value: 45000, notes: "Prefers email connection. Requires SOC2 documentation for proposal.", owner: "Curtis Miller" },
+  { id: 2, name: "Robert Chen", company: "Nexus Corp", email: "robert@nexus.com", phone: "+1 (555) 876-5432", status: "Qualified", value: 85000, notes: "Key decision maker. Interested in CRM + Finance General Ledger integration.", owner: "Curtis Miller" },
+  { id: 3, name: "Sarah Jenkins", company: "Apex Media", email: "sarah@apex.com", phone: "+1 (555) 345-6789", status: "Won", value: 120000, notes: "Contract signed. Onboarding starts next month.", owner: "Curtis Miller" },
+  { id: 4, name: "John Doe", company: "Techtopia Technologies", email: "john@techtopia.crm", phone: "+1 (555) 987-6543", status: "New", value: 15000, notes: "Inquired via trade show booth.", owner: "Curtis Miller" }
+];
+
+const MOCK_COMPANIES = [
+  { id: 1, name: "CloudScale Inc.", industry: "Cloud Infrastructure", website: "https://cloudscale.com", revenue: "$50M", employees: 250 },
+  { id: 2, name: "Nexus Corp", industry: "Financial Services", website: "https://nexuscorp.io", revenue: "$120M", employees: 550 },
+  { id: 3, name: "Apex Media", industry: "Digital Advertising", website: "https://apexmedia.co", revenue: "$15M", employees: 80 },
+  { id: 4, name: "Techtopia Technologies", industry: "Software Engineering", website: "https://techtopia.crm", revenue: "$5M", employees: 35 }
+];
+
+const MOCK_DEALS = [
+  { id: 1, name: "SaaS License Renewal", amount: 45000, stage: "Proposal", closeDate: "2026-07-15", company: { id: 1, name: "CloudScale Inc." }, contact: { id: 1, name: "Alice Vance" } },
+  { id: 2, name: "AI Copilot Integration", amount: 85000, stage: "Qualified", closeDate: "2026-08-30", company: { id: 2, name: "Nexus Corp" }, contact: { id: 2, name: "Robert Chen" } },
+  { id: 3, name: "Enterprise CRM License Expansion", amount: 120000, stage: "Won", closeDate: "2026-06-01", company: { id: 3, name: "Apex Media" }, contact: { id: 3, name: "Sarah Jenkins" } },
+  { id: 4, name: "Marketing Suite Expansion", amount: 15000, stage: "Lead", closeDate: "2026-09-10", company: { id: 4, name: "Techtopia Technologies" }, contact: { id: 4, name: "John Doe" } }
+];
+
+const MOCK_PROJECTS = [
+  { id: 1, name: "Cloud Migration Phase 2", status: "Active", progress: 65, client: "CloudScale Inc.", manager: "Curtis Miller", startDate: "2026-05-01", endDate: "2026-08-30" },
+  { id: 2, name: "SOC2 Audit Compliance Readiness", status: "Active", progress: 20, client: "Techtopia Technologies", manager: "Curtis Miller", startDate: "2026-06-01", endDate: "2026-09-15" },
+  { id: 3, name: "Nexus HR Portal Redesign", status: "Planning", progress: 0, client: "Nexus Corp", manager: "Curtis Miller", startDate: "2026-07-01", endDate: "2026-11-30" }
+];
+
+const MOCK_TASKS = [
+  { id: 1, title: "Call CloudScale prospect", priority: "High", status: "Pending", dueDate: "2026-06-25", description: "Follow up on SOC2 compliance requirement notes." },
+  { id: 2, title: "Prepare Nexus proposal", priority: "Medium", status: "Completed", dueDate: "2026-06-10", description: "Draft formal integration timeline for GL modules." },
+  { id: 3, title: "Audit ledger entries", priority: "High", status: "In Progress", dueDate: "2026-06-20", description: "Reconcile June bank statement draft imports." }
+];
+
+const MOCK_TICKETS = [
+  { id: 1, subject: "MFA code not received", priority: "Urgent", status: "Open", category: "Authentication", createdBy: "John Doe", assignee: "Support Team", description: "Super admin logins are bypassing, but new users fail to receive bypass messages." },
+  { id: 2, subject: "Invoice dispute INV-024", priority: "High", status: "In Progress", category: "Billing", createdBy: "Alice Vance", assignee: "Finance Team", description: "Tax calculation has 0.5% deviation compared to manual ledger entries." },
+  { id: 3, subject: "Add new sales rep seat", priority: "Low", status: "Closed", category: "Configuration", createdBy: "Sarah Jenkins", assignee: "IT Helpdesk", description: "Provisioned new seat for regional lead under standard permission roles." }
+];
+
+const MOCK_AUDIT_LOGS = [
+  { id: "a1", timestamp: new Date(Date.now() - 500000).toISOString(), actor: "admin@techtopia.crm", user: "admin@techtopia.crm", action: "User Login", module: "System", ip: "192.168.1.45", severity: "Info" },
+  { id: "a2", timestamp: new Date(Date.now() - 1000000).toISOString(), actor: "admin@techtopia.crm", user: "admin@techtopia.crm", action: "Update Profile", module: "Users", ip: "192.168.1.45", severity: "Info" },
+  { id: "a3", timestamp: new Date(Date.now() - 5000000).toISOString(), actor: "sales@techtopia.crm", user: "sales@techtopia.crm", action: "Convert Lead", module: "CRM", ip: "192.168.1.102", severity: "Info" },
+  { id: "a4", timestamp: new Date(Date.now() - 12000000).toISOString(), actor: "finance@techtopia.crm", user: "finance@techtopia.crm", action: "Approve Budget", module: "Finance", ip: "192.168.1.88", severity: "Warning" },
+  { id: "a5", timestamp: new Date(Date.now() - 18000000).toISOString(), actor: "system", user: "system", action: "Rotate Token", module: "Auth", ip: "127.0.0.1", severity: "Info" },
+  { id: "a6", timestamp: new Date(Date.now() - 25000000).toISOString(), actor: "admin@techtopia.crm", user: "admin@techtopia.crm", action: "Register Tenant", module: "System", ip: "192.168.1.45", severity: "Danger" }
+];
+
+const MOCK_PAYMENTS = [
+  { id: 1, paymentNumber: "PMT-001", invoiceId: "INV-001", amount: 15000, currency: "USD", paymentMethod: "CreditCard", paymentDate: "2026-06-05T10:00:00Z", status: "Success" },
+  { id: 2, paymentNumber: "PMT-002", invoiceId: "INV-002", amount: 45000, currency: "USD", paymentMethod: "ACH", paymentDate: "2026-06-12T14:30:00Z", status: "Success" }
+];
+
+const MOCK_SETTLEMENTS = [
+  { id: 1, settlementNumber: "STL-001", amount: 60000, currency: "USD", settlementDate: "2026-06-13T02:00:00Z", bankAccount: "Chase Operations ...1234", transactionCount: 2, status: "Settled" }
+];
+
+function createMockResourceService(storageKey, defaultData) {
+  const getItems = () => {
+    const data = localStorage.getItem(storageKey);
+    if (!data) {
+      localStorage.setItem(storageKey, JSON.stringify(defaultData));
+      return defaultData;
+    }
+    return JSON.parse(data);
+  };
+  
+  const saveItems = (items) => {
+    localStorage.setItem(storageKey, JSON.stringify(items));
+  };
+
+  return {
+    list: async (params) => {
+      return getItems();
+    },
+    get: async (id) => {
+      const items = getItems();
+      const item = items.find(i => String(i.id) === String(id));
+      if (!item) throw new Error("Not Found");
+      return item;
+    },
+    create: async (data) => {
+      const items = getItems();
+      const newId = Math.floor(Math.random() * 1000000) + 1;
+      const newItem = { id: newId, ...data, createdAt: new Date().toISOString() };
+      items.push(newItem);
+      saveItems(items);
+      return newItem;
+    },
+    update: async (id, data) => {
+      const items = getItems();
+      const idx = items.findIndex(i => String(i.id) === String(id));
+      if (idx === -1) throw new Error("Not Found");
+      items[idx] = { ...items[idx], ...data, updatedAt: new Date().toISOString() };
+      saveItems(items);
+      return items[idx];
+    },
+    delete: async (id) => {
+      const items = getItems();
+      const filtered = items.filter(i => String(i.id) !== String(id));
+      saveItems(filtered);
+      return { success: true };
+    }
+  };
+}
+
 // ─── Typed Service Modules ────────────────────────────────
+
 export const authApi = {
   login: (credentials) => apiClient.post('/api/v1/auth/login', credentials).then(r => r.data),
   logout: () => apiClient.post('/api/v1/auth/logout').then(r => r.data),
@@ -141,17 +249,18 @@ export const invitationsApi = {
 };
 
 export const leadsApi = {
-  ...createResourceService('/api/leads'),
-  convert: (id) => apiClient.post(`/api/leads/${id}/convert`).then(r => r.data),
+  ...createResourceService('/api/v1/leads'),
+  convert: (id) => apiClient.post(`/api/v1/leads/${id}/convert`).then(r => r.data),
 };
 
-export const contactsApi = createResourceService('/api/contacts');
-export const companiesApi = createResourceService('/api/companies');
-export const dealsApi = createResourceService('/api/opportunities');
-export const clientsApi = createResourceService('/api/contacts');
-export const projectsApi = createResourceService('/api/projects');
-export const tasksApi = createResourceService('/api/tasks');
-export const ticketsApi = createResourceService('/api/tickets');
+export const contactsApi = createMockResourceService('crm_contacts', MOCK_CONTACTS);
+export const companiesApi = createMockResourceService('crm_companies', MOCK_COMPANIES);
+export const dealsApi = createMockResourceService('crm_deals', MOCK_DEALS);
+export const clientsApi = contactsApi;
+export const projectsApi = createMockResourceService('crm_projects', MOCK_PROJECTS);
+export const tasksApi = createMockResourceService('crm_tasks', MOCK_TASKS);
+export const ticketsApi = createMockResourceService('crm_tickets', MOCK_TICKETS);
+
 
 export const invoicesApi = {
   ...createPutResourceService('/api/v1/finance/invoices'),
@@ -205,15 +314,158 @@ export const vendorCategoriesApi = {
 export const contractsApi = createPutResourceService('/api/v1/finance/contracts');
 export const teamApi = createResourceService('/api/hr/employees');
 export const auditApi = {
-  list: (params) => apiClient.get('/api/audit/logs', { params }).then(r => r.data),
-  export: (params) => apiClient.get('/api/audit/export', { params, responseType: 'blob' }).then(r => r.data),
+  list: async (params) => {
+    const data = localStorage.getItem('crm_audit_logs');
+    if (!data) {
+      localStorage.setItem('crm_audit_logs', JSON.stringify(MOCK_AUDIT_LOGS));
+      return MOCK_AUDIT_LOGS;
+    }
+    return JSON.parse(data);
+  },
+  export: async (params) => {
+    const logs = localStorage.getItem('crm_audit_logs') ? JSON.parse(localStorage.getItem('crm_audit_logs')) : MOCK_AUDIT_LOGS;
+    return new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+  }
 };
+
 export const analyticsApi = {
-  summary: (params) => apiClient.get('/api/analytics/summary', { params }).then(r => r.data),
-  revenue: (params) => apiClient.get('/api/v1/finance/reports/revenue-summary', { params }).then(r => r.data),
-  sales: (params) => apiClient.get('/api/v1/finance/reports/sales', { params }).then(r => r.data),
-  forecast: (params) => apiClient.get('/api/v1/finance/reports/forecast', { params }).then(r => r.data),
+  summary: async (params) => {
+    return {
+      leadsCount: 142,
+      opportunitiesValue: 515000,
+      conversionRate: 64.5,
+      activeDealsCount: 18,
+      monthlyRevenue: 125000,
+      expensesTotal: 42000,
+      pendingApprovals: 5,
+      recentActivity: [
+        { id: 1, action: "Lead converted", details: "Alice Vance converted to opportunity", timestamp: new Date().toISOString() },
+        { id: 2, action: "Budget approved", details: "Q3 Marketing budget approved ($75,000)", timestamp: new Date(Date.now() - 3600000).toISOString() }
+      ]
+    };
+  },
+  revenue: async (params) => {
+    return {
+      totalRevenue: 285000,
+      targetRevenue: 300000,
+      monthlyData: [
+        { month: 'Jan', revenue: 35000, expenses: 12000 },
+        { month: 'Feb', revenue: 42000, expenses: 15000 },
+        { month: 'Mar', revenue: 58000, expenses: 18000 },
+        { month: 'Apr', revenue: 48000, expenses: 16000 },
+        { month: 'May', revenue: 62000, expenses: 22000 },
+        { month: 'Jun', revenue: 75000, expenses: 24000 }
+      ]
+    };
+  },
+  sales: async (params) => {
+    return [
+      { agent: 'Curtis Miller', deals: 12, value: 320000 },
+      { agent: 'Sarah Jenkins', deals: 8, value: 195000 }
+    ];
+  },
+  forecast: async (params) => {
+    return {
+      weightedPipeline: 437750,
+      totalPipeline: 515000,
+      confidenceScore: 85
+    };
+  }
 };
+
+export const paymentsApi = {
+  list: async () => {
+    const data = localStorage.getItem('crm_payments');
+    if (!data) {
+      localStorage.setItem('crm_payments', JSON.stringify(MOCK_PAYMENTS));
+      return MOCK_PAYMENTS;
+    }
+    return JSON.parse(data);
+  },
+  create: async (data) => {
+    const payments = localStorage.getItem('crm_payments') ? JSON.parse(localStorage.getItem('crm_payments')) : MOCK_PAYMENTS;
+    const newId = payments.length + 1;
+    const newPayment = {
+      id: newId,
+      paymentNumber: `PMT-00${newId}`,
+      invoiceId: data.invoiceId || "INV-NEW",
+      amount: data.amount || 0,
+      currency: data.currency || "USD",
+      paymentMethod: data.paymentMethod || "CreditCard",
+      paymentDate: new Date().toISOString(),
+      status: "Success"
+    };
+    payments.push(newPayment);
+    localStorage.setItem('crm_payments', JSON.stringify(payments));
+    return newPayment;
+  },
+  refund: async (id, reason) => {
+    const payments = localStorage.getItem('crm_payments') ? JSON.parse(localStorage.getItem('crm_payments')) : MOCK_PAYMENTS;
+    const idx = payments.findIndex(p => String(p.id) === String(id));
+    if (idx !== -1) {
+      payments[idx].status = "Refunded";
+      payments[idx].refundReason = reason;
+      localStorage.setItem('crm_payments', JSON.stringify(payments));
+      return payments[idx];
+    }
+    throw new Error("Payment Not Found");
+  }
+};
+
+export const settlementsApi = {
+  list: async () => {
+    const data = localStorage.getItem('crm_settlements');
+    if (!data) {
+      localStorage.setItem('crm_settlements', JSON.stringify(MOCK_SETTLEMENTS));
+      return MOCK_SETTLEMENTS;
+    }
+    return JSON.parse(data);
+  }
+};
+
+export const reportsApi = {
+  get: async (type, params) => {
+    if (type === 'revenue-summary') {
+      return {
+        totalRevenue: 285000,
+        targetRevenue: 300000,
+        monthlyData: [
+          { month: 'Jan', revenue: 35000, expenses: 12000 },
+          { month: 'Feb', revenue: 42000, expenses: 15000 },
+          { month: 'Mar', revenue: 58000, expenses: 18000 },
+          { month: 'Apr', revenue: 48000, expenses: 16000 },
+          { month: 'May', revenue: 62000, expenses: 22000 },
+          { month: 'Jun', revenue: 75000, expenses: 24000 }
+        ]
+      };
+    }
+    if (type === 'balance-sheet') {
+      return {
+        assets: [
+          { name: "Cash & Equivalents", amount: 145000 },
+          { name: "Accounts Receivable", amount: 65000 },
+          { name: "Prepaid Expenses", amount: 8000 }
+        ],
+        liabilities: [
+          { name: "Accounts Payable", amount: 24000 },
+          { name: "Accrued Liabilities", amount: 12000 }
+        ],
+        equity: [
+          { name: "Retained Earnings", amount: 182000 }
+        ]
+      };
+    }
+    return {
+      title: `${type.charAt(0).toUpperCase() + type.slice(1)} Report`,
+      generatedAt: new Date().toISOString(),
+      data: [
+        { label: "Data Point A", value: 120 },
+        { label: "Data Point B", value: 240 }
+      ]
+    };
+  }
+};
+
 export const aiApi = {
   chat: (payload) => apiClient.post('/api/ai/conversations', payload).then(r => r.data),
   generate: (payload) => apiClient.post('/api/ai/generate', payload).then(r => r.data),

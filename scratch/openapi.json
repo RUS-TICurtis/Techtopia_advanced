@@ -1,3 +1,11 @@
+Title: Live Content
+
+Description: Fetched live
+
+Source: https://techtopiagh-crm.onrender.com/openapi/v1.json
+
+---
+
 {
   "openapi": "3.1.1",
   "info": {
@@ -1356,6 +1364,117 @@
         }
       }
     },
+    "/api/v1/finance/vendor-quotes": {
+      "get": {
+        "tags": [
+          "Vendors_Quotes"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Vendors_Quotes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVendorQuoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/vendor-quotes/requisitions/{requisitionId}": {
+      "get": {
+        "tags": [
+          "Vendors_Quotes"
+        ],
+        "parameters": [
+          {
+            "name": "requisitionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/vendor-quotes/{id}/evaluate": {
+      "post": {
+        "tags": [
+          "Vendors_Quotes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluateVendorQuoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/vendor-quotes/{id}/select": {
+      "post": {
+        "tags": [
+          "Vendors_Quotes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/finance/budgets": {
       "get": {
         "tags": [
@@ -1721,6 +1840,31 @@
         }
       }
     },
+    "/api/v1/finance/budgets/{id}/variance": {
+      "get": {
+        "tags": [
+          "Budgets"
+        ],
+        "summary": "Get budget variance analysis",
+        "operationId": "GetBudgetVariance",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/invitations": {
       "post": {
         "tags": [
@@ -1810,6 +1954,1136 @@
           }
         }
       }
+    },
+    "/api/v1/finance/purchase-orders": {
+      "get": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePurchaseOrderDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-orders/{id}": {
+      "get": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePurchaseOrderDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-orders/{id}/submit": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-orders/{id}/approve": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-orders/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseOrders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-requisitions": {
+      "get": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePurchaseRequisitionDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-requisitions/{id}": {
+      "get": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePurchaseRequisitionDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-requisitions/{id}/submit": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-requisitions/{id}/approve": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-requisitions/{id}/reject": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-requisitions/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/purchase-requisitions/{id}/convert-to-po": {
+      "post": {
+        "tags": [
+          "Procurement_PurchaseRequisitions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "vendorId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/accounts": {
+      "get": {
+        "tags": [
+          "GeneralLedger_Accounts"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "GeneralLedger_Accounts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/accounts/{id}": {
+      "get": {
+        "tags": [
+          "GeneralLedger_Accounts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "GeneralLedger_Accounts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/journal-entries": {
+      "get": {
+        "tags": [
+          "GeneralLedger_JournalEntries"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/journal-entries/{id}": {
+      "get": {
+        "tags": [
+          "GeneralLedger_JournalEntries"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliation/statements": {
+      "get": {
+        "tags": [
+          "GeneralLedger_Reconciliation"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliation/statements/{id}": {
+      "get": {
+        "tags": [
+          "GeneralLedger_Reconciliation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliation/import": {
+      "post": {
+        "tags": [
+          "GeneralLedger_Reconciliation"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportBankStatementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliation/lines/{lineId}/reconcile": {
+      "post": {
+        "tags": [
+          "GeneralLedger_Reconciliation"
+        ],
+        "parameters": [
+          {
+            "name": "lineId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "matchId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "matchType",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliation/lines/{lineId}/manual-reconcile": {
+      "post": {
+        "tags": [
+          "GeneralLedger_Reconciliation"
+        ],
+        "parameters": [
+          {
+            "name": "lineId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/reconciliation/statements/{id}/auto-match": {
+      "post": {
+        "tags": [
+          "GeneralLedger_Reconciliation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/system/tenants": {
+      "get": {
+        "tags": [
+          "System_Tenants"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "System_Tenants"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTenantDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/system/tenants/{id}": {
+      "get": {
+        "tags": [
+          "System_Tenants"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "System_Tenants"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTenantDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "System_Tenants"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads": {
+      "get": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "List all leads",
+        "operationId": "GetLeads",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Create a new lead",
+        "operationId": "CreateLead",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLeadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{id}": {
+      "get": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Get lead by ID",
+        "operationId": "GetLeadById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Update an existing lead",
+        "operationId": "UpdateLead",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLeadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Delete a lead",
+        "operationId": "DeleteLead",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{id}/assign": {
+      "post": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Assign a lead to a user",
+        "operationId": "AssignLead",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignLeadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{id}/qualify": {
+      "post": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Qualify a lead using BANT",
+        "operationId": "QualifyLead",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QualifyLeadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{id}/convert": {
+      "post": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Convert a lead to a company, contact, and opportunity",
+        "operationId": "ConvertLead",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertLeadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads/dashboard": {
+      "get": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Get lead dashboard statistics",
+        "operationId": "GetLeadDashboard",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{id}/notes": {
+      "get": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Get lead notes",
+        "operationId": "GetLeadNotes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Add a note to a lead",
+        "operationId": "AddLeadNote",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLeadNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{id}/activities": {
+      "get": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Get lead activities",
+        "operationId": "GetLeadActivities",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Leads"
+        ],
+        "summary": "Add an activity to a lead",
+        "operationId": "AddLeadActivity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLeadActivityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1837,6 +3111,42 @@
           }
         }
       },
+      "AccountCategory": {
+        "enum": [
+          "Cash",
+          "Bank",
+          "AccountsReceivable",
+          "AccountsPayable",
+          "Revenue",
+          "Expense",
+          "Tax",
+          "Inventory",
+          "Payroll",
+          "Equity",
+          "FixedAsset",
+          "Depreciation"
+        ]
+      },
+      "AccountType": {
+        "enum": [
+          "Asset",
+          "Liability",
+          "Equity",
+          "Revenue",
+          "Expense"
+        ]
+      },
+      "ActivityType": {
+        "enum": [
+          "Call",
+          "Email",
+          "Meeting",
+          "SMS",
+          "WhatsApp",
+          "Demo",
+          "Note"
+        ]
+      },
       "ApprovalDecision": {
         "enum": [
           "Pending",
@@ -1859,6 +3169,15 @@
           },
           "status": {
             "$ref": "#/components/schemas/InvoiceApprovalStatus"
+          }
+        }
+      },
+      "AssignLeadRequest": {
+        "type": "object",
+        "properties": {
+          "assignedToId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -1914,6 +3233,41 @@
           "Operational",
           "CapitalExpenditure"
         ]
+      },
+      "ConvertLeadRequest": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string"
+          },
+          "opportunityName": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateAccountDto": {
+        "type": "object",
+        "properties": {
+          "accountCode": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AccountType"
+          },
+          "category": {
+            "$ref": "#/components/schemas/AccountCategory"
+          },
+          "parentAccountId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
       },
       "CreateBudgetAllocationRequest": {
         "required": [
@@ -2179,6 +3533,179 @@
           }
         }
       },
+      "CreateLeadActivityRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ActivityType"
+          },
+          "description": {
+            "type": "string"
+          },
+          "activityDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateLeadNoteRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateLeadRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "jobTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sourceId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "assignedToId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/LeadPriority"
+          },
+          "estimatedValue": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreatePurchaseOrderDto": {
+        "type": "object",
+        "properties": {
+          "vendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "budgetId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "orderDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expectedDeliveryDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreatePurchaseOrderItemDto"
+            }
+          }
+        }
+      },
+      "CreatePurchaseOrderItemDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "unitPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "CreatePurchaseRequisitionDto": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string"
+          },
+          "requestedBy": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "budgetId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "estimatedAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "CreateRoleRequest": {
         "required": [
           "name",
@@ -2199,6 +3726,21 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        }
+      },
+      "CreateTenantDto": {
+        "required": [
+          "name",
+          "slug"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
           }
         }
       },
@@ -2332,6 +3874,52 @@
           }
         }
       },
+      "CreateVendorQuoteRequest": {
+        "required": [
+          "purchaseRequisitionId",
+          "vendorId",
+          "quoteNumber",
+          "amount",
+          "deliveryDays",
+          "termsAndConditions"
+        ],
+        "type": "object",
+        "properties": {
+          "purchaseRequisitionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "vendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quoteNumber": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "deliveryDays": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "termsAndConditions": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CreateVendorRequest": {
         "required": [
           "name",
@@ -2392,6 +3980,29 @@
             ]
           },
           "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "EvaluateVendorQuoteRequest": {
+        "required": [
+          "score",
+          "evaluationNotes"
+        ],
+        "type": "object",
+        "properties": {
+          "score": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "evaluationNotes": {
             "type": [
               "null",
               "string"
@@ -2480,6 +4091,81 @@
           }
         }
       },
+      "ImportBankStatementLineRequest": {
+        "required": [
+          "transactionDate",
+          "reference",
+          "description",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "transactionDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "ImportBankStatementRequest": {
+        "required": [
+          "statementNumber",
+          "startDate",
+          "endDate",
+          "openingBalance",
+          "closingBalance",
+          "lines"
+        ],
+        "type": "object",
+        "properties": {
+          "statementNumber": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "openingBalance": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "closingBalance": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportBankStatementLineRequest"
+            }
+          }
+        }
+      },
       "InvoiceApprovalStatus": {
         "enum": [
           "Pending",
@@ -2497,6 +4183,27 @@
           "Other"
         ]
       },
+      "LeadPriority": {
+        "enum": [
+          "Low",
+          "Medium",
+          "High",
+          "Critical"
+        ]
+      },
+      "LeadStatus": {
+        "enum": [
+          "New",
+          "Contacted",
+          "Qualified",
+          "Unqualified",
+          "Nurturing",
+          "ProposalSent",
+          "Converted",
+          "Lost",
+          "Archived"
+        ]
+      },
       "LoginRequest": {
         "required": [
           "email",
@@ -2509,6 +4216,23 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "QualifyLeadRequest": {
+        "type": "object",
+        "properties": {
+          "hasBudget": {
+            "type": "boolean"
+          },
+          "isDecisionMaker": {
+            "type": "boolean"
+          },
+          "hasNeed": {
+            "type": "boolean"
+          },
+          "hasTimeline": {
+            "type": "boolean"
           }
         }
       },
@@ -2615,6 +4339,17 @@
           },
           "newPassword": {
             "type": "string"
+          }
+        }
+      },
+      "UpdateAccountDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
           }
         }
       },
@@ -2854,6 +4589,114 @@
           }
         }
       },
+      "UpdateLeadRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "jobTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sourceId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/LeadPriority"
+          },
+          "status": {
+            "$ref": "#/components/schemas/LeadStatus"
+          },
+          "estimatedValue": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UpdatePurchaseOrderDto": {
+        "type": "object",
+        "properties": {
+          "vendorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "budgetId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "expectedDeliveryDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdatePurchaseRequisitionDto": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string"
+          },
+          "budgetId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "estimatedAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "UpdateRoleRequest": {
         "required": [
           "name",
@@ -2874,6 +4717,24 @@
               "type": "string",
               "format": "uuid"
             }
+          }
+        }
+      },
+      "UpdateTenantDto": {
+        "required": [
+          "name",
+          "slug"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
           }
         }
       },
@@ -3062,7 +4923,32 @@
       "name": "Vendor Categories"
     },
     {
+      "name": "Vendors_Quotes"
+    },
+    {
       "name": "Budgets"
+    },
+    {
+      "name": "Procurement_PurchaseOrders"
+    },
+    {
+      "name": "Procurement_PurchaseRequisitions"
+    },
+    {
+      "name": "GeneralLedger_Accounts"
+    },
+    {
+      "name": "GeneralLedger_JournalEntries"
+    },
+    {
+      "name": "GeneralLedger_Reconciliation"
+    },
+    {
+      "name": "System_Tenants"
+    },
+    {
+      "name": "Leads"
     }
   ]
 }
+

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
@@ -74,7 +74,7 @@ export default function Reports() {
         <div className="card reports-chart-card">
           <h3 className="reports-card-title mb-4">Annual Recurring Revenue (ARR) Growth</h3>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={FINANCIAL_DATA} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorARR" x1="0" y1="0" x2="0" y2="1">

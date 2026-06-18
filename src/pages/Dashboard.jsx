@@ -256,7 +256,7 @@ export default function Dashboard({ setCurrentTab }) {
                   action={<button className="btn btn-primary text-sm" onClick={() => nav('/pipeline')}>Go to Pipeline</button>} 
                 />
               ) : (
-                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -294,7 +294,7 @@ export default function Dashboard({ setCurrentTab }) {
                     action={<button className="btn btn-outline text-sm" onClick={() => nav('/pipeline')}>Add Deal</button>} 
                   />
                 ) : (
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <PieChart>
                       <Pie
                         data={pieData}
@@ -328,7 +328,7 @@ export default function Dashboard({ setCurrentTab }) {
                     description="0 leads converted." 
                   />
                 ) : (
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <BarChart data={chartData.slice(-4)} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                       <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 12 }} />

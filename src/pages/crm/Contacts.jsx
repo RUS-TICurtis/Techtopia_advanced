@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
   Edit3, 
@@ -247,10 +247,10 @@ export default function Contacts({ searchValue = '' }) {
   // Filters setup
   const filteredContacts = contacts.filter(contact => {
     const matchesSearch = 
-      contact.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      contact.company.toLowerCase().includes(searchValue.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchValue.toLowerCase()) ||
-      contact.phone.includes(searchValue);
+      (contact.name || '').toLowerCase().includes((searchValue || '').toLowerCase()) ||
+      (contact.company || '').toLowerCase().includes((searchValue || '').toLowerCase()) ||
+      (contact.email || '').toLowerCase().includes((searchValue || '').toLowerCase()) ||
+      (contact.phone || '').includes(searchValue);
 
     const matchesFilter = activeFilter === 'All' || contact.status === activeFilter;
 

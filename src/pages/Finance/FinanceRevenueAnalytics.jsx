@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -186,7 +186,7 @@ export default function FinanceRevenueAnalytics() {
           </div>
         </div>
         <div style={{ height: 280 }}>
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={monthlyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="gradRev2" x1="0" y1="0" x2="0" y2="1">
@@ -233,7 +233,7 @@ export default function FinanceRevenueAnalytics() {
         <div className="card">
           <div className="card-title">ARR & NRR Trend</div>
           <div style={{ height: 260 }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={growthMetrics} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                 <XAxis dataKey="month" stroke="#475569" tick={{ fontSize: 10 }} />

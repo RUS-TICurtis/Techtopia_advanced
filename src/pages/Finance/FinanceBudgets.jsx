@@ -169,7 +169,7 @@ export default function FinanceBudgets() {
         <div className="card">
           <div className="card-title">Budget vs Actual Spend</div>
           <div style={{ height: 280 }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={VARIANCE_DATA} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                 <XAxis dataKey="name" stroke="#475569" tick={{ fontSize: 10 }} />
@@ -184,7 +184,7 @@ export default function FinanceBudgets() {
         <div className="card">
           <div className="card-title">Budget Utilisation</div>
           <div style={{ height: 230 }}>
-            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie data={budgets} cx="50%" cy="50%" innerRadius={50} outerRadius={85}
                   paddingAngle={2} dataKey="consumedAmount">

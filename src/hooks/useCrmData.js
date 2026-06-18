@@ -26,7 +26,10 @@ import {
   journalEntriesApi,
   reconciliationApi,
   purchaseRequisitionsApi,
-  vendorQuotesApi
+  vendorQuotesApi,
+  paymentsApi,
+  settlementsApi,
+  reportsApi
 } from '../lib/api';
 
 
@@ -377,12 +380,12 @@ export function useFinanceSummary() {
 
   const paymentsQuery = useQuery({
     queryKey: ['financePayments'],
-    queryFn: () => apiClient.get('/api/v1/finance/payments').then(r => r.data).catch(() => []),
+    queryFn: () => paymentsApi.list().catch(() => []),
   });
 
   const settlementsQuery = useQuery({
     queryKey: ['financeSettlements'],
-    queryFn: () => apiClient.get('/api/v1/finance/settlements').then(r => r.data).catch(() => []),
+    queryFn: () => settlementsApi.list().catch(() => []),
   });
 
   return {
@@ -660,7 +663,7 @@ export function useTaxRecords() {
 export function useSettlements() {
   const query = useQuery({
     queryKey: ['settlements'],
-    queryFn: () => apiClient.get('/api/v1/finance/settlements').then(r => r.data),
+    queryFn: () => settlementsApi.list(),
   });
 
   return {
@@ -706,11 +709,11 @@ export function usePayments() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['payments'],
-    queryFn: () => apiClient.get('/api/v1/finance/payments').then(r => r.data),
+    queryFn: () => paymentsApi.list(),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/api/v1/finance/payments/manual', data).then(r => r.data),
+    mutationFn: (data) => paymentsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -719,7 +722,7 @@ export function usePayments() {
   });
 
   const refundMutation = useMutation({
-    mutationFn: ({ id, reason }) => apiClient.post(`/api/v1/finance/payments/${id}/refund`, { reason }).then(r => r.data),
+    mutationFn: ({ id, reason }) => paymentsApi.refund(id, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['financeOverview'] });
@@ -821,7 +824,7 @@ export function useExpenses() {
 export function useRevenueAnalytics() {
   const query = useQuery({
     queryKey: ['revenueAnalytics'],
-    queryFn: () => apiClient.get('/api/v1/finance/reports/revenue-summary').then(r => r.data),
+    queryFn: () => reportsApi.get('revenue-summary'),
   });
 
   return {
@@ -834,7 +837,7 @@ export function useRevenueAnalytics() {
 export function useFinancialReport(type, from, to) {
   const query = useQuery({
     queryKey: ['financialReport', type, from, to],
-    queryFn: () => apiClient.get(`/api/v1/finance/reports/${type}`, { params: { start: from, end: to } }).then(r => r.data),
+    queryFn: () => reportsApi.get(type, { start: from, end: to }),
     enabled: !!type,
   });
 
