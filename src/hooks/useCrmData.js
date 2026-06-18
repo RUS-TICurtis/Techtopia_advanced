@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import auditTrack from '../services/audit/auditService';
 import { 
   leadsApi, 
   projectsApi, 
@@ -43,12 +44,18 @@ export function useLeads() {
 
   const createMutation = useMutation({
     mutationFn: (data) => leadsApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['leads'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      auditTrack.info('Create Lead', 'CRM');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => leadsApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['leads'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      auditTrack.warning('Update Lead', 'CRM');
+    },
   });
 
   const convertMutation = useMutation({
@@ -58,12 +65,16 @@ export function useLeads() {
       queryClient.invalidateQueries({ queryKey: ['opportunities'] });
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       queryClient.invalidateQueries({ queryKey: ['companies'] });
+      auditTrack.warning('Convert Lead', 'CRM');
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => leadsApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['leads'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      auditTrack.critical('Delete Lead', 'CRM');
+    },
   });
 
   return {
@@ -86,12 +97,18 @@ export function useProjects() {
 
   const createMutation = useMutation({
     mutationFn: (data) => projectsApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      auditTrack.info('Create Project', 'Projects');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => projectsApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projects'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      auditTrack.warning('Update Project', 'Projects');
+    },
   });
 
   return {
@@ -114,35 +131,42 @@ export function useInvoices() {
 
   const createMutation = useMutation({
     mutationFn: (data) => invoicesApi.create(data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.info('Create Invoice', 'Finance'); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => invoicesApi.update(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Update Invoice', 'Finance'); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => invoicesApi.delete(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.critical('Delete Invoice', 'Finance'); },
   });
 
   // POST /api/v1/finance/invoices/{id}/submit  → Draft → PendingApproval
   const submitMutation = useMutation({
     mutationFn: (id) => invoicesApi.submit(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Submit Invoice', 'Finance'); },
   });
 
   // POST /api/v1/finance/invoices/{id}/approve  body: { comment, status: "Approved"|"Rejected" }
   const approveMutation = useMutation({
     mutationFn: ({ id, data }) => invoicesApi.approve(id, data),
-    onSuccess: invalidate,
+    onSuccess: (_, { data }) => {
+      invalidate();
+      const isRejected = data?.status === 'Rejected';
+      auditTrack[isRejected ? 'warning' : 'warning'](
+        isRejected ? 'Reject Invoice' : 'Approve Invoice',
+        'Finance'
+      );
+    },
   });
 
   // POST /api/v1/finance/invoices/{id}/payments
   const recordPaymentMutation = useMutation({
     mutationFn: ({ id, data }) => invoicesApi.recordPayment(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.info('Record Invoice Payment', 'Finance'); },
   });
 
   return {
@@ -167,17 +191,26 @@ export function useTickets() {
 
   const createMutation = useMutation({
     mutationFn: (data) => ticketsApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tickets'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      auditTrack.info('Create Support Ticket', 'Support');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => ticketsApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tickets'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      auditTrack.warning('Update Support Ticket', 'Support');
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => ticketsApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tickets'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      auditTrack.critical('Delete Support Ticket', 'Support');
+    },
   });
 
   return {
@@ -212,17 +245,26 @@ export function useContacts() {
 
   const createMutation = useMutation({
     mutationFn: (data) => contactsApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contacts'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      auditTrack.info('Create Contact', 'CRM');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => contactsApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contacts'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      auditTrack.warning('Update Contact', 'CRM');
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => contactsApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contacts'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      auditTrack.critical('Delete Contact', 'CRM');
+    },
   });
 
   return {
@@ -244,17 +286,26 @@ export function useCompanies() {
 
   const createMutation = useMutation({
     mutationFn: (data) => companiesApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['companies'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      auditTrack.info('Create Company', 'CRM');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => companiesApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['companies'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      auditTrack.warning('Update Company', 'CRM');
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => companiesApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['companies'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      auditTrack.critical('Delete Company', 'CRM');
+    },
   });
 
   return {
@@ -276,17 +327,26 @@ export function useOpportunities() {
 
   const createMutation = useMutation({
     mutationFn: (data) => dealsApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['opportunities'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['opportunities'] });
+      auditTrack.info('Create Opportunity', 'CRM');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => dealsApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['opportunities'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['opportunities'] });
+      auditTrack.warning('Update Opportunity', 'CRM');
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => dealsApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['opportunities'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['opportunities'] });
+      auditTrack.critical('Delete Opportunity', 'CRM');
+    },
   });
 
   return {
@@ -308,17 +368,26 @@ export function useTasks() {
 
   const createMutation = useMutation({
     mutationFn: (data) => tasksApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      auditTrack.info('Create Task', 'Workspace');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => tasksApi.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      auditTrack.warning('Update Task', 'Workspace');
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => tasksApi.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      auditTrack.critical('Delete Task', 'Workspace');
+    },
   });
 
   return {
@@ -464,59 +533,59 @@ export function useBudgets() {
 
   const createMutation = useMutation({
     mutationFn: (data) => budgetsApi.create(data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.info('Create Budget', 'Finance'); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => budgetsApi.update(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Update Budget', 'Finance'); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => budgetsApi.delete(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.critical('Delete Budget', 'Finance'); },
   });
 
   // POST /api/v1/finance/budgets/{id}/submit  body: { comment }
   const submitMutation = useMutation({
     mutationFn: ({ id, data }) => budgetsApi.submit(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Submit Budget', 'Finance'); },
   });
 
   // POST /api/v1/finance/budgets/{id}/approve  body: { comment }
   const approveMutation = useMutation({
     mutationFn: ({ id, data }) => budgetsApi.approve(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Approve Budget', 'Finance'); },
   });
 
   // POST /api/v1/finance/budgets/{id}/reject  body: { comment }
   const rejectMutation = useMutation({
     mutationFn: ({ id, data }) => budgetsApi.reject(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Reject Budget', 'Finance'); },
   });
 
   // POST /api/v1/finance/budgets/{id}/activate
   const activateMutation = useMutation({
     mutationFn: (id) => budgetsApi.activate(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Activate Budget', 'Finance'); },
   });
 
   // POST /api/v1/finance/budgets/{id}/close  body: { comment }
   const closeMutation = useMutation({
     mutationFn: ({ id, data }) => budgetsApi.close(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Close Budget', 'Finance'); },
   });
 
   // POST /api/v1/finance/budgets/{id}/cancel
   const cancelMutation = useMutation({
     mutationFn: (id) => budgetsApi.cancel(id),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Cancel Budget', 'Finance'); },
   });
 
   // GET /api/v1/finance/budgets/{id}/allocations and /variance
   const createAllocationMutation = useMutation({
     mutationFn: ({ id, data }) => budgetsApi.createAllocation(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Create Budget Allocation', 'Finance'); },
   });
 
   return {
@@ -549,12 +618,12 @@ export function useVendors() {
 
   const createMutation = useMutation({
     mutationFn: (data) => vendorsApi.create(data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.info('Create Vendor', 'Finance'); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => vendorsApi.update(id, data),
-    onSuccess: invalidate,
+    onSuccess: () => { invalidate(); auditTrack.warning('Update Vendor', 'Finance'); },
   });
 
   const deleteMutation = useMutation({

@@ -1,6 +1,7 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuditLogs } from '../../hooks/useCrmData';
-import { Search, ShieldAlert, ArrowDownToLine, RefreshCw } from 'lucide-react';
+import { auditApi } from '../../lib/api';
+import { Search, ShieldAlert, ArrowDownToLine, RefreshCw, WifiOff } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
 import './AuditLogs.css';
 
@@ -9,8 +10,39 @@ export default function AuditLogs() {
   const [search, setSearch] = useState('');
   const [severity, setSeverity] = useState('');
   const [page, setPage] = useState(1);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
+  // Track browser online/offline status for the indicator banner.
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  /**
+   * Resolve severity for a log entry.
+   *
+   * Prefer the backend-stamped `severity` field which will be one of:
+   *   'info' | 'warning' | 'critical'
+   *
+   * Fall back to client-side derivation only for legacy/mock records that
+   * pre-date the backend integration and do not carry a severity field.
+   */
   const getSeverity = (log) => {
+    // --- Backend-stamped field (production path) ---
+    if (log.severity) {
+      const s = log.severity.toLowerCase();
+      if (s === 'critical' || s === 'danger') return 'Danger';
+      if (s === 'warning') return 'Warning';
+      return 'Info';
+    }
+    // --- Legacy client-side derivation (fallback for mock data only) ---
     const act = (log.action || '').toUpperCase();
     if (act.includes('DELETE') || act.includes('REMOVE') || act.includes('REVOKE') || act.includes('PURGE')) {
       return 'Danger';
@@ -27,7 +59,7 @@ export default function AuditLogs() {
     const logModule = log.module || log.resource || '';
     const logSeverity = getSeverity(log);
 
-    const matchesSearch = 
+    const matchesSearch =
       logActor.toLowerCase().includes(search.toLowerCase()) ||
       logAction.toLowerCase().includes(search.toLowerCase()) ||
       logModule.toLowerCase().includes(search.toLowerCase());
@@ -41,19 +73,26 @@ export default function AuditLogs() {
   const totalPages = Math.ceil(filteredLogs.length / limit) || 1;
   const paginatedLogs = filteredLogs.slice((page - 1) * limit, page * limit);
 
-  const handleExportData = () => {
-    const reportSummary = {
-      timestamp: new Date().toISOString(),
-      logs: filteredLogs
-    };
-
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportSummary, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `techtopia_crm_audit_logs_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+  /**
+   * Export: calls the backend export endpoint (which returns a server-generated
+   * file with all logs and proper IP/actor stamping). Falls back to a client-side
+   * blob when the backend is offline.
+   */
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      const blob = await auditApi.export('json');
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `techtopia_crm_audit_logs_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -62,16 +101,32 @@ export default function AuditLogs() {
         <div>
           <h1 className="page-title flex items-center gap-2">
             <ShieldAlert className="text-[#EF4444]" />
-            Security & Audit Trail
+            Security &amp; Audit Trail
           </h1>
           <p className="page-subtitle">
             Real-time security logs, RBAC policy audits, and data access compliance records.
           </p>
         </div>
-        <button onClick={handleExportData} className="btn btn-secondary flex items-center gap-2">
-          <ArrowDownToLine size={16} /> Export Logs
+        <button
+          onClick={handleExportData}
+          disabled={isExporting}
+          className="btn btn-secondary flex items-center gap-2"
+        >
+          <ArrowDownToLine size={16} />
+          {isExporting ? 'Exporting…' : 'Export Logs'}
         </button>
       </div>
+
+      {/* Offline indicator */}
+      {isOffline && (
+        <div
+          className="flex items-center gap-2 px-4 py-2 mb-4 rounded-lg text-sm font-medium"
+          style={{ background: 'var(--color-warning-bg, #451a03)', color: '#fbbf24', border: '1px solid #92400e' }}
+        >
+          <WifiOff size={15} />
+          You are offline. Showing cached logs — new events will be queued and synced when connectivity is restored.
+        </div>
+      )}
 
       {/* Filters Bar */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -152,7 +207,11 @@ export default function AuditLogs() {
                     <td style={{ fontWeight: 600, color: 'var(--text-title)' }}>{log.actor || log.user}</td>
                     <td>{log.action}</td>
                     <td><code style={{ fontSize: 11, color: 'var(--text-muted)' }}>{log.module || log.resource}</code></td>
-                    <td><code>{log.ip || '127.0.0.1'}</code></td>
+                    <td>
+                      <code title={log.ip ? 'Server-resolved IP' : 'IP unavailable'}>
+                        {log.ip || '—'}
+                      </code>
+                    </td>
                     <td>
                       <Badge variant={
                         logSeverity === 'Danger' ? 'error' :
@@ -167,7 +226,7 @@ export default function AuditLogs() {
             )}
           </tbody>
         </table>
-        
+
         {/* Pagination */}
         <div className="flex justify-between items-center p-4 border-t border-light" style={{ borderTop: '1px solid var(--border-light)' }}>
           <span className="text-xs text-gray-500">
@@ -194,3 +253,4 @@ export default function AuditLogs() {
     </div>
   );
 }
+

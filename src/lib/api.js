@@ -314,18 +314,54 @@ export const vendorCategoriesApi = {
 export const contractsApi = createPutResourceService('/api/v1/finance/contracts');
 export const teamApi = createResourceService('/api/hr/employees');
 export const auditApi = {
+  /**
+   * Fetch audit event records from the backend.
+   * Falls back to static MOCK_AUDIT_LOGS when the backend is unreachable
+   * (network error / server offline) so the UI is never left empty during
+   * development or when the backend hasn't been deployed yet.
+   *
+   * Supported query params (forwarded to backend):
+   *   page, limit, severity, module, actor, from, to
+   */
   list: async (params) => {
-    const data = localStorage.getItem('crm_audit_logs');
-    if (!data) {
-      localStorage.setItem('crm_audit_logs', JSON.stringify(MOCK_AUDIT_LOGS));
-      return MOCK_AUDIT_LOGS;
+    try {
+      const response = await apiClient.get('/api/v1/audit/events', { params });
+      // Backend may return { data: [...] } or the array directly
+      return Array.isArray(response.data) ? response.data : (response.data?.data ?? []);
+    } catch (err) {
+      // Only fall back for genuine network failures (no response from server).
+      // 4xx/5xx errors propagate normally so the UI can surface them.
+      if (!err.response) {
+        console.warn('[auditApi] Backend unreachable — returning mock audit logs.');
+        return MOCK_AUDIT_LOGS;
+      }
+      throw err;
     }
-    return JSON.parse(data);
   },
-  export: async (params) => {
-    const logs = localStorage.getItem('crm_audit_logs') ? JSON.parse(localStorage.getItem('crm_audit_logs')) : MOCK_AUDIT_LOGS;
-    return new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
-  }
+
+  /**
+   * Trigger a server-generated export file download.
+   * Falls back to a client-side JSON Blob when the backend is unreachable.
+   *
+   * @param {'json'|'csv'} [format='json']
+   */
+  export: async (format = 'json') => {
+    try {
+      const response = await apiClient.get('/api/v1/audit/events/export', {
+        params: { format },
+        responseType: 'blob',
+      });
+      return response.data; // already a Blob
+    } catch (err) {
+      if (!err.response) {
+        // Offline fallback — export whatever is cached in localStorage
+        const cached = localStorage.getItem('crm_audit_logs');
+        const logs = cached ? JSON.parse(cached) : MOCK_AUDIT_LOGS;
+        return new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+      }
+      throw err;
+    }
+  },
 };
 
 export const analyticsApi = {
