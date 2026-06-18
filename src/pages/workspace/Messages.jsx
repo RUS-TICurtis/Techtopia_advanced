@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Send, Paperclip, MoreVertical, Phone, Video, MessageSquare } from 'lucide-react';
 import { useCommunications, useConversationMessages } from '../../hooks/useCrmData';
 import { useAuthStore } from '../../store/authStore';
@@ -10,20 +10,14 @@ export default function Messages() {
   const [activeThreadId, setActiveThreadId] = useState(null);
   const [inputValue, setInputValue] = useState('');
 
-  const { messages = [], sendMessage, isLoading: isLoadingMessages } = useConversationMessages(activeThreadId);
+  const effectiveActiveThreadId = activeThreadId || conversations[0]?.id;
+  const { messages = [], sendMessage, isLoading: isLoadingMessages } = useConversationMessages(effectiveActiveThreadId);
 
-  // Set the first thread active by default once loaded
-  useEffect(() => {
-    if (conversations.length > 0 && !activeThreadId) {
-      setActiveThreadId(conversations[0].id);
-    }
-  }, [conversations, activeThreadId]);
-
-  const activeThread = conversations.find(t => t.id === activeThreadId);
+  const activeThread = conversations.find(t => t.id === effectiveActiveThreadId);
 
   const handleSend = async (e) => {
     if (e) e.preventDefault();
-    if (!inputValue.trim() || !activeThreadId) return;
+    if (!inputValue.trim() || !effectiveActiveThreadId) return;
 
     try {
       await sendMessage(inputValue.trim());
@@ -83,7 +77,7 @@ export default function Messages() {
                 return (
                   <div 
                     key={thread.id} 
-                    className={`message-thread ${activeThreadId === thread.id ? 'active' : ''}`}
+                    className={`message-thread ${effectiveActiveThreadId === thread.id ? 'active' : ''}`}
                     onClick={() => setActiveThreadId(thread.id)}
                   >
                     <div className="message-thread-avatar">{getInitials(threadName)}</div>

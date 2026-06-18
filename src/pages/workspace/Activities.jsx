@@ -1,23 +1,13 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   Clock, 
   Search, 
-  Plus, 
-  X, 
-  Filter, 
-  SlidersHorizontal,
-  ArrowUpDown,
-  Building2,
-  TrendingUp,
+  TrendingUp, 
   DollarSign,
-  User,
-  ShieldCheck,
   LifeBuoy,
   GitBranch,
-  CheckCircle,
-  FileText
+  CheckCircle
 } from 'lucide-react';
-import Badge from '../../components/ui/Badge';
 import { useAuditLogs } from '../../hooks/useCrmData';
 import './Activities.css';
 
@@ -27,11 +17,12 @@ export default function Activities() {
   const { logs = [], isLoading } = useAuditLogs();
   const [activeTab, setActiveTab] = useState('All');
   const [search, setSearch] = useState('');
+  const [now] = useState(() => Date.now());
 
   const activities = useMemo(() => {
     return logs.map(act => {
       // Calculate a friendly relative time or standard localized string
-      const timeDiff = Date.now() - new Date(act.timestamp).getTime();
+      const timeDiff = now - new Date(act.timestamp).getTime();
       let timeStr = 'Just now';
       if (!isNaN(timeDiff)) {
         const mins = Math.floor(timeDiff / (60 * 1000));
@@ -63,7 +54,7 @@ export default function Activities() {
         type: displayModule.toLowerCase()
       };
     });
-  }, [logs]);
+  }, [logs, now]);
 
   const getModuleIcon = (mod) => {
     switch (mod.toLowerCase()) {

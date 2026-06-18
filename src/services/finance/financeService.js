@@ -5,20 +5,63 @@
  * Default currency: GHS (Ghana Cedis). Multi-currency supported via currencyCode param.
  */
 import axios from 'axios';
-
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { getApiBaseUrl } from '../../lib/api';
 
 const api = axios.create({
-  baseURL: `${BASE_URL}/finance`,
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach JWT token to every request
+// Attach JWT token + tenant ID to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('crm_token');
+  const apiBase = getApiBaseUrl();
+  config.baseURL = apiBase.endsWith('/') ? `${apiBase}finance` : `${apiBase}/finance`;
+  
+  const token = localStorage.getItem('crm_access_token');
+  const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  config.headers['Tenant-Id'] = tenantId;
   return config;
 });
+
+// Response interceptor to handle token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const accessToken = localStorage.getItem('crm_access_token');
+        const refreshToken = localStorage.getItem('crm_refresh_token');
+        const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+        if (refreshToken && accessToken) {
+          const apiBase = getApiBaseUrl();
+          const { data } = await axios.post(`${apiBase}api/v1/auth/refresh`, {
+            token: accessToken,
+            refreshToken
+          }, {
+            headers: {
+              'Tenant-Id': tenantId,
+              'Content-Type': 'application/json'
+            }
+          });
+          localStorage.setItem('crm_access_token', data.accessToken);
+          localStorage.setItem('crm_refresh_token', data.refreshToken);
+          
+          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          originalRequest.baseURL = apiBase.endsWith('/') ? `${apiBase}finance` : `${apiBase}/finance`;
+          return api(originalRequest);
+        }
+      } catch {
+        localStorage.removeItem('crm_access_token');
+        localStorage.removeItem('crm_refresh_token');
+        window.location.href = '/auth/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ─── Currency Utilities ────────────────────────────────────────────────────
 export const CURRENCIES = {

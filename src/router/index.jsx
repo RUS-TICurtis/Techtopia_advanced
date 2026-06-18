@@ -87,24 +87,23 @@ const PageLoader = () => (
   </div>
 );
 
-export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchValue }) {
-  const currentTabAdapter = (Component) => (props) => {
-    const handleSetTab = (tab) => {
-      const urlMap = {
-        'dashboard': '/', 'leads': '/leads', 'clients': '/clients',
-        'pipeline': '/pipeline', 'billing': '/billing', 'contracts': '/contracts',
-        'support': '/support', 'ai-assistant': '/ai', 'analytics': '/analytics',
-        'team': '/team', 'settings': '/settings', 'contacts': '/contacts',
-        'companies': '/companies', 'invoices': '/finance/invoices',
-        'tasks': '/tasks', 'calendar': '/calendar', 'messages': '/messages',
-      };
-      window.location.href = urlMap[tab] || '/';
+const TabAdapter = ({ Component, ...props }) => {
+  const handleSetTab = (tab) => {
+    const urlMap = {
+      'dashboard': '/', 'leads': '/leads', 'clients': '/clients',
+      'pipeline': '/pipeline', 'billing': '/billing', 'contracts': '/contracts',
+      'support': '/support', 'ai-assistant': '/ai', 'analytics': '/analytics',
+      'team': '/team', 'settings': '/settings', 'contacts': '/contacts',
+      'companies': '/companies', 'invoices': '/finance/invoices',
+      'tasks': '/tasks', 'calendar': '/calendar', 'messages': '/messages',
     };
-    return <Component setCurrentTab={handleSetTab} {...props} />;
+    window.location.href = urlMap[tab] || '/';
   };
+  return <Component setCurrentTab={handleSetTab} {...props} />;
+};
 
-  const LegacyDashboard = currentTabAdapter(Dashboard);
-  const LegacySettings = currentTabAdapter(Settings);
+export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchValue }) {
+
 
   return (
     <Suspense fallback={<PageLoader />}>
@@ -116,7 +115,7 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
 
         {/* ── Protected App Routes ──────────────────────────────────── */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<LegacyDashboard />} />
+          <Route path="/" element={<TabAdapter Component={Dashboard} />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/activities" element={<Activities />} />
@@ -192,7 +191,7 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.VIEW_SETTINGS} />}>
-            <Route path="/settings" element={<LegacySettings theme={theme} toggleTheme={toggleTheme} onProfileUpdate={onProfileUpdate} />} />
+            <Route path="/settings" element={<TabAdapter Component={Settings} theme={theme} toggleTheme={toggleTheme} onProfileUpdate={onProfileUpdate} />} />
           </Route>
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.SECURITY_SETTINGS} />}>
