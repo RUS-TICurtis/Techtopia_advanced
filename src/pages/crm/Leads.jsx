@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
   Search, 
@@ -297,7 +297,7 @@ export default function Leads({ searchValue = '' }) {
       header: 'Data Enrichment',
       cell: ({ row }) => {
         const lead = row.original;
-        const enrichStatus = lead.source.includes('Enriched') ? 'Enriched' : 'Pending';
+        const enrichStatus = lead.source?.includes('Enriched') ? 'Enriched' : 'Pending';
         return (
           <Badge variant={enrichStatus === 'Enriched' ? 'success' : 'neutral'}>
             {enrichStatus}
@@ -340,7 +340,7 @@ export default function Leads({ searchValue = '' }) {
       label: 'Run AI Enrichment',
       icon: Sparkles,
       onClick: (e) => triggerEnrichment(lead, e),
-      disabled: lead.source.includes('Enriched')
+      disabled: lead.source?.includes('Enriched')
     },
     {
       label: 'Promote to CRM Client',
@@ -415,7 +415,7 @@ export default function Leads({ searchValue = '' }) {
         {selectedLead && (() => {
           const leadName = `${selectedLead.firstName || ''} ${selectedLead.lastName || ''}`.trim() || selectedLead.email;
           const score = ((selectedLead.id * 7) % 31) + 68;
-          const enrichStatus = selectedLead.source.includes('Enriched') ? 'Enriched' : 'Pending';
+          const enrichStatus = selectedLead.source?.includes('Enriched') ? 'Enriched' : 'Pending';
 
           return (
             <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#1E293B]/80 backdrop-blur-lg">
