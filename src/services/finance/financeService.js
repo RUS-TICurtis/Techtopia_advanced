@@ -92,10 +92,13 @@ export const financeService = {
   getInvoices: (params = {}) => api.get('/invoices', { params }).then(r => r.data),
   getInvoice: (id) => api.get(`/invoices/${id}`).then(r => r.data),
   createInvoice: (data) => api.post('/invoices', data).then(r => r.data),
-  updateInvoice: (id, data) => api.patch(`/invoices/${id}`, data).then(r => r.data),
+  updateInvoice: (id, data) => api.put(`/invoices/${id}`, data).then(r => r.data),
   deleteInvoice: (id) => api.delete(`/invoices/${id}`).then(r => r.data),
+  submitInvoice: (id) => api.post(`/invoices/${id}/submit`).then(r => r.data),
   sendInvoice: (id) => api.post(`/invoices/${id}/send`).then(r => r.data),
   approveInvoice: (id) => api.post(`/invoices/${id}/approve`).then(r => r.data),
+  addInvoicePayment: (id, data) => api.post(`/invoices/${id}/payments`, data).then(r => r.data),
+  getInvoiceActivities: (id) => api.get(`/invoices/${id}/activities`).then(r => r.data),
   duplicateInvoice: (id) => api.post(`/invoices/${id}/duplicate`).then(r => r.data),
   downloadInvoicePDF: (id) => api.get(`/invoices/${id}/pdf`, { responseType: 'blob' }).then(r => r.data),
 
@@ -125,9 +128,11 @@ export const financeService = {
 
   // ── Expenses ─────────────────────────────────────────────────────────
   getExpenses: (params = {}) => api.get('/expenses', { params }).then(r => r.data),
+  getExpense: (id) => api.get(`/expenses/${id}`).then(r => r.data),
   getExpenseCategories: () => api.get('/expenses/categories').then(r => r.data),
   submitExpense: (data) => api.post('/expenses', data).then(r => r.data),
-  updateExpense: (id, data) => api.patch(`/expenses/${id}`, data).then(r => r.data),
+  submitExpenseById: (id) => api.post(`/expenses/${id}/submit`).then(r => r.data),
+  updateExpense: (id, data) => api.put(`/expenses/${id}`, data).then(r => r.data),
   approveExpense: (id) => api.post(`/expenses/${id}/approve`).then(r => r.data),
   rejectExpense: (id, reason) => api.post(`/expenses/${id}/reject`, { reason }).then(r => r.data),
   deleteExpense: (id) => api.delete(`/expenses/${id}`).then(r => r.data),

@@ -325,7 +325,7 @@ export const auditApi = {
    */
   list: async (params) => {
     try {
-      const response = await apiClient.get('/api/v1/audit/events', { params });
+      const response = await apiClient.get('/api/v1/system/audit-logs', { params });
       // Backend may return { data: [...] } or the array directly
       return Array.isArray(response.data) ? response.data : (response.data?.data ?? []);
     } catch (err) {
@@ -347,7 +347,7 @@ export const auditApi = {
    */
   export: async (format = 'json') => {
     try {
-      const response = await apiClient.get('/api/v1/audit/events/export', {
+      const response = await apiClient.get('/api/v1/system/audit-logs/export', {
         params: { format },
         responseType: 'blob',
       });

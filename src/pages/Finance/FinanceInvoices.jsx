@@ -104,15 +104,15 @@ export default function FinanceInvoices() {
     setSubmitting(true);
 
     const payload = {
-      companyId: newInvoice.companyId || null,
-      contactId: newInvoice.contactId || null,
-      opportunityId: newInvoice.opportunityId || null,
-      phone: newInvoice.phone || null,
-      address: newInvoice.address || null,
+      companyId: newInvoice.companyId || undefined,
+      contactId: newInvoice.contactId || undefined,
+      opportunityId: newInvoice.opportunityId || undefined,
+      phone: newInvoice.phone || undefined,
+      address: newInvoice.address || undefined,
       currency: newInvoice.currency || 'GHS',
-      issueDate: newInvoice.issueDate ? new Date(newInvoice.issueDate + 'T00:00:00').toISOString() : null,
-      dueDate: newInvoice.dueDate ? new Date(newInvoice.dueDate + 'T00:00:00').toISOString() : null,
-      notes: newInvoice.notes || null,
+      issueDate: newInvoice.issueDate ? new Date(newInvoice.issueDate + 'T00:00:00').toISOString() : undefined,
+      dueDate: newInvoice.dueDate ? new Date(newInvoice.dueDate + 'T00:00:00').toISOString() : undefined,
+      notes: newInvoice.notes || undefined,
       items: newInvoice.items.map(item => ({
         description: item.description || '',
         quantity: parseFloat(item.qty) || 0,

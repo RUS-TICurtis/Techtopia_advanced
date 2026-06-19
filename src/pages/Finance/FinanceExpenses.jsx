@@ -126,15 +126,12 @@ export default function FinanceExpenses() {
     setSubmitting(true);
     const payload = {
       categoryId: newExpense.categoryId,
-      vendorId: newExpense.vendorId || null,
-      budgetId: null,
-      projectId: null,
-      opportunityId: null,
       expenseDate: new Date(newExpense.expenseDate + 'T00:00:00').toISOString(),
       amount: parseFloat(newExpense.amount) || 0,
       currency: newExpense.currency || 'GHS',
       description: newExpense.description,
     };
+    if (newExpense.vendorId) payload.vendorId = newExpense.vendorId;
     
     try {
       if (newExpense.id) {
@@ -407,11 +404,15 @@ export default function FinanceExpenses() {
                       onChange={e => setNewExpense(p => ({ ...p, categoryId: e.target.value }))}
                     >
                       <option value="">Select category…</option>
-                      {categories.map(cat => (
-                        <option key={cat.id ?? cat} value={cat.id ?? cat}>
-                          {cat.name ?? cat}
-                        </option>
-                      ))}
+                      {categories.map(cat => {
+                        const val = cat.id || cat.categoryId || (typeof cat === 'string' ? cat : JSON.stringify(cat));
+                        const label = cat.name || cat.categoryName || (typeof cat === 'string' ? cat : 'Unknown Category');
+                        return (
+                          <option key={val} value={val}>
+                            {label}
+                          </option>
+                        );
+                      })}
                     </select>
                   ) : (
                     <input

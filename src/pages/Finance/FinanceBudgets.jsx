@@ -81,7 +81,7 @@ export default function FinanceBudgets() {
     try {
       const payload = {
         name: newBudget.name,
-        description: newBudget.description || null,
+        description: newBudget.description || undefined,
         type: newBudget.type,
         startDate: startIso,
         endDate: endIso,

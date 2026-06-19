@@ -44,12 +44,12 @@ export default function FinanceVendors() {
     try {
       const payload = {
         name: newVendor.name,
-        registrationNumber: newVendor.registrationNumber || null,
-        taxIdentificationNumber: newVendor.taxIdentificationNumber || null,
-        email: newVendor.email || null,
-        phone: newVendor.phone || null,
-        website: newVendor.website || null,
-        address: newVendor.address || null,
+        registrationNumber: newVendor.registrationNumber || undefined,
+        taxIdentificationNumber: newVendor.taxIdentificationNumber || undefined,
+        email: newVendor.email || undefined,
+        phone: newVendor.phone || undefined,
+        website: newVendor.website || undefined,
+        address: newVendor.address || undefined,
         country: newVendor.country || 'Ghana',
         city: newVendor.city || 'Accra',
       };
