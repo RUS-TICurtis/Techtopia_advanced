@@ -137,6 +137,11 @@ export const PERMISSIONS = {
 
   VENDOR_VIEW: 'vendor.view' as Permission,
   VENDOR_MANAGE: 'vendor.manage' as Permission,
+
+  // ── HR Module Permissions ────────────────────────────────────────
+  HR_VIEW: 'hr.view' as Permission,
+  HR_MANAGE: 'hr.manage' as Permission,
+  HR_SELF_SERVICE: 'hr.self_service' as Permission,
 };
 
 export const PERMISSION_MATRIX: Record<Permission, Role[]> = {
@@ -615,5 +620,15 @@ export const PERMISSION_MATRIX: Record<Permission, Role[]> = {
   ],
   [PERMISSIONS.VENDOR_MANAGE]: [
     ROLES.FINANCE, ROLES.TENANT_ADMIN, ROLES.PLATFORM_OWNER, ROLES.SUPER_ADMIN,
+  ],
+  [PERMISSIONS.HR_VIEW]: [
+    ROLES.HR, ROLES.TENANT_ADMIN, ROLES.PLATFORM_OWNER, ROLES.SUPER_ADMIN,
+  ],
+  [PERMISSIONS.HR_MANAGE]: [
+    ROLES.HR, ROLES.TENANT_ADMIN, ROLES.PLATFORM_OWNER, ROLES.SUPER_ADMIN,
+  ],
+  [PERMISSIONS.HR_SELF_SERVICE]: [
+    // Everyone should probably have self service? Wait, "roles are given". So maybe just standard roles
+    ROLES.HR, ROLES.FINANCE, ROLES.OPERATIONS, ROLES.SALES, ROLES.DEVELOPER, ROLES.SUPPORT, ROLES.AI_OPERATOR, ROLES.PROJECT_MANAGER, ROLES.TENANT_ADMIN, ROLES.PLATFORM_OWNER, ROLES.SUPER_ADMIN,
   ],
 } as Record<Permission, Role[]>;

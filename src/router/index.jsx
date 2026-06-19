@@ -67,6 +67,13 @@ const FinanceSettlements = lazy(() => import('../pages/Finance/FinanceSettlement
 const FinanceTaxRecords = lazy(() => import('../pages/Finance/FinanceTaxRecords'));
 const AIFinanceAgent = lazy(() => import('../pages/Finance/AIFinanceAgent'));
 
+// ─── HR Module Pages ──────────────────────────────────────────────────────
+const HRDashboard = lazy(() => import('../pages/HR/HRDashboard'));
+const Employees = lazy(() => import('../pages/HR/Employees'));
+const LeaveManagement = lazy(() => import('../pages/HR/LeaveManagement'));
+const Attendance = lazy(() => import('../pages/HR/Attendance'));
+const HRSelfService = lazy(() => import('../pages/HR/SelfService'));
+
 // ─── Client Portal Pages ──────────────────────────────────────────────────
 const ClientDashboard = lazy(() => import('../pages/ClientPortal/ClientDashboard'));
 const ClientInvoices = lazy(() => import('../pages/ClientPortal/ClientInvoices'));
@@ -217,6 +224,19 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
             <Route path="/finance/settlements" element={<FinanceSettlements />} />
             <Route path="/finance/tax" element={<FinanceTaxRecords />} />
             <Route path="/finance/ai-agent" element={<AIFinanceAgent />} />
+          </Route>
+
+          {/* ── HR Module Routes ─────────────────────────────────────── */}
+          <Route element={<ProtectedRoute permission={PERMISSIONS.HR_VIEW} />}>
+            <Route path="/hr" element={<HRDashboard />} />
+            <Route path="/hr/dashboard" element={<Navigate to="/hr" replace />} />
+            <Route path="/hr/employees" element={<Employees />} />
+            <Route path="/hr/leave" element={<LeaveManagement />} />
+            <Route path="/hr/attendance" element={<Attendance />} />
+          </Route>
+          
+          <Route element={<ProtectedRoute permission={PERMISSIONS.HR_SELF_SERVICE} />}>
+            <Route path="/hr/self-service" element={<HRSelfService />} />
           </Route>
         </Route>
 

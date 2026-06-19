@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   CreditCard, Search, Download, RefreshCw, Plus, CheckCircle,
   Clock, AlertCircle, X, ArrowUpRight, RotateCcw, Filter
@@ -9,6 +9,7 @@ import { usePayments } from '../../hooks/useCrmData';
 
 const STATUS_CONFIG = {
   completed: { label: 'Completed', class: 'badge-success', icon: CheckCircle },
+  success:   { label: 'Success',   class: 'badge-success', icon: CheckCircle },
   pending:   { label: 'Pending',   class: 'badge-warning', icon: Clock },
   failed:    { label: 'Failed',    class: 'badge-danger',  icon: AlertCircle },
   refunded:  { label: 'Refunded',  class: 'badge-info',   icon: RotateCcw },
@@ -154,7 +155,7 @@ export default function FinancePayments() {
           </thead>
           <tbody>
             {filtered.map(pay => {
-              const cfg = STATUS_CONFIG[pay.status];
+              const cfg = STATUS_CONFIG[pay.status?.toLowerCase()] || { label: pay.status || 'Unknown', class: 'badge-neutral', icon: CheckCircle };
               const StatusIcon = cfg.icon;
               return (
                 <tr key={pay.id}>

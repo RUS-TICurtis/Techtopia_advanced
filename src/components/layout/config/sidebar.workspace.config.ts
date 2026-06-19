@@ -69,7 +69,12 @@ export const WORKSPACE_ITEMS: WorkspaceItem[] = [
   { id: 'calendar', label: 'Scheduling', url: '/calendar', group: 'projects', permission: PERMISSIONS.VIEW_PROJECTS },
 
   // HR Group
-  { id: 'team', label: 'Employee Workspace', url: '/team', group: 'hr', permission: PERMISSIONS.VIEW_TEAM },
+  { id: 'hr-dashboard', label: 'HR Dashboard', url: '/hr', group: 'hr', permission: PERMISSIONS.HR_VIEW },
+  { id: 'hr-employees', label: 'Employees', url: '/hr/employees', group: 'hr', permission: PERMISSIONS.HR_VIEW },
+  { id: 'hr-leave', label: 'Leave Management', url: '/hr/leave', group: 'hr', permission: PERMISSIONS.HR_MANAGE },
+  { id: 'hr-attendance', label: 'Attendance', url: '/hr/attendance', group: 'hr', permission: PERMISSIONS.HR_MANAGE },
+  { id: 'hr-self-service', label: 'Self Service', url: '/hr/self-service', group: 'hr', permission: PERMISSIONS.HR_SELF_SERVICE },
+  { id: 'team', label: 'Admin Team Config', url: '/team', group: 'hr', permission: PERMISSIONS.VIEW_TEAM },
 
   // Finance Group
   { id: 'finance-overview', label: 'Finance Overview', url: '/finance', group: 'finance', permission: PERMISSIONS.FINANCE_VIEW },
