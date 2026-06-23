@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus as PlusIcon, Search as MagnifyingGlassIcon } from 'lucide-react';
-import { usersApi, rolesApi } from '../../lib/api';
-
+import { hrEmployeesApi } from '../../lib/hrApi';
+import { rolesApi } from '../../lib/api';
 export default function Employees() {
   const [search, setSearch] = useState('');
   const [employees, setEmployees] = useState([]);
@@ -10,28 +10,29 @@ export default function Employees() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const [usersData, rolesData] = await Promise.all([
-          usersApi.list(),
+        const [employeesData, rolesData] = await Promise.all([
+          hrEmployeesApi.list(),
           rolesApi.list()
         ]);
         
-        const usersList = Array.isArray(usersData) ? usersData : (usersData?.data || usersData?.items || usersData?.users || []);
+        const employeesList = Array.isArray(employeesData) ? employeesData : (employeesData?.data || employeesData?.items || []);
         const rolesList = Array.isArray(rolesData) ? rolesData : (rolesData?.data || rolesData?.items || rolesData?.roles || []);
         
-        const mappedUsers = usersList.map(u => {
-          // Find primary role name if available
-          const userRoleId = u.roleIds && u.roleIds[0];
-          const roleObj = rolesList.find(r => r.id === userRoleId);
+        const mappedEmployees = employeesList.map(e => {
+          // If Employee contains User or we rely on JobTitle/EmployeeNumber
+          // employee has e.user.firstName, e.user.lastName etc. based on doc
+          const userName = e.user ? `${e.user.firstName || ''} ${e.user.lastName || ''}`.trim() : `Emp #${e.employeeNumber}`;
+          
           return {
-            id: u.id,
-            name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.username || 'Unknown User',
-            role: roleObj ? roleObj.name : 'Standard User',
-            department: 'Company', // Not defined in backend model yet
-            status: u.isActive !== false ? 'Active' : 'Inactive',
+            id: e.id,
+            name: userName || 'Unknown Employee',
+            role: e.jobTitle || 'Standard Role',
+            department: e.department?.name || 'Unassigned',
+            status: e.employmentStatus === 1 ? 'Active' : (e.employmentStatus === 4 ? 'Terminated' : 'Inactive'),
           };
         });
         
-        setEmployees(mappedUsers);
+        setEmployees(mappedEmployees);
       } catch (err) {
         console.error('Failed to fetch employees:', err);
       } finally {

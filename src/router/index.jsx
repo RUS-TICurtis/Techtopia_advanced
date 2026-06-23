@@ -70,8 +70,11 @@ const AIFinanceAgent = lazy(() => import('../pages/Finance/AIFinanceAgent'));
 // ─── HR Module Pages ──────────────────────────────────────────────────────
 const HRDashboard = lazy(() => import('../pages/HR/HRDashboard'));
 const Employees = lazy(() => import('../pages/HR/Employees'));
+const Departments = lazy(() => import('../pages/HR/Departments'));
 const LeaveManagement = lazy(() => import('../pages/HR/LeaveManagement'));
 const Attendance = lazy(() => import('../pages/HR/Attendance'));
+const Recruitment = lazy(() => import('../pages/HR/Recruitment'));
+const Payroll = lazy(() => import('../pages/HR/Payroll'));
 const HRSelfService = lazy(() => import('../pages/HR/SelfService'));
 
 // ─── Client Portal Pages ──────────────────────────────────────────────────
@@ -231,8 +234,11 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
             <Route path="/hr" element={<HRDashboard />} />
             <Route path="/hr/dashboard" element={<Navigate to="/hr" replace />} />
             <Route path="/hr/employees" element={<Employees />} />
+            <Route path="/hr/departments" element={<Departments />} />
             <Route path="/hr/leave" element={<LeaveManagement />} />
             <Route path="/hr/attendance" element={<Attendance />} />
+            <Route path="/hr/recruitment" element={<Recruitment />} />
+            <Route path="/hr/payroll" element={<Payroll />} />
           </Route>
           
           <Route element={<ProtectedRoute permission={PERMISSIONS.HR_SELF_SERVICE} />}>
