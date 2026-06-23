@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { hrAttendanceApi } from '../../lib/hrApi';
-import { PlayIcon, StopIcon } from '@heroicons/react/24/outline';
+import { Play as PlayIcon, Square as StopIcon } from 'lucide-react';
 
 export default function Attendance() {
   const [records, setRecords] = useState([]);

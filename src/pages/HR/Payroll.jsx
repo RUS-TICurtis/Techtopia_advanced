@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CurrencyDollarIcon, LockClosedIcon, PlayIcon } from '@heroicons/react/24/outline';
+import { DollarSign as CurrencyDollarIcon, Lock as LockClosedIcon, Play as PlayIcon } from 'lucide-react';
 import { hrPayrollApi } from '../../lib/hrApi';
 
 export default function Payroll() {

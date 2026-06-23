@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { Plus as PlusIcon, Users as UserGroupIcon } from 'lucide-react';
 import { hrRecruitmentApi } from '../../lib/hrApi';
 
 export default function Recruitment() {

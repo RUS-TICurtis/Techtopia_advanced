@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { hrLeaveApi } from '../../lib/hrApi';
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Check as CheckIcon, X as XMarkIcon } from 'lucide-react';
 
 export default function LeaveManagement() {
   const [requests, setRequests] = useState([]);

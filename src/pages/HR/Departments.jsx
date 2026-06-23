@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus as PlusIcon, Search as MagnifyingGlassIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { Plus as PlusIcon, Search as MagnifyingGlassIcon, Building2 as BuildingOfficeIcon } from 'lucide-react';
 import { hrDepartmentsApi } from '../../lib/hrApi';
 
 export default function Departments() {
