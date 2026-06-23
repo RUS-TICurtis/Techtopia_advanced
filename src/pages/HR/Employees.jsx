@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus as PlusIcon, Search as MagnifyingGlassIcon, X as XIcon } from 'lucide-react';
+import { Plus as PlusIcon, Search as MagnifyingGlassIcon, X as XIcon, Edit2 as EditIcon, Trash2 as TrashIcon, Eye as EyeIcon } from 'lucide-react';
 import { hrEmployeesApi, hrDepartmentsApi } from '../../lib/hrApi';
 import { usersApi } from '../../lib/api';
 
@@ -10,6 +10,8 @@ export default function Employees() {
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const [deletingEmployee, setDeletingEmployee] = useState(null);
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -21,8 +23,8 @@ export default function Employees() {
     employeeNumber: '',
     jobTitle: '',
     hireDate: new Date().toISOString().split('T')[0],
-    employmentStatus: 1, // Active
-    payFrequency: 4 // Monthly
+    employmentStatus: 'Active', // string enum
+    payFrequency: 'Monthly' // string enum
   });
 
   const fetchData = async () => {
@@ -48,7 +50,8 @@ export default function Employees() {
           name: userName || 'Unknown Employee',
           role: e.jobTitle || 'Standard Role',
           department: e.department?.name || 'Unassigned',
-          status: e.employmentStatus === 1 ? 'Active' : (e.employmentStatus === 4 ? 'Terminated' : 'Inactive'),
+          status: e.employmentStatus === 'Active' ? 'Active' : (e.employmentStatus === 'Terminated' ? 'Terminated' : (e.employmentStatus || 'Inactive')),
+          raw: e
         };
       });
       
@@ -68,32 +71,74 @@ export default function Employees() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'employmentStatus' || name === 'payFrequency' ? parseInt(value) : value
+      [name]: value
     }));
+  };
+
+  const handleOpenCreate = () => {
+    setEditingEmployee(null);
+    setFormData({
+      userId: '',
+      departmentId: '',
+      employeeNumber: '',
+      jobTitle: '',
+      hireDate: new Date().toISOString().split('T')[0],
+      employmentStatus: 'Active',
+      payFrequency: 'Monthly'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (emp) => {
+    setEditingEmployee(emp);
+    setFormData({
+      userId: emp.raw.userId || '',
+      departmentId: emp.raw.departmentId || '',
+      employeeNumber: emp.raw.employeeNumber || '',
+      jobTitle: emp.raw.jobTitle || '',
+      hireDate: emp.raw.hireDate ? emp.raw.hireDate.split('T')[0] : new Date().toISOString().split('T')[0],
+      employmentStatus: emp.raw.employmentStatus || 'Active',
+      payFrequency: emp.raw.payFrequency || 'Monthly'
+    });
+    setIsModalOpen(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await hrEmployeesApi.create({
+      const payload = {
         ...formData,
+        departmentId: formData.departmentId || null,
         hireDate: new Date(formData.hireDate).toISOString()
-      });
+      };
+
+      if (editingEmployee) {
+        await hrEmployeesApi.update(editingEmployee.id, payload);
+      } else {
+        await hrEmployeesApi.create(payload);
+      }
+
       setIsModalOpen(false);
-      setFormData({
-        userId: '',
-        departmentId: '',
-        employeeNumber: '',
-        jobTitle: '',
-        hireDate: new Date().toISOString().split('T')[0],
-        employmentStatus: 1,
-        payFrequency: 4
-      });
       fetchData(); // refresh list
     } catch (err) {
-      console.error('Failed to create employee:', err);
-      alert('Failed to create employee. Check console for details.');
+      console.error('Failed to save employee:', err);
+      alert('Failed to save employee. Check console for details.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingEmployee) return;
+    setSubmitting(true);
+    try {
+      await hrEmployeesApi.delete(deletingEmployee.id);
+      setDeletingEmployee(null);
+      fetchData();
+    } catch (err) {
+      console.error('Failed to delete employee:', err);
+      alert('Failed to delete employee. It may be linked to other records.');
     } finally {
       setSubmitting(false);
     }
@@ -102,14 +147,14 @@ export default function Employees() {
   const filteredEmployees = employees.filter(e => e.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="p-6 max-w-7xl mx-auto h-full flex flex-col">
+    <div className="p-6 w-full mx-auto h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Employees</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">Manage your workforce directory.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenCreate}
           className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
         >
           <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
@@ -143,7 +188,7 @@ export default function Employees() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="relative px-6 py-3"><span className="sr-only">Edit</span></th>
+                  <th className="relative px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -169,7 +214,23 @@ export default function Employees() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">View</button>
+                      <div className="flex justify-end gap-3">
+                        <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 flex items-center gap-1">
+                          <EyeIcon size={16} /> View
+                        </button>
+                        <button 
+                          onClick={() => handleOpenEdit(person)}
+                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 flex items-center gap-1"
+                        >
+                          <EditIcon size={16} /> Edit
+                        </button>
+                        <button 
+                          onClick={() => setDeletingEmployee(person)}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1"
+                        >
+                          <TrashIcon size={16} /> Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -184,7 +245,7 @@ export default function Employees() {
         </div>
       </div>
 
-      {/* Add Employee Modal */}
+      {/* Add/Edit Employee Modal */}
       {isModalOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -195,7 +256,7 @@ export default function Employees() {
                 <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
-                      Add New Employee
+                      {editingEmployee ? 'Edit Employee' : 'Add New Employee'}
                     </h3>
                     <button type="button" onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-500">
                       <XIcon className="h-6 w-6" />
@@ -242,19 +303,19 @@ export default function Employees() {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                         <select name="employmentStatus" value={formData.employmentStatus} onChange={handleInputChange} className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white">
-                          <option value={1}>Active</option>
-                          <option value={2}>On Leave</option>
-                          <option value={3}>Suspended</option>
-                          <option value={4}>Terminated</option>
+                          <option value="Active">Active</option>
+                          <option value="OnLeave">On Leave</option>
+                          <option value="Suspended">Suspended</option>
+                          <option value="Terminated">Terminated</option>
                         </select>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Pay Frequency</label>
                         <select name="payFrequency" value={formData.payFrequency} onChange={handleInputChange} className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white">
-                          <option value={1}>Weekly</option>
-                          <option value={2}>BiWeekly</option>
-                          <option value={3}>SemiMonthly</option>
-                          <option value={4}>Monthly</option>
+                          <option value="Weekly">Weekly</option>
+                          <option value="BiWeekly">BiWeekly</option>
+                          <option value="SemiMonthly">SemiMonthly</option>
+                          <option value="Monthly">Monthly</option>
                         </select>
                       </div>
                     </div>
@@ -263,13 +324,46 @@ export default function Employees() {
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                   <button type="submit" disabled={submitting} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
-                    {submitting ? 'Saving...' : 'Save Employee'}
+                    {submitting ? 'Saving...' : editingEmployee ? 'Update Employee' : 'Save Employee'}
                   </button>
                   <button type="button" onClick={() => setIsModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
                     Cancel
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingEmployee && (
+        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm p-6 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
+              <TrashIcon className="h-6 w-6 text-red-600 dark:text-red-400" aria-hidden="true" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Delete Employee</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              Are you sure you want to delete <strong>{deletingEmployee.name}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setDeletingEmployee(null)}
+                disabled={submitting}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={submitting}
+                className="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 disabled:opacity-50"
+              >
+                {submitting ? 'Deleting...' : 'Yes, Delete'}
+              </button>
             </div>
           </div>
         </div>

@@ -19,6 +19,7 @@ import {
   vendorsApi,
   invitationsApi,
   vendorCategoriesApi,
+  expenseCategoriesApi,
   usersApi,
   rolesApi,
   tenantsApi,
@@ -819,10 +820,10 @@ export function useExpenses() {
     queryFn: () => expensesApi.list(),
   });
 
-  // GET /api/v1/finance/vendor-categories
+  // GET /api/v1/finance/expenses/categories
   const categoriesQuery = useQuery({
     queryKey: ['expenseCategories'],
-    queryFn: () => vendorCategoriesApi.list().catch(() => []),
+    queryFn: () => expenseCategoriesApi.list().catch(() => []),
     staleTime: 5 * 60 * 1000,
   });
 

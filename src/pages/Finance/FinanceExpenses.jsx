@@ -39,6 +39,8 @@ export default function FinanceExpenses() {
     rejectExpense,
     updateExpense,
     deleteExpense,
+    recordExpensePayment,
+    cancelExpense,
   } = useExpenses();
 
   const [search, setSearch] = useState('');
@@ -48,6 +50,7 @@ export default function FinanceExpenses() {
   const [newExpense, setNewExpense] = useState(EMPTY_EXPENSE);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   const metrics = useMemo(() => ({
     total: expenses.reduce((s, e) => s + (e.amount || 0), 0),
@@ -111,6 +114,34 @@ export default function FinanceExpenses() {
     } catch (err) {
       console.error(err);
       alert(err?.response?.data?.details || err?.response?.data?.error || 'Failed to delete expense.');
+    }
+  };
+
+  const handleMarkPaid = async (exp) => {
+    try {
+      await recordExpensePayment({ 
+        id: exp.id, 
+        data: { 
+          amount: exp.amount, 
+          paymentMethod: 'BankTransfer', 
+          paymentDate: new Date().toISOString() 
+        } 
+      });
+      setActiveDropdown(null);
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.details || err?.response?.data?.error || 'Failed to mark expense as paid.');
+    }
+  };
+
+  const handleCancel = async (id) => {
+    if (!window.confirm('Cancel this expense?')) return;
+    try {
+      await cancelExpense(id);
+      setActiveDropdown(null);
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.details || err?.response?.data?.error || 'Failed to cancel expense.');
     }
   };
 
@@ -309,35 +340,9 @@ export default function FinanceExpenses() {
                       <StatusIcon size={10} /> {cfg.label}
                     </span>
                   </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
-                      {exp.status === 'Draft' && (
-                        <>
-                          <button className="btn-icon" title="Edit" onClick={() => openEditModal(exp)}>
-                            <Edit3 size={13} style={{ color: 'var(--text-main)' }} />
-                          </button>
-                          <button
-                            className="btn-icon" title="Submit for Approval"
-                            onClick={() => handleSubmitForApproval(exp.id)}
-                          >
-                            <Send size={13} style={{ color: 'var(--info)' }} />
-                          </button>
-                          <button className="btn-icon" title="Delete" onClick={() => handleDelete(exp.id)}>
-                            <Trash2 size={13} style={{ color: 'var(--error)' }} />
-                          </button>
-                        </>
-                      )}
-                      {exp.status === 'PendingApproval' && (
-                        <>
-                          <button className="btn-icon" title="Approve" onClick={() => handleApprove(exp.id)}>
-                            <ThumbsUp size={13} style={{ color: 'var(--success)' }} />
-                          </button>
-                          <button className="btn-icon" title="Reject" onClick={() => handleReject(exp.id)}>
-                            <ThumbsDown size={13} style={{ color: 'var(--error)' }} />
-                          </button>
-                        </>
-                      )}
-                      {['Rejected', 'Cancelled'].includes(exp.status) && (
+                  <td style={{ textAlign: 'right', overflow: 'visible' }}>
+                    <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end', position: 'relative' }}>
+                      {['Draft', 'Rejected'].includes(exp.status) && (
                         <>
                           <button className="btn-icon" title="Edit" onClick={() => openEditModal(exp)}>
                             <Edit3 size={13} style={{ color: 'var(--text-main)' }} />
@@ -346,6 +351,50 @@ export default function FinanceExpenses() {
                             <Trash2 size={13} style={{ color: 'var(--error)' }} />
                           </button>
                         </>
+                      )}
+                      
+                      <button className="btn-icon" onClick={(e) => { e.stopPropagation(); setActiveDropdown(activeDropdown === exp.id ? null : exp.id); }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                      </button>
+
+                      {activeDropdown === exp.id && (
+                        <div style={{
+                          position: 'absolute', top: '100%', right: 0, marginTop: 4, zIndex: 100,
+                          background: 'var(--surface)', border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius-md)', padding: '6px', minWidth: 160,
+                          boxShadow: 'var(--shadow-lg)'
+                        }}>
+                          {exp.status === 'Draft' && (
+                            <button onClick={(e) => { e.stopPropagation(); handleSubmitForApproval(exp.id); setActiveDropdown(null); }}
+                              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--text-main)', borderRadius: 6, background: 'transparent' }}
+                              onMouseEnter={e => e.target.style.background = 'var(--bg-app)'} onMouseLeave={e => e.target.style.background = 'transparent'}
+                            >Submit for Approval</button>
+                          )}
+                          {exp.status === 'PendingApproval' && (
+                            <>
+                              <button onClick={(e) => { e.stopPropagation(); handleApprove(exp.id); setActiveDropdown(null); }}
+                                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--success)', borderRadius: 6, background: 'transparent' }}
+                                onMouseEnter={e => e.target.style.background = 'var(--bg-app)'} onMouseLeave={e => e.target.style.background = 'transparent'}
+                              >Mark as Approved</button>
+                              <button onClick={(e) => { e.stopPropagation(); handleReject(exp.id); setActiveDropdown(null); }}
+                                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--error)', borderRadius: 6, background: 'transparent' }}
+                                onMouseEnter={e => e.target.style.background = 'var(--bg-app)'} onMouseLeave={e => e.target.style.background = 'transparent'}
+                              >Mark as Rejected</button>
+                            </>
+                          )}
+                          {exp.status === 'Approved' && (
+                            <button onClick={(e) => { e.stopPropagation(); handleMarkPaid(exp); }}
+                              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--text-main)', borderRadius: 6, background: 'transparent' }}
+                              onMouseEnter={e => e.target.style.background = 'var(--bg-app)'} onMouseLeave={e => e.target.style.background = 'transparent'}
+                            >Mark as Paid</button>
+                          )}
+                          {!['Paid', 'Cancelled'].includes(exp.status) && (
+                            <button onClick={(e) => { e.stopPropagation(); handleCancel(exp.id); }}
+                              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--text-main)', borderRadius: 6, background: 'transparent' }}
+                              onMouseEnter={e => e.target.style.background = 'var(--bg-app)'} onMouseLeave={e => e.target.style.background = 'transparent'}
+                            >Mark as Cancelled</button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </td>

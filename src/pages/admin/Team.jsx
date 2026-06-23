@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Search, Plus, X, Shield, UserCheck, UserCog, Edit2, Trash2, Key, Info, HelpCircle } from 'lucide-react';
-import { usersApi, rolesApi } from '../../lib/api';
+import { usersApi, rolesApi, permissionsApi } from '../../lib/api';
 import './Team.css';
 
 export default function Team() {
@@ -9,10 +9,12 @@ export default function Team() {
   // Data State
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [permissions, setPermissions] = useState([]);
   
   // Load States
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingRoles, setLoadingRoles] = useState(false);
+  const [loadingPermissions, setLoadingPermissions] = useState(false);
   const [errorUsers, setErrorUsers] = useState('');
   const [errorRoles, setErrorRoles] = useState('');
   
@@ -20,6 +22,7 @@ export default function Team() {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [editingRole, setEditingRole] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
   const [deletingRole, setDeletingRole] = useState(null);
   
@@ -35,18 +38,20 @@ export default function Team() {
     username: '',
     password: '',
     phoneNumber: '',
-    roleId: ''
+    roleIds: []
   });
 
   const [roleForm, setRoleForm] = useState({
     name: '',
-    description: ''
+    description: '',
+    permissionIds: []
   });
 
   // Fetch initial data
   useEffect(() => {
     fetchUsers();
     fetchRoles();
+    fetchPermissions();
   }, []);
 
   const fetchUsers = async () => {
@@ -79,6 +84,18 @@ export default function Team() {
     }
   };
 
+  const fetchPermissions = async () => {
+    setLoadingPermissions(true);
+    try {
+      const data = await permissionsApi.list();
+      setPermissions(Array.isArray(data) ? data : (data?.data || []));
+    } catch (err) {
+      console.error('Failed to fetch permissions:', err);
+    } finally {
+      setLoadingPermissions(false);
+    }
+  };
+
   // Error extractor
   const getErrorMessage = (err) => {
     if (err.response?.data?.errors) {
@@ -100,7 +117,7 @@ export default function Team() {
       username: '',
       password: '',
       phoneNumber: '',
-      roleId: roles[0]?.id || ''
+      roleIds: []
     });
     setFormError('');
     setShowUserModal(true);
@@ -108,14 +125,19 @@ export default function Team() {
 
   const handleOpenEditUser = (user) => {
     setEditingUser(user);
+    // Find role IDs for this user by matching their roles array (names) with the roles state (which has IDs)
+    const userRoleIds = (user.roles || [])
+      .map(roleName => roles.find(r => r.name === roleName)?.id)
+      .filter(Boolean);
+
     setUserForm({
       firstName: user.firstName || '',
       lastName: user.lastName || '',
       email: user.email || '',
       username: user.username || '',
-      password: '', // Password is not editable through PUT /api/v1/users/{id}
+      password: '', 
       phoneNumber: user.phoneNumber || '',
-      roleId: '' // Role cannot be modified directly via UpdateUserRequest in PUT /users/{id}
+      roleIds: userRoleIds 
     });
     setFormError('');
     setShowUserModal(true);
@@ -131,7 +153,8 @@ export default function Team() {
         const payload = {
           firstName: userForm.firstName,
           lastName: userForm.lastName,
-          phoneNumber: userForm.phoneNumber
+          phoneNumber: userForm.phoneNumber,
+          roleIds: userForm.roleIds
         };
         await usersApi.update(editingUser.id, payload);
       } else {
@@ -143,7 +166,7 @@ export default function Team() {
           username: userForm.username,
           password: userForm.password,
           phoneNumber: userForm.phoneNumber,
-          roleIds: userForm.roleId ? [userForm.roleId] : []
+          roleIds: userForm.roleIds
         };
         await usersApi.create(payload);
       }
@@ -162,14 +185,12 @@ export default function Team() {
     setFormSaving(true);
     setFormError('');
     try {
-      // Optimistic UI update
       setUsers(prev => prev.filter(u => u.id !== deletingUser.id));
       await usersApi.delete(deletingUser.id);
       setDeletingUser(null);
     } catch (err) {
       console.error(err);
       setErrorUsers(getErrorMessage(err));
-      // Revert if failed
       fetchUsers();
     } finally {
       setFormSaving(false);
@@ -178,7 +199,22 @@ export default function Team() {
 
   // Roles CRUD Handlers
   const handleOpenCreateRole = () => {
-    setRoleForm({ name: '', description: '' });
+    setEditingRole(null);
+    setRoleForm({ name: '', description: '', permissionIds: [] });
+    setFormError('');
+    setShowRoleModal(true);
+  };
+
+  const handleOpenEditRole = (role) => {
+    setEditingRole(role);
+    setRoleForm({ 
+      name: role.name, 
+      description: role.description || '',
+      permissionIds: role.permissions?.map(p => {
+        // Find permission ID by code or name
+        return permissions.find(perm => perm.code === p || perm.name === p)?.id;
+      }).filter(Boolean) || []
+    });
     setFormError('');
     setShowRoleModal(true);
   };
@@ -191,9 +227,15 @@ export default function Team() {
       const payload = {
         name: roleForm.name,
         description: roleForm.description,
-        permissionIds: [] // Currently permissions mapping backend-side is a stub
+        permissionIds: roleForm.permissionIds
       };
-      await rolesApi.create(payload);
+      
+      if (editingRole) {
+        await rolesApi.update(editingRole.id, payload);
+      } else {
+        await rolesApi.create(payload);
+      }
+      
       setShowRoleModal(false);
       fetchRoles();
     } catch (err) {
@@ -209,18 +251,38 @@ export default function Team() {
     setFormSaving(true);
     setFormError('');
     try {
-      // Optimistic UI update
       setRoles(prev => prev.filter(r => r.id !== deletingRole.id));
       await rolesApi.delete(deletingRole.id);
       setDeletingRole(null);
     } catch (err) {
       console.error(err);
       setErrorRoles(getErrorMessage(err));
-      // Revert if failed
       fetchRoles();
     } finally {
       setFormSaving(false);
     }
+  };
+
+  const togglePermission = (permId) => {
+    setRoleForm(prev => {
+      const isSelected = prev.permissionIds.includes(permId);
+      if (isSelected) {
+        return { ...prev, permissionIds: prev.permissionIds.filter(id => id !== permId) };
+      } else {
+        return { ...prev, permissionIds: [...prev.permissionIds, permId] };
+      }
+    });
+  };
+
+  const toggleUserRole = (roleId) => {
+    setUserForm(prev => {
+      const isSelected = prev.roleIds.includes(roleId);
+      if (isSelected) {
+        return { ...prev, roleIds: prev.roleIds.filter(id => id !== roleId) };
+      } else {
+        return { ...prev, roleIds: [...prev.roleIds, roleId] };
+      }
+    });
   };
 
   // Filtering
@@ -374,6 +436,7 @@ export default function Team() {
                         <td>{u.email}</td>
                         <td>{u.phoneNumber || '—'}</td>
                         <td>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                           {u.roles && u.roles.length > 0 ? (
                             u.roles.map(r => (
                               <span key={r} className={`badge ${r.toLowerCase() === 'administrator' ? 'badge-danger' : 'badge-neutral'}`}>
@@ -383,6 +446,7 @@ export default function Team() {
                           ) : (
                             <span className="badge badge-neutral">No Roles</span>
                           )}
+                          </div>
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
@@ -436,6 +500,7 @@ export default function Team() {
                   <tr>
                     <th>Role Name</th>
                     <th>Description</th>
+                    <th>Permissions</th>
                     <th>Role ID</th>
                     <th style={{ textAlign: 'right' }}>Actions</th>
                   </tr>
@@ -450,16 +515,30 @@ export default function Team() {
                         </div>
                       </td>
                       <td>{r.description || '—'}</td>
+                      <td>
+                        <span className="badge badge-neutral" style={{ fontSize: 10 }}>
+                          {r.permissions?.length || 0} permissions
+                        </span>
+                      </td>
                       <td><span className="font-mono text-xs text-muted">{r.id}</span></td>
                       <td style={{ textAlign: 'right' }}>
-                        <button 
-                          className="btn-icon text-danger" 
-                          title="Delete Role" 
-                          onClick={() => setDeletingRole(r)}
-                          disabled={r.id === '11111111-1111-1111-1111-111111111111'} // Protect seeded admin role
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                          <button 
+                            className="btn-icon" 
+                            title="Edit Role" 
+                            onClick={() => handleOpenEditRole(r)}
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button 
+                            className="btn-icon text-danger" 
+                            title="Delete Role" 
+                            onClick={() => setDeletingRole(r)}
+                            disabled={r.id === '11111111-1111-1111-1111-111111111111'} // Protect seeded admin role
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -538,16 +617,12 @@ export default function Team() {
                       />
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <label>Role Assignment *</label>
-                      <select 
+                      <label>Phone Number</label>
+                      <input 
                         className="form-input" 
-                        required
-                        value={userForm.roleId}
-                        onChange={e => setUserForm({...userForm, roleId: e.target.value})}
-                      >
-                        <option value="">Select a role...</option>
-                        {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-                      </select>
+                        value={userForm.phoneNumber}
+                        onChange={e => setUserForm({...userForm, phoneNumber: e.target.value})} 
+                      />
                     </div>
                   </div>
                 </>
@@ -558,22 +633,35 @@ export default function Team() {
                     <input className="form-input" disabled value={userForm.email} />
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
-                    <label>Username (Read-only)</label>
-                    <input className="form-input" disabled value={userForm.username} />
+                    <label>Phone Number</label>
+                    <input 
+                      className="form-input" 
+                      value={userForm.phoneNumber}
+                      onChange={e => setUserForm({...userForm, phoneNumber: e.target.value})} 
+                    />
                   </div>
                 </div>
               )}
 
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input 
-                  className="form-input" 
-                  value={userForm.phoneNumber}
-                  onChange={e => setUserForm({...userForm, phoneNumber: e.target.value})} 
-                />
+              <div className="form-group mt-4">
+                <label className="mb-2 block font-semibold text-sm">Role Assignments</label>
+                <div className="roles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px', maxHeight: '150px', overflowY: 'auto', padding: '10px', background: 'var(--bg-card-alt)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  {roles.map(r => (
+                    <label key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={userForm.roleIds.includes(r.id)}
+                        onChange={() => toggleUserRole(r.id)}
+                        className="accent-[#38BDF8]"
+                      />
+                      <span style={{ color: 'var(--text-primary)' }}>{r.name}</span>
+                    </label>
+                  ))}
+                </div>
+                {userForm.roleIds.length === 0 && <span className="text-xs text-danger mt-1">Please select at least one role.</span>}
               </div>
 
-              <div className="modal-footer">
+              <div className="modal-footer mt-6">
                 <button 
                   type="button" 
                   className="btn btn-secondary" 
@@ -585,7 +673,7 @@ export default function Team() {
                 <button 
                   type="submit" 
                   className="btn btn-primary"
-                  disabled={formSaving}
+                  disabled={formSaving || userForm.roleIds.length === 0}
                 >
                   {formSaving ? 'Saving...' : editingUser ? 'Update Member' : 'Create Member'}
                 </button>
@@ -595,12 +683,12 @@ export default function Team() {
         </div>
       )}
 
-      {/* Modal: Create Role */}
+      {/* Modal: Create/Edit Role */}
       {showRoleModal && (
         <div className="modal-overlay" onClick={() => setShowRoleModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
             <div className="modal-header">
-              <h2>Create Custom Role</h2>
+              <h2>{editingRole ? 'Edit Role' : 'Create Custom Role'}</h2>
               <button className="btn-icon" onClick={() => setShowRoleModal(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleRoleSubmit} className="modal-body">
@@ -621,14 +709,42 @@ export default function Team() {
                 <label>Description</label>
                 <textarea 
                   className="form-input" 
-                  rows={3}
+                  rows={2}
                   placeholder="Summarize the core permissions and access of this role."
                   value={roleForm.description}
                   onChange={e => setRoleForm({...roleForm, description: e.target.value})} 
                 />
               </div>
 
-              <div className="modal-footer">
+              <div className="form-group mt-4">
+                <label className="mb-2 block font-semibold text-sm">Assign Permissions</label>
+                {loadingPermissions ? (
+                  <p className="text-xs text-muted">Loading permissions...</p>
+                ) : (
+                  <div className="permissions-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '8px', maxHeight: '250px', overflowY: 'auto', padding: '12px', background: 'var(--bg-card-alt)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                    {permissions.map(perm => (
+                      <label key={perm.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer', fontSize: '13px' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={roleForm.permissionIds.includes(perm.id)}
+                          onChange={() => togglePermission(perm.id)}
+                          style={{ marginTop: '3px' }}
+                          className="accent-[#38BDF8]"
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{perm.name || perm.code}</span>
+                          <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>{perm.code}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-2 text-xs text-muted">
+                  {roleForm.permissionIds.length} permissions selected
+                </div>
+              </div>
+
+              <div className="modal-footer mt-6">
                 <button 
                   type="button" 
                   className="btn btn-secondary" 
@@ -642,7 +758,7 @@ export default function Team() {
                   className="btn btn-primary"
                   disabled={formSaving}
                 >
-                  {formSaving ? 'Creating...' : 'Create Role'}
+                  {formSaving ? 'Saving...' : editingRole ? 'Update Role' : 'Create Role'}
                 </button>
               </div>
             </form>

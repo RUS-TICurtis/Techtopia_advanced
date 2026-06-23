@@ -10,7 +10,7 @@ import './Finance.css';
 // ── Status Config ─────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
   Draft:           { class: 'status-draft',    icon: FileText },
-  'Pending Approval': { class: 'status-pending', icon: Clock },
+  PendingApproval: { class: 'status-pending',  icon: Clock },
   Approved:        { class: 'status-approved', icon: CheckCircle },
   Sent:            { class: 'status-sent',     icon: Send },
   Viewed:          { class: 'status-viewed',   icon: Eye },
@@ -47,6 +47,7 @@ export default function FinanceInvoices() {
     deleteInvoice, 
     sendInvoice, 
     approveInvoice, 
+    recordInvoicePayment,
     duplicateInvoice 
   } = useInvoices();
 
@@ -171,16 +172,33 @@ export default function FinanceInvoices() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
+      const inv = invoices.find(i => i.id === id);
+      if (!inv) return;
+
       if (newStatus === 'Sent') {
-        await sendInvoice(id);
+        alert('Sent status is not currently implemented in the API.');
       } else if (newStatus === 'Approved') {
-        await approveInvoice(id);
+        await approveInvoice({ id, data: { status: 'Approved', comment: 'Approved from UI' } });
+      } else if (newStatus === 'Cancelled' || newStatus === 'Rejected') {
+        await approveInvoice({ id, data: { status: 'Rejected', comment: 'Rejected/Cancelled from UI' } });
+      } else if (newStatus === 'Paid') {
+        if (recordInvoicePayment) {
+          await recordInvoicePayment({ 
+            id, 
+            data: { 
+              amount: inv.amount - (inv.paid || 0), 
+              paymentMethod: 'BankTransfer', 
+              paymentDate: new Date().toISOString() 
+            } 
+          });
+        }
       } else {
         await updateInvoice({ id, data: { status: newStatus } });
       }
       setActiveDropdown(null);
     } catch (err) {
       console.error(err);
+      alert(err?.response?.data?.error || 'Action failed. See console for details.');
     }
   };
 
@@ -275,13 +293,22 @@ export default function FinanceInvoices() {
                   <td className="text-xs text-muted">{inv.dueDate}</td>
                   <td>
                     <span className={`badge badge-sm ${cfg.class}`} style={{ gap: 4 }}>
-                      <StatusIcon size={10} /> {inv.status}
+                      <StatusIcon size={10} /> {inv.status === 'PendingApproval' ? 'Pending Approval' : inv.status}
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end', position: 'relative' }}>
-                      <button className="btn-icon" title="Download PDF"><Download size={15} /></button>
-                      <button className="btn-icon" title="Send" onClick={() => handleStatusChange(inv.id, 'Sent')}><Send size={15} /></button>
+                      {inv.status === 'PendingApproval' ? (
+                        <>
+                          <button className="btn-icon" title="Approve" style={{ color: '#10B981' }} onClick={(e) => { e.stopPropagation(); handleStatusChange(inv.id, 'Approved'); }}><CheckCircle size={15} /></button>
+                          <button className="btn-icon" title="Reject" style={{ color: 'var(--error)' }} onClick={(e) => { e.stopPropagation(); handleStatusChange(inv.id, 'Cancelled'); }}><X size={15} /></button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="btn-icon" title="Download PDF"><Download size={15} /></button>
+                          <button className="btn-icon" title="Send" onClick={(e) => { e.stopPropagation(); handleStatusChange(inv.id, 'Sent'); }}><Send size={15} /></button>
+                        </>
+                      )}
                       {inv.status === 'Draft' && (
                         <button className="btn-icon" title="Edit" onClick={(e) => { e.stopPropagation(); openEditModal(inv); }}><Edit3 size={15} /></button>
                       )}
@@ -295,8 +322,13 @@ export default function FinanceInvoices() {
                           borderRadius: 'var(--radius-md)', padding: '6px', minWidth: 160,
                           boxShadow: 'var(--shadow-lg)'
                         }}>
-                          {['Approved', 'Sent', 'Paid', 'Cancelled'].map(s => (
-                            <button key={s} onClick={() => handleStatusChange(inv.id, s)}
+                          {['Approved', 'Sent', 'Paid', 'Cancelled'].filter(s => {
+                            if (s === 'Approved' || s === 'Cancelled') return inv.status === 'PendingApproval';
+                            if (s === 'Sent') return ['Approved', 'Overdue'].includes(inv.status);
+                            if (s === 'Paid') return ['Approved', 'Sent', 'Viewed', 'PartiallyPaid', 'Overdue'].includes(inv.status);
+                            return true;
+                          }).map(s => (
+                            <button key={s} onClick={(e) => { e.stopPropagation(); handleStatusChange(inv.id, s); }}
                               style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', fontSize: 13, color: 'var(--text-main)', borderRadius: 6, background: 'transparent' }}
                               onMouseEnter={e => e.target.style.background = 'var(--bg-app)'}
                               onMouseLeave={e => e.target.style.background = 'transparent'}
@@ -348,7 +380,7 @@ export default function FinanceInvoices() {
                   <p className="text-xs text-muted mt-1">{activeSelectedInvoice.project}</p>
                 </div>
                 <span className={`badge ${STATUS_CONFIG[activeSelectedInvoice.status]?.class}`} style={{ height: 'fit-content' }}>
-                  {activeSelectedInvoice.status}
+                  {activeSelectedInvoice.status === 'PendingApproval' ? 'Pending Approval' : activeSelectedInvoice.status}
                 </span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
@@ -394,11 +426,24 @@ export default function FinanceInvoices() {
               </div>
             </div>
             <div className="finance-drawer-footer">
-              <button className="btn btn-secondary"><Download size={15} /> PDF</button>
-              <button className="btn btn-secondary" onClick={() => sendInvoice(activeSelectedInvoice.id)}><Send size={15} /> Send</button>
-              <button className="btn btn-primary" onClick={() => handleStatusChange(activeSelectedInvoice.id, 'Paid')}>
-                <CheckCircle size={15} /> Mark Paid
-              </button>
+              {activeSelectedInvoice.status === 'PendingApproval' ? (
+                <>
+                  <button className="btn btn-primary" style={{ backgroundColor: '#10B981', borderColor: '#10B981', flex: 1 }} onClick={() => handleStatusChange(activeSelectedInvoice.id, 'Approved')}>
+                    Approve Invoice
+                  </button>
+                  <button className="btn btn-secondary" style={{ color: 'var(--error)' }} onClick={() => handleStatusChange(activeSelectedInvoice.id, 'Cancelled')}>
+                    Reject
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="btn btn-secondary"><Download size={15} /> PDF</button>
+                  <button className="btn btn-secondary" onClick={() => sendInvoice(activeSelectedInvoice.id)}><Send size={15} /> Send</button>
+                  <button className="btn btn-primary" onClick={() => handleStatusChange(activeSelectedInvoice.id, 'Paid')}>
+                    <CheckCircle size={15} /> Mark Paid
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

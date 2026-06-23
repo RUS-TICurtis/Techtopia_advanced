@@ -71,6 +71,7 @@ export const WORKSPACE_ITEMS: WorkspaceItem[] = [
   // HR Group
   { id: 'hr-dashboard', label: 'HR Dashboard', url: '/hr', group: 'hr', permission: PERMISSIONS.HR_VIEW },
   { id: 'hr-employees', label: 'Employees', url: '/hr/employees', group: 'hr', permission: PERMISSIONS.HR_VIEW },
+  { id: 'hr-departments', label: 'Departments', url: '/hr/departments', group: 'hr', permission: PERMISSIONS.HR_VIEW },
   { id: 'hr-leave', label: 'Leave Management', url: '/hr/leave', group: 'hr', permission: PERMISSIONS.HR_MANAGE },
   { id: 'hr-attendance', label: 'Attendance', url: '/hr/attendance', group: 'hr', permission: PERMISSIONS.HR_MANAGE },
   { id: 'hr-self-service', label: 'Self Service', url: '/hr/self-service', group: 'hr', permission: PERMISSIONS.HR_SELF_SERVICE },

@@ -6,9 +6,11 @@ import './Finance.css';
 
 // Status badge config (API returns 'Active', 'Inactive', etc.)
 const STATUS_COLORS = {
+  PendingApproval: { badge: 'badge-warning', text: '#F59E0B' },
   Active:   { badge: 'badge-success',  text: '#10B981' },
   Inactive: { badge: 'badge-neutral',  text: '#64748B' },
   Suspended:{ badge: 'badge-danger',   text: '#EF4444' },
+  Blocked:  { badge: 'badge-danger',   text: '#EF4444' },
 };
 const AVATAR_COLORS = ['#38BDF8', '#6366F1', '#EF4444', '#10B981', '#F59E0B', '#3B82F6', '#FB923C'];
 
@@ -70,6 +72,33 @@ export default function FinanceVendors() {
     }
   };
 
+  const handleApproveVendor = async (vendorId, status) => {
+    try {
+      const vendorToUpdate = vendors.find(v => v.id === vendorId);
+      if (!vendorToUpdate) return;
+      
+      const payload = {
+        name: vendorToUpdate.name,
+        registrationNumber: vendorToUpdate.registrationNumber || undefined,
+        taxIdentificationNumber: vendorToUpdate.taxIdentificationNumber || undefined,
+        email: vendorToUpdate.email || undefined,
+        phone: vendorToUpdate.phone || undefined,
+        website: vendorToUpdate.website || undefined,
+        address: vendorToUpdate.address || undefined,
+        country: vendorToUpdate.country || 'Ghana',
+        city: vendorToUpdate.city || 'Accra',
+        status: status
+      };
+      await updateVendor({ id: vendorId, data: payload });
+      if (selectedVendor && selectedVendor.id === vendorId) {
+        setSelectedVendor({ ...selectedVendor, status });
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update vendor status.');
+    }
+  };
+
   const openEditModal = () => {
     if (!selectedVendor) return;
     setNewVendor({
@@ -113,9 +142,9 @@ export default function FinanceVendors() {
       <div className="finance-metric-row">
         {[
           { label: 'Total Vendors', value: vendors.length },
-          { label: 'Active Vendors', value: vendors.filter(v => v.status === 'Active').length },
+          { label: 'Active', value: vendors.filter(v => v.status === 'Active').length },
+          { label: 'Pending Approval', value: vendors.filter(v => v.status === 'PendingApproval').length },
           { label: 'Countries', value: new Set(vendors.map(v => v.country).filter(Boolean)).size || 0 },
-          { label: 'Cities', value: new Set(vendors.map(v => v.city).filter(Boolean)).size || 0 },
         ].map(m => (
           <div key={m.label} className="finance-metric-mini">
             <span className="finance-metric-mini-label">{m.label}</span>
@@ -146,7 +175,7 @@ export default function FinanceVendors() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                   <p className="font-semibold text-sm">{vendor.name}</p>
-                  <span className={`badge badge-sm ${statusCfg.badge}`}>{vendor.status || 'Active'}</span>
+                  <span className={`badge badge-sm ${statusCfg.badge}`}>{vendor.status === 'PendingApproval' ? 'Pending Approval' : (vendor.status || 'Active')}</span>
                 </div>
                 {vendor.vendorCode && (
                   <p style={{ fontSize: 10, color: 'var(--brand-cyan)', fontFamily: 'monospace', marginBottom: 8, letterSpacing: 0.5 }}>
@@ -170,6 +199,16 @@ export default function FinanceVendors() {
                     </div>
                   )}
                 </div>
+                {vendor.status === 'PendingApproval' && (
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12 }} onClick={e => e.stopPropagation()}>
+                    <button className="btn btn-primary" style={{ backgroundColor: '#10B981', borderColor: '#10B981', flex: 1, padding: '4px 8px', fontSize: 12 }} onClick={() => handleApproveVendor(vendor.id, 'Active')}>
+                      Approve
+                    </button>
+                    <button className="btn btn-secondary" style={{ color: 'var(--error)', padding: '4px 8px', fontSize: 12 }} onClick={() => handleApproveVendor(vendor.id, 'Blocked')}>
+                      Reject
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -213,9 +252,18 @@ export default function FinanceVendors() {
               </div>
             </div>
             <div className="finance-drawer-footer">
-              <button className="btn btn-secondary" style={{ color: 'var(--error)' }} onClick={() => { if(window.confirm('Delete this vendor?')) { deleteVendor(selectedVendor.id); setSelectedVendor(null); } }}>Delete</button>
-              <button className="btn btn-secondary" onClick={openEditModal}><Edit3 size={14} /> Edit</button>
-              <button className="btn btn-primary"><Package size={14} /> New PO</button>
+              {selectedVendor.status === 'PendingApproval' ? (
+                <>
+                  <button className="btn btn-primary" style={{ backgroundColor: '#10B981', borderColor: '#10B981', flex: 1 }} onClick={() => handleApproveVendor(selectedVendor.id, 'Active')}>Approve Vendor</button>
+                  <button className="btn btn-secondary" style={{ color: 'var(--error)' }} onClick={() => handleApproveVendor(selectedVendor.id, 'Blocked')}>Reject</button>
+                </>
+              ) : (
+                <>
+                  <button className="btn btn-secondary" style={{ color: 'var(--error)' }} onClick={() => { if(window.confirm('Delete this vendor?')) { deleteVendor(selectedVendor.id); setSelectedVendor(null); } }}>Delete</button>
+                  <button className="btn btn-secondary" onClick={openEditModal}><Edit3 size={14} /> Edit</button>
+                  <button className="btn btn-primary"><Package size={14} /> New PO</button>
+                </>
+              )}
             </div>
           </div>
         </div>

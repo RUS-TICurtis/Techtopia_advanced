@@ -311,6 +311,10 @@ export const vendorCategoriesApi = {
   update: (categoryId, data) => apiClient.put(`/api/v1/finance/vendor-categories/${categoryId}`, data).then(r => r.data),
 };
 
+export const expenseCategoriesApi = {
+  list: () => apiClient.get('/api/v1/finance/expenses/categories').then(r => r.data),
+};
+
 export const contractsApi = createPutResourceService('/api/v1/finance/contracts');
 export const teamApi = createResourceService('/api/hr/employees');
 export const auditApi = {
