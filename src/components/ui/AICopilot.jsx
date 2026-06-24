@@ -73,15 +73,15 @@ export default function AICopilot() {
       
       const query = textToSend.toLowerCase();
       if (query.includes('risk') || query.includes('pipeline') || query.includes('deal')) {
-        replyText = "🌐 [Sales Agent Active] - I have performed a deal risk assessment on your Sales Pipeline. CloudScale Inc is flagged as High Win Probability (85%), while Roma Tech is flagged as extreme Churn Risk due to unpaid invoices. I have drafted an Overdue Collection Notice in your AI Approvals queue.";
+        replyText = "ðŸŒ [Sales Agent Active] - I have performed a deal risk assessment on your Sales Pipeline. CloudScale Inc is flagged as High Win Probability (85%), while Roma Tech is flagged as extreme Churn Risk due to unpaid invoices. I have drafted an Overdue Collection Notice in your AI Approvals queue.";
       } else if (query.includes('onboard') || query.includes('hire') || query.includes('employee')) {
-        replyText = "👥 [HR Agent Active] - I have queued the onboarding sequence standard block. An automation trigger invitation has been constructed for the incoming Sales Lead. Please approve the task list in the Approvals queue to execute.";
+        replyText = "ðŸ‘¥ [HR Agent Active] - I have queued the onboarding sequence standard block. An automation trigger invitation has been constructed for the incoming Sales Lead. Please approve the task list in the Approvals queue to execute.";
       } else if (query.includes('audit') || query.includes('security') || query.includes('tenant')) {
-        replyText = "🛡️ [Admin Agent Active] - Performed a standard systems threat audit. System status is NOMINAL. 0 inactive users detected. MFA is fully enforced for admin/finance roles. Access compliance score stands at 98/100.";
+        replyText = "ðŸ›¡ï¸ [Admin Agent Active] - Performed a standard systems threat audit. System status is NOMINAL. 0 inactive users detected. MFA is fully enforced for admin/finance roles. Access compliance score stands at 98/100.";
       } else if (query.includes('automation') || query.includes('workflow')) {
-        replyText = "⚙️ [Workflow Agent Active] - Webhook trigger and Conditional Branching structures mapped successfully. I can seed the Onboard New Employee and SLA Breach Escalation templates into your visual builder instantly.";
+        replyText = "âš™ï¸ [Workflow Agent Active] - Webhook trigger and Conditional Branching structures mapped successfully. I can seed the Onboard New Employee and SLA Breach Escalation templates into your visual builder instantly.";
       } else if (query.includes('clear') || query.includes('reset')) {
-        replyText = "🧹 [Cleanup Agent Active] - I have cleared the conversational buffer. Neural parameters synchronized.";
+        replyText = "ðŸ§¹ [Cleanup Agent Active] - I have cleared the conversational buffer. Neural parameters synchronized.";
         setMessages([messages[0]]);
         setIsTyping(false);
         return;
@@ -104,7 +104,7 @@ export default function AICopilot() {
     setMessages(prev => [...prev, {
       id: Date.now(),
       sender: 'ai',
-      text: `✅ [Neural Approval Dispatched] - Successfully validated claims and dispatched transaction payload to target channels. Logged under compliance token: SECURE-AUDIT-${Math.floor(Math.random()*90000+10000)}.`,
+      text: `âœ… [Neural Approval Dispatched] - Successfully validated claims and dispatched transaction payload to target channels. Logged under compliance token: SECURE-AUDIT-${Math.floor(Math.random()*90000+10000)}.`,
       time: 'Just now'
     }]);
   };

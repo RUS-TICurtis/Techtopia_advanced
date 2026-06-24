@@ -11,15 +11,16 @@ function App() {
   const {
     theme,
     toggleTheme,
-    sidebarCollapsed,
-    setSidebarCollapsed,
-    sidebarMobileOpen: mobileSidebarOpen,
-    setSidebarMobileOpen: setMobileSidebarOpen
   } = useUIStore();
   const location = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [theme]);
 
   // Don't render layout shell on auth pages
@@ -41,10 +42,6 @@ function App() {
     <AppLayout
       theme={theme}
       toggleTheme={toggleTheme}
-      sidebarCollapsed={sidebarCollapsed}
-      setSidebarCollapsed={setSidebarCollapsed}
-      mobileSidebarOpen={mobileSidebarOpen}
-      setMobileSidebarOpen={setMobileSidebarOpen}
     >
       <AppRoutes 
         theme={theme} 

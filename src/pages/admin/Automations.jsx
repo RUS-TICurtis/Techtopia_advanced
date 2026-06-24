@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { 
   Play, Plus, ArrowRight, Settings, Info, CheckCircle2, 
   Trash2, ShieldCheck, Zap, ToggleLeft, ToggleRight,
@@ -58,7 +58,7 @@ export default function Automations() {
 
   const handleTestFlow = (flowName) => {
     setSimulatedExecutions(prev => prev + 1);
-    alert(`⚙️ [Simulation Triggered] - Simulated dry-run event for "${flowName}". Successfully evaluated conditional branches and executed action chains.`);
+    alert(`âš™ï¸ [Simulation Triggered] - Simulated dry-run event for "${flowName}". Successfully evaluated conditional branches and executed action chains.`);
   };
 
   const [showCreateModal, setShowCreateModal] = useState(false);

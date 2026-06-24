@@ -1,7 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { 
   KeyRound, Play, Plus, Trash2, CheckCircle, HelpCircle,
   Copy, RefreshCw, Send, ShieldAlert, Cpu, Check, AlertCircle,
@@ -60,7 +60,7 @@ export default function DeveloperConsole() {
     setTokens(prev => [createdToken, ...prev]);
     setNewTokenName('');
     setSelectedScopes(['crm.read']);
-    alert('🔑 [API Access Token Provisioned] - Scoped authorization key compiled successfully. Ensure to save this securely under SOC2 policies.');
+    alert('?? [API Access Token Provisioned] - Scoped authorization key compiled successfully. Ensure to save this securely under SOC2 policies.');
   };
 
   const handleDeleteToken = (id) => {

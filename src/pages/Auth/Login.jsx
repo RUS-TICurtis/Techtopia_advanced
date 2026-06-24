@@ -101,7 +101,7 @@ export default function AuthLogin() {
                 <input 
                   type="password" 
                   className="form-input" 
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required

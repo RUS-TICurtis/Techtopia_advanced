@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { 
   ShieldCheck, Building2, Users, HardDrive, Cpu, AlertTriangle,
   LogIn, Ban, Key, RefreshCw, X, Check, Lock, ShieldAlert,
@@ -150,7 +150,7 @@ export default function SuperAdminOversight() {
   };
 
   const handleRevokeSessions = (tenantName) => {
-    alert(`⚡ [Revoke Signal Dispatched] - Forcefully invalidated all active WebAuthn/MFA tokens and sessions for ${tenantName}.`);
+    alert(`âš¡ [Revoke Signal Dispatched] - Forcefully invalidated all active WebAuthn/MFA tokens and sessions for ${tenantName}.`);
   };
 
   return (

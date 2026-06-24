@@ -4,7 +4,7 @@ import {
 } from 'recharts';
 import { FileSpreadsheet, FileDown, Plus, Download, Mail } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import './Reports.css';
 
 const FINANCIAL_DATA = [
@@ -105,7 +105,7 @@ export default function Reports() {
               <div className="reports-metric-box">
                 <span className="reports-metric-label">Current ARR</span>
                 <span className="reports-metric-value text-gradient font-black">$680,000</span>
-                <span className="reports-metric-trend positive">▲ +30.7% vs last quarter</span>
+                <span className="reports-metric-trend positive">â–² +30.7% vs last quarter</span>
               </div>
               <div className="reports-metric-box">
                 <span className="reports-metric-label">Gross Margin</span>

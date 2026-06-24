@@ -204,7 +204,7 @@ export default function FinanceOverview() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Finance Overview</h1>
-          <p className="page-subtitle">Real-time financial intelligence for Techtopia Corp · GH₵ · FY 2026</p>
+          <p className="page-subtitle">Real-time financial intelligence for Techtopia Corp Â· GHâ‚µ Â· FY 2026</p>
         </div>
         <div className="page-actions">
           <button className="btn btn-secondary" onClick={() => refetch()}>
@@ -248,7 +248,7 @@ export default function FinanceOverview() {
         {/* Revenue vs Expenses Chart */}
         <div className="card finance-chart-primary">
           <div className="card-title">
-            Revenue & Expenses — FY 2026
+            Revenue & Expenses â€” FY 2026
             <div className="flex gap-3">
               <span className="finance-legend-dot" style={{ background: '#38BDF8' }}>Revenue</span>
               <span className="finance-legend-dot" style={{ background: '#EF4444' }}>Expenses</span>
@@ -416,7 +416,7 @@ export default function FinanceOverview() {
                   <td className="font-semibold">{formatCurrency(txn.amount)}</td>
                   <td>{txn.gateway ? (
                     <span className="badge badge-info badge-sm">{txn.gateway}</span>
-                  ) : <span className="text-muted text-xs">—</span>}</td>
+                  ) : <span className="text-muted text-xs">â€”</span>}</td>
                   <td>
                     <span className={`badge badge-sm ${
                       txn.status === 'completed' ? 'badge-success' :

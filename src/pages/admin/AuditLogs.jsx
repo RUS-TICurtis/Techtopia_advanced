@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuditLogs } from '../../hooks/useCrmData';
 import { auditApi } from '../../lib/api';
 import { Search, ShieldAlert, ArrowDownToLine, RefreshCw, WifiOff } from 'lucide-react';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import './AuditLogs.css';
 
 export default function AuditLogs() {
@@ -113,7 +113,7 @@ export default function AuditLogs() {
           className="btn btn-secondary flex items-center gap-2"
         >
           <ArrowDownToLine size={16} />
-          {isExporting ? 'Exporting…' : 'Export Logs'}
+          {isExporting ? 'Exportingâ€¦' : 'Export Logs'}
         </button>
       </div>
 
@@ -124,7 +124,7 @@ export default function AuditLogs() {
           style={{ background: 'var(--color-warning-bg, #451a03)', color: '#fbbf24', border: '1px solid #92400e' }}
         >
           <WifiOff size={15} />
-          You are offline. Showing cached logs — new events will be queued and synced when connectivity is restored.
+          You are offline. Showing cached logs â€” new events will be queued and synced when connectivity is restored.
         </div>
       )}
 
@@ -209,7 +209,7 @@ export default function AuditLogs() {
                     <td><code style={{ fontSize: 11, color: 'var(--text-muted)' }}>{log.module || log.resource}</code></td>
                     <td>
                       <code title={log.ip ? 'Server-resolved IP' : 'IP unavailable'}>
-                        {log.ip || '—'}
+                        {log.ip || 'â€”'}
                       </code>
                     </td>
                     <td>

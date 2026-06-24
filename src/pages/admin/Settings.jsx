@@ -409,7 +409,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                     <input 
                       type={showPassword ? "text" : "password"} 
                       className="form-input" 
-                      placeholder="••••••••••••"
+                      placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                       value={currentPassword}
                       onChange={e => setCurrentPassword(e.target.value)}
                       required
@@ -430,7 +430,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                   <input 
                     type="password" 
                     className="form-input" 
-                    placeholder="••••••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
                     required

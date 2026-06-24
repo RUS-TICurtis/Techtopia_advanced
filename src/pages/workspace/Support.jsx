@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { 
   LifeBuoy, 
   Search, 
@@ -22,7 +22,7 @@ import {
 import { useTickets } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import './Support.css';
 
@@ -355,7 +355,7 @@ export default function Support({ searchValue = '' }) {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#EF4444]">⚡</span> Command Center
+            <span className="text-[#EF4444]">?</span> Command Center
           </h1>
           <p className="page-subtitle">Manage client requests, SLA commitments, and engineering tickets</p>
         </div>

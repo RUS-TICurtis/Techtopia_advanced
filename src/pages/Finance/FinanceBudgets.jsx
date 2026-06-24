@@ -38,7 +38,7 @@ export default function FinanceBudgets() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
-  // Map API response fields → chart data
+  // Map API response fields â†’ chart data
   // API returns: totalAmount, consumedAmount, remainingAmount, allocatedAmount
   const VARIANCE_DATA = budgets.map((b, i) => {
     const nameStr = b.name || '';
@@ -264,7 +264,7 @@ export default function FinanceBudgets() {
                 </span>
                 <span>
                   {budget.startDate && budget.endDate
-                    ? `${new Date(budget.startDate).toLocaleDateString()} – ${new Date(budget.endDate).toLocaleDateString()}`
+                    ? `${new Date(budget.startDate).toLocaleDateString()} â€“ ${new Date(budget.endDate).toLocaleDateString()}`
                     : budget.type}
                 </span>
               </div>
@@ -295,13 +295,13 @@ export default function FinanceBudgets() {
                 <label>Budget Name *</label>
                 <input type="text" className="form-input" required value={newBudget.name}
                   onChange={e => setNewBudget(p => ({ ...p, name: e.target.value }))}
-                  placeholder="Q3 Marketing Budget, Engineering FY2026…" />
+                  placeholder="Q3 Marketing Budget, Engineering FY2026â€¦" />
               </div>
               <div className="form-group">
                 <label>Description</label>
                 <textarea className="form-input" rows={2} value={newBudget.description}
                   onChange={e => setNewBudget(p => ({ ...p, description: e.target.value }))}
-                  placeholder="Purpose of this budget…" />
+                  placeholder="Purpose of this budgetâ€¦" />
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
@@ -314,7 +314,7 @@ export default function FinanceBudgets() {
                   </select>
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Total Amount (GH₵) *</label>
+                  <label>Total Amount (GHâ‚µ) *</label>
                   <input type="number" className="form-input" required min={0} step="0.01"
                     value={newBudget.totalAmount}
                     onChange={e => setNewBudget(p => ({ ...p, totalAmount: e.target.value }))} />
@@ -341,7 +341,7 @@ export default function FinanceBudgets() {
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
                   <Plus size={14} />
-                  {submitting ? 'Saving…' : (newBudget.id ? 'Save Changes' : 'Create Budget')}
+                  {submitting ? 'Savingâ€¦' : (newBudget.id ? 'Save Changes' : 'Create Budget')}
                 </button>
               </div>
             </form>

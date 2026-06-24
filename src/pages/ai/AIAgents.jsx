@@ -1,7 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { 
   Sparkles, ShieldCheck, TrendingUp, LifeBuoy, Users, 
   Receipt, ShieldAlert, BookOpen, ToggleLeft, ToggleRight,
@@ -160,7 +160,7 @@ export default function AIAgents() {
       <PageHeader 
         title="AI Workforce Orchestrator"
         subtitle="Provision, configure, and monitor autonomous specialized agents across departments"
-        icon={<span className="text-[#38BDF8]">⚡</span>}
+        icon={<span className="text-[#38BDF8]">?</span>}
         actions={
           <button 
             onClick={handleRefresh} 

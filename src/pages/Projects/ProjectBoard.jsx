@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Plus, 
@@ -21,7 +21,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTasks, useContacts, useProjects } from '../../hooks/useCrmData';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import './Projects.css';
 
@@ -241,7 +241,7 @@ export default function ProjectBoard() {
             <Link to="/projects" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span className="text-[#38BDF8]">⚡</span> Task Kanban Board {currentProject ? `— ${projectTitle}` : ''}
+            <span className="text-[#38BDF8]">?</span> Task Kanban Board {currentProject ? `— ${projectTitle}` : ''}
           </h1>
           <p className="page-subtitle">Track project deliverables, sprint schedules, and development items</p>
         </div>

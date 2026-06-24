@@ -119,12 +119,12 @@ export default function Contracts({ searchValue = '' }) {
                   <td style={{ fontWeight: 600 }}>{c.title}</td>
                   <td>{c.client}</td>
                   <td>{c.type || 'Service Agreement'}</td>
-                  <td>{c.startDate || '—'}</td>
-                  <td>{c.endDate || '—'}</td>
+                  <td>{c.startDate || 'â€”'}</td>
+                  <td>{c.endDate || 'â€”'}</td>
                   <td>
                     {c.fileName
                       ? <span className="contract-file-tag"><FileText size={13}/> {c.fileName}</span>
-                      : '—'}
+                      : 'â€”'}
                   </td>
                   <td><span className={`badge ${statusColors[c.status]}`}>{c.status}</span></td>
                 </tr>

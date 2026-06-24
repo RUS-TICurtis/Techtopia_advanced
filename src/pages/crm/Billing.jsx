@@ -135,7 +135,7 @@ export default function Billing({ searchValue = '' }) {
                   <td style={{ fontWeight: 600, color: 'var(--primary)' }}>{inv.invoiceNumber || inv.number}</td>
                   <td>{inv.client}</td>
                   <td>${total(inv).toLocaleString()}</td>
-                  <td>{inv.dueDate || '—'}</td>
+                  <td>{inv.dueDate || 'â€”'}</td>
                   <td><span className={`badge ${statusColors[inv.status]}`}>{inv.status}</span></td>
                 </tr>
               ))}

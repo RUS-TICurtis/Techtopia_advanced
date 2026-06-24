@@ -90,7 +90,7 @@ export default function FinancialReports() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Financial Reports</h1>
-          <p className="page-subtitle">Generate, view, and export statutory and management reports · GH₵</p>
+          <p className="page-subtitle">Generate, view, and export statutory and management reports Â· GHâ‚µ</p>
         </div>
         <div className="page-actions">
           <button className="btn btn-secondary" onClick={handleGenerate} disabled={isLoading}>
@@ -156,12 +156,12 @@ export default function FinancialReports() {
           {/* P&L Report */}
           {activeReport === 'pl' && (
             <div className="card">
-              <div className="card-title">Profit & Loss Statement — {dateRange.from} to {dateRange.to}</div>
+              <div className="card-title">Profit & Loss Statement â€” {dateRange.from} to {dateRange.to}</div>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
                     <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5 }}>Line Item</th>
-                    <th style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase' }}>Amount (GH₵)</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase' }}>Amount (GHâ‚µ)</th>
                     <th style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase' }}>% of Revenue</th>
                   </tr>
                 </thead>
@@ -204,7 +204,7 @@ export default function FinancialReports() {
           {/* Cash Flow Report */}
           {activeReport === 'cf' && (
             <div className="card">
-              <div className="card-title">Cash Flow Statement — {dateRange.from} to {dateRange.to}</div>
+              <div className="card-title">Cash Flow Statement â€” {dateRange.from} to {dateRange.to}</div>
               <div style={{ height: 280 }}>
                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <RBarChart data={Array.isArray(cashFlowData) ? cashFlowData : []} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
@@ -242,9 +242,9 @@ export default function FinancialReports() {
                       {genericData.map((row, index) => (
                         <tr key={index} style={{ borderBottom: '1px solid var(--border-light)' }}>
                           <td style={{ padding: '8px 12px' }}>{index + 1}</td>
-                          <td style={{ padding: '8px 12px' }}>{row.date || row.range || '—'}</td>
+                          <td style={{ padding: '8px 12px' }}>{row.date || row.range || 'â€”'}</td>
                           <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(row.amount)}</td>
-                          <td style={{ padding: '8px 12px' }}>{row.client || row.category || row.gateway || '—'}</td>
+                          <td style={{ padding: '8px 12px' }}>{row.client || row.category || row.gateway || 'â€”'}</td>
                         </tr>
                       ))}
                     </tbody>

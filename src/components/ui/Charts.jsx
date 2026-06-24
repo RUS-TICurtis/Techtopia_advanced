@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 // ==========================================================================
 // 1. Weekly Activity Chart (Bar Chart)

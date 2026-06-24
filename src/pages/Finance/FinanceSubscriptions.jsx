@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Users, TrendingUp, TrendingDown, CheckCircle, AlertCircle,
   Plus, X, ArrowUpCircle, ArrowDownCircle, PauseCircle,

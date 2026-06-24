@@ -434,7 +434,7 @@ export default function Team() {
                         </td>
                         <td><span className="font-mono text-xs">{u.username}</span></td>
                         <td>{u.email}</td>
-                        <td>{u.phoneNumber || '—'}</td>
+                        <td>{u.phoneNumber || 'â€”'}</td>
                         <td>
                           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                           {u.roles && u.roles.length > 0 ? (
@@ -514,7 +514,7 @@ export default function Team() {
                           {r.name}
                         </div>
                       </td>
-                      <td>{r.description || '—'}</td>
+                      <td>{r.description || 'â€”'}</td>
                       <td>
                         <span className="badge badge-neutral" style={{ fontSize: 10 }}>
                           {r.permissions?.length || 0} permissions

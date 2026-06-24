@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useProjects, useInvoices, useTickets } from '../../hooks/useCrmData';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import './ClientPortal.css';
 
 export default function ClientDashboard() {
@@ -79,7 +79,7 @@ export default function ClientDashboard() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="portal-header-title">
-              Welcome to Techtopia Hub, {user?.name || 'Client'}! <span className="animate-pulse">⚡</span>
+              Welcome to Techtopia Hub, {user?.name || 'Client'}! <span className="animate-pulse">âš¡</span>
             </h1>
             <p className="portal-header-subtitle">
               <Building2 size={14} />
@@ -167,7 +167,7 @@ export default function ClientDashboard() {
                     {activeProject.milestones.map((ms, idx) => (
                       <div key={idx} className="portal-bullet-item">
                         <div className="portal-bullet-dot" />
-                        <span>{ms.name} {ms.completed ? '(✓ Completed)' : ''}</span>
+                        <span>{ms.name} {ms.completed ? '(âœ“ Completed)' : ''}</span>
                       </div>
                     ))}
                   </div>

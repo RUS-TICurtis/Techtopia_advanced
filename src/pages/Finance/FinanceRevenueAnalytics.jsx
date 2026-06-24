@@ -137,7 +137,7 @@ export default function FinanceRevenueAnalytics() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Revenue Analytics</h1>
-          <p className="page-subtitle">Real-time revenue intelligence, growth metrics, and churn analysis · GH₵</p>
+          <p className="page-subtitle">Real-time revenue intelligence, growth metrics, and churn analysis Â· GHâ‚µ</p>
         </div>
         <div className="page-actions">
           <select className="form-input" style={{ width: 'auto' }} value={period} onChange={e => setPeriod(e.target.value)}>
@@ -179,7 +179,7 @@ export default function FinanceRevenueAnalytics() {
       {/* Revenue vs Target */}
       <div className="card">
         <div className="card-title">
-          Revenue vs Target — {period}
+          Revenue vs Target â€” {period}
           <div style={{ display: 'flex', gap: 12 }}>
             <span className="finance-legend-dot" style={{ background: '#38BDF8' }}>Revenue</span>
             <span className="finance-legend-dot" style={{ background: '#64748B' }}>Target</span>
@@ -268,7 +268,7 @@ export default function FinanceRevenueAnalytics() {
                   <td style={{ padding: '8px 12px', fontWeight: 600, whiteSpace: 'nowrap' }}>{row.cohort}</td>
                   {['month1', 'month2', 'month3', 'month4', 'month5', 'month6'].map(m => {
                     const val = row[m];
-                    if (val === undefined) return <td key={m} style={{ padding: '8px 12px', textAlign: 'center', color: 'var(--text-muted)' }}>—</td>;
+                    if (val === undefined) return <td key={m} style={{ padding: '8px 12px', textAlign: 'center', color: 'var(--text-muted)' }}>â€”</td>;
                     const opacity = val / 100;
                     return (
                       <td key={m} style={{ padding: '8px 12px', textAlign: 'center' }}>

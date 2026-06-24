@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

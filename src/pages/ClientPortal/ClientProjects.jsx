@@ -11,7 +11,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { useProjects } from '../../hooks/useCrmData';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import './ClientPortal.css';
 
 export default function ClientProjects() {
@@ -38,7 +38,7 @@ export default function ClientProjects() {
             <Link to="/client" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span style={{ color: 'var(--brand-cyan)' }}>⚡</span> Deliverables Portfolio
+            <span style={{ color: 'var(--brand-cyan)' }}>âš¡</span> Deliverables Portfolio
           </h1>
           <p className="page-subtitle">Track real-time engineering progress, milestone updates and health check markers</p>
         </div>
@@ -102,7 +102,7 @@ export default function ClientProjects() {
                     {proj.milestones.map((ms, idx) => (
                       <div key={idx} className="portal-bullet-item">
                         <div className="portal-bullet-dot" />
-                        <span>{ms.name} {ms.completed ? '(✓ Completed)' : ''}</span>
+                        <span>{ms.name} {ms.completed ? '(âœ“ Completed)' : ''}</span>
                       </div>
                     ))}
                   </div>
@@ -112,11 +112,11 @@ export default function ClientProjects() {
               <div className="flex justify-between items-center text-xs text-gray-500 border-t border-light pt-4 mt-auto" style={{ borderTop: '1px solid var(--border-light)' }}>
                 <div className="flex items-center gap-1 font-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>
                   <Calendar size={12} style={{ color: 'var(--brand-cyan)' }} />
-                  <span>Start: {proj.startDate || '—'}</span>
+                  <span>Start: {proj.startDate || 'â€”'}</span>
                 </div>
                 <div className="flex items-center gap-1 font-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>
                   <Clock size={12} style={{ color: 'var(--brand-magenta)' }} />
-                  <span>Target: {proj.endDate || '—'}</span>
+                  <span>Target: {proj.endDate || 'â€”'}</span>
                 </div>
               </div>
 

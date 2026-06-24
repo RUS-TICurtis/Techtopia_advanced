@@ -11,7 +11,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useContracts } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import './ClientPortal.css';
 
@@ -92,7 +92,7 @@ export default function ClientContracts() {
     {
       accessorKey: 'startDate',
       header: 'Effective Date',
-      cell: ({ getValue }) => <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{getValue() || '—'}</span>
+      cell: ({ getValue }) => <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{getValue() || 'â€”'}</span>
     },
     {
       accessorKey: 'status',
@@ -135,7 +135,7 @@ export default function ClientContracts() {
             <Link to="/client" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span style={{ color: 'var(--brand-magenta)' }}>⚡</span> Service Contracts
+            <span style={{ color: 'var(--brand-magenta)' }}>âš¡</span> Service Contracts
           </h1>
           <p className="page-subtitle">Master agreements, service level commitments and legislative compliance</p>
         </div>

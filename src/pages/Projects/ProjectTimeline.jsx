@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Calendar, 
@@ -12,7 +12,7 @@ import {
   Flag,
   Sparkles
 } from 'lucide-react';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { useProjects } from '../../hooks/useCrmData';
 import './Projects.css';
 
@@ -111,7 +111,7 @@ export default function ProjectTimeline() {
             <Link to="/projects" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span className="text-[#38BDF8]">⚡</span> Portfolio Gantt Timeline
+            <span className="text-[#38BDF8]">?</span> Portfolio Gantt Timeline
           </h1>
           <p className="page-subtitle">Visual sprint tracking, project windows, and milestone delivery targets</p>
         </div>

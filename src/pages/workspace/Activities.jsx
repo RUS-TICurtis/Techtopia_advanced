@@ -48,7 +48,7 @@ export default function Activities() {
         id: `act_${act.id}`,
         user: act.actor || 'System',
         action: act.action || 'Performed action',
-        details: act.newValue ? (act.previousValue ? `${act.previousValue} → ${act.newValue}` : act.newValue) : (act.previousValue || ''),
+        details: act.newValue ? (act.previousValue ? `${act.previousValue} â†’ ${act.newValue}` : act.newValue) : (act.previousValue || ''),
         module: displayModule,
         timestamp: timeStr,
         type: displayModule.toLowerCase()
@@ -102,7 +102,7 @@ export default function Activities() {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#F59E0B]">⚡</span> Operation Timeline
+            <span className="text-[#F59E0B]">âš¡</span> Operation Timeline
           </h1>
           <p className="page-subtitle">Cross-module transaction streams, diagnostic compliance & live audit trails</p>
         </div>

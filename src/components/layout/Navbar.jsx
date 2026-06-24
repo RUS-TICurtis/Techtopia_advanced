@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
@@ -6,7 +6,14 @@ import { useNotificationStore } from '../../store/notificationStore';
 import { 
   Search, Bell, Settings, Sun, Moon, Menu, Sparkles, Command
 } from 'lucide-react';
-import Dropdown from '../ui/Dropdown';
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator 
+} from '../ui/dropdown-menu';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import './Navbar.css';
 
 export default function Navbar({ 
@@ -15,7 +22,6 @@ export default function Navbar({
   profile,
   onSearchChange,
   searchValue,
-  onMenuClick
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,24 +62,11 @@ export default function Navbar({
 
   const currentTitle = getPageTitle(location.pathname);
 
-  // User Profile Dropdown Configuration
-  const profileDropdownItems = [
-    { label: 'My Settings', icon: Settings, onClick: () => navigate('/settings') },
-    { label: 'AI Assistant', icon: Sparkles, onClick: () => navigate('/ai') },
-    { type: 'separator' },
-    { label: 'Sign Out', icon: Settings, onClick: () => { logout(); navigate('/auth/login'); }, variant: 'danger' }
-  ];
-
   return (
     <header className="navbar">
-      <div className="navbar-left">
-        <button 
-          className="mobile-menu-toggle nav-icon-btn" 
-          onClick={onMenuClick}
-        >
-          <Menu size={20} />
-        </button>
-        <h2 className="navbar-title font-display font-bold text-xl text-white">{currentTitle}</h2>
+      <div className="navbar-left flex items-center gap-2">
+        <SidebarTrigger className="text-gray-400 hover:text-white transition-colors" />
+        <h2 className="navbar-title font-display font-bold text-xl text-white ml-2">{currentTitle}</h2>
       </div>
 
       <div className="navbar-actions">
@@ -131,24 +124,36 @@ export default function Navbar({
         </div>
 
         {/* User profile dropdown */}
-        <Dropdown 
-          trigger={
-            <div className="nav-profile cursor-pointer" title="User Profile">
-              {user?.avatarUrl ? (
-                <img 
-                  src={user.avatarUrl} 
-                  alt="Avatar" 
-                  className="w-8 h-8 rounded-full object-cover border border-[#38BDF8]/35" 
-                />
-              ) : (
-                <span className="profile-initials font-bold text-xs bg-[#38BDF8]/20 text-[#38BDF8] w-8 h-8 rounded-full flex items-center justify-center border border-[#38BDF8]/35">
-                  {user?.avatar || 'U'}
-                </span>
-              )}
-            </div>
-          }
-          items={profileDropdownItems}
-        />
+        <DropdownMenu>
+          <DropdownMenuTrigger className="nav-profile cursor-pointer outline-none" title="User Profile">
+            {user?.avatarUrl ? (
+              <img 
+                src={user.avatarUrl} 
+                alt="Avatar" 
+                className="w-8 h-8 rounded-full object-cover border border-[#38BDF8]/35" 
+              />
+            ) : (
+              <span className="profile-initials font-bold text-xs bg-[#38BDF8]/20 text-[#38BDF8] w-8 h-8 rounded-full flex items-center justify-center border border-[#38BDF8]/35">
+                {user?.avatar || 'U'}
+              </span>
+            )}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 font-sans">
+            <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>My Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/ai')} className="cursor-pointer">
+              <Sparkles className="mr-2 h-4 w-4 text-[#38BDF8]" />
+              <span>AI Assistant</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => { logout(); navigate('/auth/login'); }} className="cursor-pointer text-red-500 focus:text-red-500 focus:bg-red-950/20">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Sign Out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

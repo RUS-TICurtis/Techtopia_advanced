@@ -229,15 +229,15 @@ export default function FinanceVendors() {
             <div className="finance-drawer-body">
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
                 {[
-                  { label: 'Vendor Code', value: selectedVendor.vendorCode || '—', icon: Building2 },
-                  { label: 'Email', value: selectedVendor.email || '—', icon: Mail },
-                  { label: 'Phone', value: selectedVendor.phone || '—', icon: Phone },
-                  { label: 'Website', value: selectedVendor.website || '—', icon: Globe },
-                  { label: 'City', value: selectedVendor.city || '—', icon: MapPin },
-                  { label: 'Country', value: selectedVendor.country || '—', icon: MapPin },
-                  { label: 'Address', value: selectedVendor.address || '—', icon: Building2 },
-                  { label: 'Reg. Number', value: selectedVendor.registrationNumber || '—', icon: Package },
-                  { label: 'Tax ID (TIN)', value: selectedVendor.taxIdentificationNumber || '—', icon: Package },
+                  { label: 'Vendor Code', value: selectedVendor.vendorCode || 'â€”', icon: Building2 },
+                  { label: 'Email', value: selectedVendor.email || 'â€”', icon: Mail },
+                  { label: 'Phone', value: selectedVendor.phone || 'â€”', icon: Phone },
+                  { label: 'Website', value: selectedVendor.website || 'â€”', icon: Globe },
+                  { label: 'City', value: selectedVendor.city || 'â€”', icon: MapPin },
+                  { label: 'Country', value: selectedVendor.country || 'â€”', icon: MapPin },
+                  { label: 'Address', value: selectedVendor.address || 'â€”', icon: Building2 },
+                  { label: 'Reg. Number', value: selectedVendor.registrationNumber || 'â€”', icon: Package },
+                  { label: 'Tax ID (TIN)', value: selectedVendor.taxIdentificationNumber || 'â€”', icon: Package },
                 ].map(f => {
                   const Icon = f.icon;
                   return (
@@ -282,7 +282,7 @@ export default function FinanceVendors() {
                 <label>Vendor Name *</label>
                 <input type="text" className="form-input" required value={newVendor.name}
                   onChange={e => setNewVendor(p => ({ ...p, name: e.target.value }))}
-                  placeholder="Tech Corp, Acme Supplies Ltd…" />
+                  placeholder="Tech Corp, Acme Supplies Ltdâ€¦" />
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   Plus, 
@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useProjects } from '../../hooks/useCrmData';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import './Projects.css';
 
@@ -96,7 +96,7 @@ export default function Projects() {
       <PageHeader
         title="Project Portfolio"
         subtitle="Track project health, progress bars, budgets, and milestones"
-        icon={<span className="text-[#10B981] text-xl">⚡</span>}
+        icon={<span className="text-[#10B981] text-xl">?</span>}
         actions={
           <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
             <Plus size={18} /> New Project

@@ -2,6 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -10,6 +14,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, './src'),
       'es-toolkit/compat/get': path.resolve('src/lib/es-toolkit-compat/get.js'),
       'es-toolkit/compat/isPlainObject': path.resolve('src/lib/es-toolkit-compat/isPlainObject.js'),
       'es-toolkit/compat/last': path.resolve('src/lib/es-toolkit-compat/last.js'),

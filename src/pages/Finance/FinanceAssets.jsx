@@ -2,23 +2,60 @@ import React, { useState } from 'react';
 import { Package, Plus, Calculator, Settings, Edit3, Trash2, X } from 'lucide-react';
 import './Finance.css';
 import { formatCurrency } from '../../services/finance/financeService';
+import { useAssets, useProducts } from '../../hooks/useCrmData';
 
 export default function FinanceAssets() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newAsset, setNewAsset] = useState({ name: '', category: '', purchaseValue: '', date: '' });
+  const { assets: rawAssets = [], isLoading: isLoadingAssets, createAsset } = useAssets();
+  const { products = [], createProduct } = useProducts();
+  const [newAsset, setNewAsset] = useState({ name: '', category: '', serialNumber: '', purchaseValue: '', date: '' });
 
-  const handleCreateAsset = (e) => {
+  const handleCreateAsset = async (e) => {
     e.preventDefault();
-    alert(`Registering Asset: ${newAsset.name}`);
-    setShowCreateModal(false);
+    try {
+      const product = await createProduct({
+        sku: 'AST-' + Math.floor(Math.random() * 100000),
+        name: newAsset.name,
+        category: newAsset.category,
+        isAsset: true,
+        standardCost: parseFloat(newAsset.purchaseValue || 0)
+      });
+      
+      await createAsset({
+        productId: product.id,
+        serialNumber: newAsset.serialNumber || 'N/A',
+        purchaseDate: newAsset.date ? new Date(newAsset.date).toISOString() : null
+      });
+
+      alert(`Successfully registered Asset: ${newAsset.name}`);
+      setShowCreateModal(false);
+      setNewAsset({ name: '', category: '', serialNumber: '', purchaseValue: '', date: '' });
+    } catch (error) {
+      console.error(error);
+      alert('Failed to register asset.');
+    }
   };
 
-  const assets = [];
+  const assets = rawAssets.map(a => {
+    const product = products.find(p => p.id === a.productId) || {};
+    return {
+      ...a,
+      displayId: a.id.split('-')[0],
+      name: a.productName || 'Unknown Asset',
+      category: product.category || 'N/A',
+      serialNumber: a.serialNumber,
+      purchaseDate: a.purchaseDate ? new Date(a.purchaseDate).toLocaleDateString() : 'N/A',
+      purchaseValue: product.standardCost || 0,
+      currentValue: product.standardCost || 0,
+      status: a.status || 'Active',
+    };
+  });
 
   const filteredAssets = assets.filter(a => 
     a.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    a.id.toLowerCase().includes(searchTerm.toLowerCase())
+    (a.displayId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (a.serialNumber || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalAssetsValue = assets.reduce((sum, a) => sum + a.currentValue, 0);
@@ -87,7 +124,7 @@ export default function FinanceAssets() {
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Asset ID</th>
+                <th>S/N</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th>Purchase Date</th>
@@ -100,7 +137,7 @@ export default function FinanceAssets() {
             <tbody>
               {filteredAssets.map(asset => (
                 <tr key={asset.id}>
-                  <td className="font-mono text-xs text-brand-cyan">{asset.id}</td>
+                  <td className="font-mono text-xs text-brand-cyan">{asset.serialNumber || asset.displayId}</td>
                   <td className="font-semibold">{asset.name}</td>
                   <td>{asset.category}</td>
                   <td className="text-muted">{asset.purchaseDate}</td>
@@ -171,6 +208,18 @@ export default function FinanceAssets() {
                     <option value="Software">Software & IP</option>
                   </select>
                 </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Serial Number</label>
+                  <input 
+                    className="form-input" 
+                    placeholder="e.g. SN-12345"
+                    value={newAsset.serialNumber}
+                    onChange={e => setNewAsset({...newAsset, serialNumber: e.target.value})} 
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
                   <label>Purchase Date *</label>
                   <input 

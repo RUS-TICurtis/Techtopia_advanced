@@ -1,7 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { 
   Mail, MessageSquare, Send, Sparkles, AlertCircle, 
   Smile, Frown, CheckCircle, RefreshCw, Smartphone, 

@@ -19,7 +19,7 @@ import {
 import { useContacts } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
 import './Contacts.css';
@@ -217,7 +217,7 @@ export default function Contacts({ searchValue = '' }) {
     {
       accessorKey: 'phone',
       header: 'Phone Connection',
-      cell: ({ getValue }) => <span className="font-mono text-xs text-gray-400">{getValue() || '—'}</span>
+      cell: ({ getValue }) => <span className="font-mono text-xs text-gray-400">{getValue() || 'â€”'}</span>
     },
     {
       accessorKey: 'value',
@@ -262,7 +262,7 @@ export default function Contacts({ searchValue = '' }) {
       <PageHeader
         title="Lead Ledger"
         subtitle="Unified customer records with Radix right-click execution & dossiers"
-        icon={<span className="text-[#6366F1] text-xl">⚡</span>}
+        icon={<span className="text-[#6366F1] text-xl">âš¡</span>}
         actions={
           <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => setIsAddModalOpen(true)}>
             <Plus size={18} /> Add New Lead
@@ -337,11 +337,11 @@ export default function Contacts({ searchValue = '' }) {
             <div className="flex flex-col gap-2.5 p-4 bg-[#0F172A]/80 border border-gray-850 rounded-xl">
               <div className="flex items-center gap-3 text-xs text-gray-300">
                 <Mail size={14} className="text-gray-500 w-4" />
-                <span className="truncate">{selectedContactDetails.email || '—'}</span>
+                <span className="truncate">{selectedContactDetails.email || 'â€”'}</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-gray-300">
                 <Phone size={14} className="text-gray-500 w-4" />
-                <span className="font-mono">{selectedContactDetails.phone || '—'}</span>
+                <span className="font-mono">{selectedContactDetails.phone || 'â€”'}</span>
               </div>
               <div className="flex items-center gap-3 text-xs text-gray-300 border-t border-gray-850/50 pt-2.5 mt-1">
                 <Briefcase size={14} className="text-gray-500 w-4" />

@@ -250,7 +250,13 @@ export const invitationsApi = {
 
 export const leadsApi = {
   ...createResourceService('/api/v1/leads'),
-  convert: (id) => apiClient.post(`/api/v1/leads/${id}/convert`).then(r => r.data),
+  convert: (id, data = {}) => apiClient.post(`/api/v1/leads/${id}/convert`, data).then(r => r.data),
+  qualify: (id, data) => apiClient.post(`/api/v1/leads/${id}/qualify`, data).then(r => r.data),
+  assign: (id, data) => apiClient.post(`/api/v1/leads/${id}/assign`, data).then(r => r.data),
+  getNotes: (id) => apiClient.get(`/api/v1/leads/${id}/notes`).then(r => r.data),
+  addNote: (id, data) => apiClient.post(`/api/v1/leads/${id}/notes`, data).then(r => r.data),
+  getActivities: (id) => apiClient.get(`/api/v1/leads/${id}/activities`).then(r => r.data),
+  addActivity: (id, data) => apiClient.post(`/api/v1/leads/${id}/activities`, data).then(r => r.data),
 };
 
 export const contactsApi = createMockResourceService('crm_contacts', MOCK_CONTACTS);
@@ -316,7 +322,8 @@ export const expenseCategoriesApi = {
 };
 
 export const contractsApi = createPutResourceService('/api/v1/finance/contracts');
-export const teamApi = createResourceService('/api/hr/employees');
+export const teamApi = createResourceService('/api/v1/hr/employees');
+export const departmentsApi = createPutResourceService('/api/v1/hr/departments');
 export const auditApi = {
   /**
    * Fetch audit event records from the backend.
@@ -567,6 +574,22 @@ export const vendorQuotesApi = {
   ...createPutResourceService('/api/v1/finance/vendor-quotes'),
   evaluate: (id, data) => apiClient.post(`/api/v1/finance/vendor-quotes/${id}/evaluate`, data).then(r => r.data),
   select: (id, data) => apiClient.post(`/api/v1/finance/vendor-quotes/${id}/select`, data).then(r => r.data),
+};
+
+// ---------------------------------------------------------
+// Inventory API
+// ---------------------------------------------------------
+
+export const inventoryApi = {
+  listProducts: () => apiClient.get('/api/v1/inventory/products').then(r => r.data),
+  createProduct: (data) => apiClient.post('/api/v1/inventory/products', data).then(r => r.data),
+};
+
+export const assetsApi = {
+  list: () => apiClient.get('/api/v1/assets').then(r => r.data),
+  create: (data) => apiClient.post('/api/v1/assets', data).then(r => r.data),
+  assign: (data) => apiClient.post('/api/v1/assets/assign', data).then(r => r.data),
+  returnAsset: (id, data) => apiClient.post(`/api/v1/assets/${id}/return`, data).then(r => r.data),
 };
 
 export default apiClient;

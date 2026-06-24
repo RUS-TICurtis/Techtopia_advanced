@@ -29,7 +29,7 @@ import {
   Legend
 } from 'recharts';
 import { useOpportunities } from '../../hooks/useCrmData';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import './Analytics.css';
 
 export default function Analytics() {
@@ -120,7 +120,7 @@ export default function Analytics() {
       <div className="page-header flex justify-between items-center mb-6">
         <div>
           <h1 className="page-title flex items-center gap-2">
-            <span className="text-[#38BDF8]">⚡</span> Intelligent Analytics
+            <span className="text-[#38BDF8]">âš¡</span> Intelligent Analytics
           </h1>
           <p className="page-subtitle">Real-time revenue attribution, projection simulations, and funnel insights</p>
         </div>

@@ -5,7 +5,7 @@ import ProtectedRoute from '../components/guards/ProtectedRoute';
 import ClientPortalRoute from '../components/guards/ClientPortalRoute';
 import PublicRoute from '../components/guards/PublicRoute';
 
-// ─── Core Pages ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Core Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Leads = lazy(() => import('../pages/crm/Leads'));
 const Contacts = lazy(() => import('../pages/crm/Contacts'));
@@ -19,23 +19,23 @@ const Quotes = lazy(() => import('../pages/crm/Quotes'));
 const Catalog = lazy(() => import('../pages/crm/Catalog'));
 const Campaigns = lazy(() => import('../pages/crm/Campaigns'));
 
-// ─── Workspace Pages ──────────────────────────────────────────────────────
+// â”€â”€â”€ Workspace Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const Tasks = lazy(() => import('../pages/workspace/Tasks'));
 const Calendar = lazy(() => import('../pages/workspace/Calendar'));
 const Support = lazy(() => import('../pages/workspace/Support'));
 const Activities = lazy(() => import('../pages/workspace/Activities'));
 const OmnichannelInbox = lazy(() => import('../pages/workspace/OmnichannelInbox'));
 
-// ─── Intelligence Pages ───────────────────────────────────────────────────
+// â”€â”€â”€ Intelligence Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const Analytics = lazy(() => import('../pages/intelligence/Analytics'));
 const Reports = lazy(() => import('../pages/intelligence/Reports'));
 const ExecutiveIntelligence = lazy(() => import('../pages/intelligence/ExecutiveIntelligence'));
 
-// ─── AI Pages ────────────────────────────────────────────────────────────
+// â”€â”€â”€ AI Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const AiAssistant = lazy(() => import('../pages/ai/AiAssistant'));
 const AIAgents = lazy(() => import('../pages/ai/AIAgents'));
 
-// ─── Admin Pages ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Admin Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const Team = lazy(() => import('../pages/admin/Team'));
 const Settings = lazy(() => import('../pages/admin/Settings'));
 const AuditLogs = lazy(() => import('../pages/admin/AuditLogs'));
@@ -44,12 +44,12 @@ const SuperAdminOversight = lazy(() => import('../pages/admin/SuperAdminOversigh
 const DeveloperConsole = lazy(() => import('../pages/admin/DeveloperConsole'));
 const Unauthorized = lazy(() => import('../pages/admin/Unauthorized'));
 
-// ─── Projects Pages ───────────────────────────────────────────────────────
+// â”€â”€â”€ Projects Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const Projects = lazy(() => import('../pages/Projects/Projects'));
 const ProjectBoard = lazy(() => import('../pages/Projects/ProjectBoard'));
 const ProjectTimeline = lazy(() => import('../pages/Projects/ProjectTimeline'));
 
-// ─── Finance Module Pages ─────────────────────────────────────────────────
+// â”€â”€â”€ Finance Module Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const FinanceOverview = lazy(() => import('../pages/Finance/FinanceOverview'));
 const FinanceGeneralLedger = lazy(() => import('../pages/Finance/FinanceGeneralLedger'));
 const FinanceBankReconciliation = lazy(() => import('../pages/Finance/FinanceBankReconciliation'));
@@ -67,7 +67,7 @@ const FinanceSettlements = lazy(() => import('../pages/Finance/FinanceSettlement
 const FinanceTaxRecords = lazy(() => import('../pages/Finance/FinanceTaxRecords'));
 const AIFinanceAgent = lazy(() => import('../pages/Finance/AIFinanceAgent'));
 
-// ─── HR Module Pages ──────────────────────────────────────────────────────
+// â”€â”€â”€ HR Module Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const HRDashboard = lazy(() => import('../pages/HR/HRDashboard'));
 const Employees = lazy(() => import('../pages/HR/Employees'));
 const Departments = lazy(() => import('../pages/HR/Departments'));
@@ -77,17 +77,17 @@ const Recruitment = lazy(() => import('../pages/HR/Recruitment'));
 const Payroll = lazy(() => import('../pages/HR/Payroll'));
 const HRSelfService = lazy(() => import('../pages/HR/SelfService'));
 
-// ─── Client Portal Pages ──────────────────────────────────────────────────
+// â”€â”€â”€ Client Portal Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ClientDashboard = lazy(() => import('../pages/ClientPortal/ClientDashboard'));
 const ClientInvoices = lazy(() => import('../pages/ClientPortal/ClientInvoices'));
 const ClientProjects = lazy(() => import('../pages/ClientPortal/ClientProjects'));
 const ClientContracts = lazy(() => import('../pages/ClientPortal/ClientContracts'));
 const ClientSupport = lazy(() => import('../pages/ClientPortal/ClientSupport'));
 
-// ─── Auth Pages ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Auth Pages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const AuthLogin = lazy(() => import('../pages/Auth/Login'));
 
-// ─── Loading Fallback ─────────────────────────────────────────────────────
+// â”€â”€â”€ Loading Fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[50vh] w-full">
     <div className="flex flex-col items-center gap-4">
@@ -118,12 +118,12 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* ── Public Routes ─────────────────────────────────────────── */}
+        {/* â”€â”€ Public Routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Route element={<PublicRoute />}>
           <Route path="/auth/login" element={<AuthLogin />} />
         </Route>
 
-        {/* ── Protected App Routes ──────────────────────────────────── */}
+        {/* â”€â”€ Protected App Routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<TabAdapter Component={Dashboard} />} />
           <Route path="/tasks" element={<Tasks />} />
@@ -209,7 +209,7 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
             <Route path="/developer" element={<DeveloperConsole />} />
           </Route>
 
-          {/* ── Finance Module Routes ────────────────────────────────── */}
+          {/* â”€â”€ Finance Module Routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <Route element={<ProtectedRoute permission={PERMISSIONS.FINANCE_VIEW} />}>
             <Route path="/finance" element={<FinanceOverview />} />
             <Route path="/finance/gl" element={<FinanceGeneralLedger />} />
@@ -229,7 +229,7 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
             <Route path="/finance/ai-agent" element={<AIFinanceAgent />} />
           </Route>
 
-          {/* ── HR Module Routes ─────────────────────────────────────── */}
+          {/* â”€â”€ HR Module Routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <Route element={<ProtectedRoute permission={PERMISSIONS.HR_VIEW} />}>
             <Route path="/hr" element={<HRDashboard />} />
             <Route path="/hr/dashboard" element={<Navigate to="/hr" replace />} />
@@ -246,7 +246,7 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
           </Route>
         </Route>
 
-        {/* ── Client Portal ─────────────────────────────────────────── */}
+        {/* â”€â”€ Client Portal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Route path="/client" element={<ClientPortalRoute />}>
           <Route index element={<ClientDashboard />} />
           <Route path="invoices" element={<ClientInvoices />} />

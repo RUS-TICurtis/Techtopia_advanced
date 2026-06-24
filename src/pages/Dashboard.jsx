@@ -18,8 +18,20 @@ import {
   ArrowRight, AlertTriangle, Activity
 } from 'lucide-react';
 import './Dashboard.css';
-import Skeleton, { CardSkeleton } from '../components/ui/Skeleton';
+import { Skeleton } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
+
+export function CardSkeleton() {
+  return (
+    <div className="card metric-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '120px' }}>
+      <Skeleton className="h-10 w-10 rounded-full" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-6 w-16" />
+      </div>
+    </div>
+  );
+}
 
 const CUSTOM_TOOLTIP = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -195,7 +207,7 @@ export default function Dashboard({ setCurrentTab }) {
       <div className="page-header">
         <div>
           <h1 className="page-title">
-            {getHour()}, {user?.name?.split(' ')[0] || 'there'} 👋
+            {getHour()}, {user?.name?.split(' ')[0] || 'there'} ðŸ‘‹
           </h1>
           <p className="page-subtitle">
             Here's your Techtopia CRM overview for today. You have{' '}

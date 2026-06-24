@@ -7,7 +7,7 @@ import { formatCurrency } from '../../services/finance/financeService';
 import { useInvoices, useCompanies } from '../../hooks/useCrmData';
 import './Finance.css';
 
-// ── Status Config ─────────────────────────────────────────────────────────
+// â”€â”€ Status Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const STATUS_CONFIG = {
   Draft:           { class: 'status-draft',    icon: FileText },
   PendingApproval: { class: 'status-pending',  icon: Clock },
@@ -68,7 +68,7 @@ export default function FinanceInvoices() {
     return invoices.find(inv => inv.id === selectedInvoice.id) || selectedInvoice;
   }, [invoices, selectedInvoice]);
 
-  // ── Derived metrics ──────────────────────────────────────────────────────
+  // â”€â”€ Derived metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const metrics = useMemo(() => ({
     total: invoices.reduce((s, inv) => s + (inv.amount || 0), 0),
     paid: invoices.filter(i => i.status === 'Paid').reduce((s, inv) => s + (inv.amount || 0), 0),
@@ -77,7 +77,7 @@ export default function FinanceInvoices() {
     outstanding: invoices.filter(i => !['Paid', 'Cancelled', 'Draft'].includes(i.status)).reduce((s, inv) => s + ((inv.amount || 0) - (inv.paid || 0)), 0),
   }), [invoices]);
 
-  // ── Filtered invoices ────────────────────────────────────────────────────
+  // â”€â”€ Filtered invoices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const filtered = useMemo(() => {
     return invoices.filter(inv => {
       const matchSearch = !search || inv.client.toLowerCase().includes(search.toLowerCase()) || (inv.invoiceNumber || '').toLowerCase().includes(search.toLowerCase());
@@ -86,7 +86,7 @@ export default function FinanceInvoices() {
     });
   }, [invoices, search, statusFilter]);
 
-  // ── Line items helpers ────────────────────────────────────────────────────
+  // â”€â”€ Line items helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const addLineItem = () => setNewInvoice(prev => ({ ...prev, items: [...prev.items, { description: '', qty: 1, unitPrice: 0 }] }));
   const removeLineItem = (idx) => setNewInvoice(prev => ({ ...prev, items: prev.items.filter((_, i) => i !== idx) }));
   const updateLineItem = (idx, field, value) => setNewInvoice(prev => ({
@@ -98,7 +98,7 @@ export default function FinanceInvoices() {
   const discountAmt = subtotal * (newInvoice.discount / 100);
   const total = subtotal + taxAmt - discountAmt;
 
-  // ── Create Invoice ────────────────────────────────────────────────────────
+  // â”€â”€ Create Invoice â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleCreate = async (e) => {
     e.preventDefault();
     setFormError('');
@@ -287,7 +287,7 @@ export default function FinanceInvoices() {
                   <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{inv.project}</td>
                   <td className="font-semibold">{formatCurrency(inv.amount)}</td>
                   <td style={{ color: balance > 0 ? 'var(--error)' : 'var(--success)', fontWeight: 700 }}>
-                    {balance > 0 ? formatCurrency(balance) : '—'}
+                    {balance > 0 ? formatCurrency(balance) : 'â€”'}
                   </td>
                   <td className="text-xs text-muted">{inv.issueDate}</td>
                   <td className="text-xs text-muted">{inv.dueDate}</td>
@@ -361,7 +361,7 @@ export default function FinanceInvoices() {
         </table>
       </div>
 
-      {/* ── Invoice Detail Drawer ───────────────────────────────────────── */}
+      {/* â”€â”€ Invoice Detail Drawer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {activeSelectedInvoice && (
         <div className="finance-drawer-overlay" onClick={() => setSelectedInvoice(null)}>
           <div className="finance-drawer" onClick={e => e.stopPropagation()}>
@@ -449,7 +449,7 @@ export default function FinanceInvoices() {
         </div>
       )}
 
-      {/* ── Create Invoice Modal ─────────────────────────────────────────── */}
+      {/* â”€â”€ Create Invoice Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" style={{ maxWidth: 700, maxHeight: '90vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
@@ -484,7 +484,7 @@ export default function FinanceInvoices() {
                       }));
                     }}
                   >
-                    <option value="">Select company…</option>
+                    <option value="">Select companyâ€¦</option>
                     {companies.map(c => (
                       <option key={c.id} value={c.id}>
                         {c.name}
@@ -507,11 +507,11 @@ export default function FinanceInvoices() {
                 <div className="form-group" style={{ flex: 1 }}>
                   <label>Currency</label>
                   <select className="form-input" value={newInvoice.currency} onChange={e => setNewInvoice(p => ({ ...p, currency: e.target.value }))}>
-                    <option value="GHS">GHS — Ghana Cedi (GH₵)</option>
-                    <option value="USD">USD — US Dollar ($)</option>
-                    <option value="EUR">EUR — Euro (€)</option>
-                    <option value="GBP">GBP — British Pound (£)</option>
-                    <option value="NGN">NGN — Nigerian Naira (₦)</option>
+                    <option value="GHS">GHS â€” Ghana Cedi (GHâ‚µ)</option>
+                    <option value="USD">USD â€” US Dollar ($)</option>
+                    <option value="EUR">EUR â€” Euro (â‚¬)</option>
+                    <option value="GBP">GBP â€” British Pound (Â£)</option>
+                    <option value="NGN">NGN â€” Nigerian Naira (â‚¦)</option>
                   </select>
                 </div>
               </div>
@@ -604,7 +604,7 @@ export default function FinanceInvoices() {
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)} disabled={submitting}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  <Send size={14} /> {submitting ? 'Saving…' : (newInvoice.id ? 'Save Changes' : 'Create & Send')}
+                  <Send size={14} /> {submitting ? 'Savingâ€¦' : (newInvoice.id ? 'Save Changes' : 'Create & Send')}
                 </button>
               </div>
             </form>

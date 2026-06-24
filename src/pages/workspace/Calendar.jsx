@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock, Users, Video, X } from 'lucide-react';
 import { useTasks } from '../../hooks/useCrmData';
 import { showToast } from '../../components/ui/Toast';

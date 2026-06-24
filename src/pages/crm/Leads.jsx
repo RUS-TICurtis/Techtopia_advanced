@@ -16,14 +16,23 @@ import {
   Edit2,
   CheckCircle,
   Clock,
-  Briefcase
+  Briefcase,
+  Target,
+  Users
 } from 'lucide-react';
-import { useLeads } from '../../hooks/useCrmData';
+import { useLeads, useLeadDetails } from '../../hooks/useCrmData';
+import { useQuery } from '@tanstack/react-query';
+import { teamApi } from '../../lib/api';
 import { showToast } from '../../components/ui/Toast';
 import DataTable from '../../components/ui/DataTable';
-import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '../../components/ui/Badge';
 import PageContainer from '../../components/layout/PageContainer';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '../../components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import PageHeader from '../../components/layout/PageHeader';
 import './Leads.css';
 
@@ -31,12 +40,17 @@ const STATUSES = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
 const SOURCES  = ['Website', 'Referral', 'LinkedIn', 'Email Campaign', 'Cold Call', 'Other'];
 
 export default function Leads({ searchValue = '' }) {
-  const { leads, isLoading, createLead, updateLead, convertLead, deleteLead } = useLeads();
+  const { leads, isLoading, createLead, updateLead, convertLead, deleteLead, qualifyLead, assignLead, addLeadNote, addLeadActivity } = useLeads();
 
   const [activeFilter, setActiveFilter] = useState('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isQualifyModalOpen, setIsQualifyModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
+
+  const { notes: dossierNotes, activities, isLoading: isDetailsLoading } = useLeadDetails(selectedLead?.id);
+  const { data: team = [] } = useQuery({ queryKey: ['team'], queryFn: () => teamApi.list() });
 
   // Form states
   const [fullName, setFullName] = useState('');
@@ -47,6 +61,14 @@ export default function Leads({ searchValue = '' }) {
   const [status, setStatus] = useState('New');
   const [notes, setNotes] = useState('');
   const [editId, setEditId] = useState(null);
+
+  // Qualify & Assign States
+  const [bant, setBant] = useState({ hasBudget: false, isDecisionMaker: false, hasNeed: false, hasTimeline: false });
+  const [assignedToId, setAssignedToId] = useState('');
+  
+  // Note/Activity States
+  const [newNoteContent, setNewNoteContent] = useState('');
+  const [activityType, setActivityType] = useState('0'); // 0=Call, 1=Email, 2=Meeting
 
   const [isEnriching, setIsEnriching] = useState(false);
 
@@ -185,7 +207,7 @@ export default function Leads({ searchValue = '' }) {
   const handleConvertToContact = async (lead, e) => {
     if (e) e.stopPropagation();
     try {
-      await convertLead(lead.id);
+      await convertLead({ id: lead.id, data: { companyName: lead.companyName } });
       if (selectedLead && selectedLead.id === lead.id) {
         setSelectedLead(null);
       }
@@ -206,6 +228,53 @@ export default function Leads({ searchValue = '' }) {
       }
     } catch (err) {
       showToast('Error', 'Failed to update status.', 'error');
+    }
+  };
+
+  const handleQualifySubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await qualifyLead({ id: editId, data: bant });
+      setIsQualifyModalOpen(false);
+      showToast('Success', 'Lead successfully qualified via BANT criteria.', 'success');
+    } catch (err) {
+      showToast('Error', 'Failed to qualify lead.', 'error');
+    }
+  };
+
+  const handleAssignSubmit = async (e) => {
+    e.preventDefault();
+    if (!assignedToId) return;
+    try {
+      await assignLead({ id: editId, data: { assignedToId } });
+      setIsAssignModalOpen(false);
+      showToast('Success', 'Lead successfully assigned.', 'success');
+    } catch (err) {
+      showToast('Error', 'Failed to assign lead.', 'error');
+    }
+  };
+
+  const handleAddNote = async (e) => {
+    e.preventDefault();
+    if (!newNoteContent.trim()) return;
+    try {
+      await addLeadNote({ id: selectedLead.id, data: { content: newNoteContent } });
+      setNewNoteContent('');
+      showToast('Success', 'Note added.', 'success');
+    } catch (err) {
+      showToast('Error', 'Failed to add note.', 'error');
+    }
+  };
+
+  const handleAddActivity = async (e) => {
+    e.preventDefault();
+    if (!newNoteContent.trim()) return;
+    try {
+      await addLeadActivity({ id: selectedLead.id, data: { type: parseInt(activityType), description: newNoteContent } });
+      setNewNoteContent('');
+      showToast('Success', 'Activity logged.', 'success');
+    } catch (err) {
+      showToast('Error', 'Failed to log activity.', 'error');
     }
   };
 
@@ -268,7 +337,7 @@ export default function Leads({ searchValue = '' }) {
         const lead = row.original;
         return (
           <div className="flex flex-col">
-            <span className="font-semibold text-gray-300 text-xs">{lead.companyName || '—'}</span>
+            <span className="font-semibold text-gray-300 text-xs">{lead.companyName || 'â€”'}</span>
             <span className="text-[10px] text-gray-500 flex items-center gap-1">
               Source: <span className="text-[#6366F1] font-bold">{lead.source}</span>
             </span>
@@ -293,7 +362,7 @@ export default function Leads({ searchValue = '' }) {
       }
     },
     {
-      accessorKey: 'status',
+      id: 'enrichment',
       header: 'Data Enrichment',
       cell: ({ row }) => {
         const lead = row.original;
@@ -327,6 +396,16 @@ export default function Leads({ searchValue = '' }) {
       label: 'Modify Lead Profile',
       icon: Edit2,
       onClick: (e) => openEditModal(lead, e)
+    },
+    {
+      label: 'Qualify (BANT)',
+      icon: Target,
+      onClick: (e) => { if (e) e.stopPropagation(); setEditId(lead.id); setIsQualifyModalOpen(true); }
+    },
+    {
+      label: 'Assign to Rep',
+      icon: Users,
+      onClick: (e) => { if (e) e.stopPropagation(); setEditId(lead.id); setIsAssignModalOpen(true); }
     },
     {
       label: 'Transition Status',
@@ -363,9 +442,9 @@ export default function Leads({ searchValue = '' }) {
         subtitle="Prospect enrichment engine with integrated clearbit lookup & RBAC promotion"
         icon={<span className="text-[#38BDF8] text-xl">⚡</span>}
         actions={
-          <button className="btn btn-primary shadow-glow flex items-center gap-2" onClick={() => { clearForm(); setIsAddModalOpen(true); }}>
+          <Button onClick={() => { clearForm(); setIsAddModalOpen(true); }} className="gap-2">
             <Plus size={18} /> New Prospect
-          </button>
+          </Button>
         }
       />
 
@@ -418,18 +497,15 @@ export default function Leads({ searchValue = '' }) {
           const enrichStatus = selectedLead.source?.includes('Enriched') ? 'Enriched' : 'Pending';
 
           return (
-            <div className="dossier-card card xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col gap-5 border border-gray-800/85 bg-[#1E293B]/80 backdrop-blur-lg">
-              <div className="flex justify-between items-center border-b border-gray-850 pb-4">
-                <h3 className="card-title text-white font-black font-display text-base tracking-wide m-0">Inbound Dossier</h3>
-                <button 
-                  onClick={() => setSelectedLead(null)} 
-                  className="text-gray-400 hover:text-white p-1 hover:bg-gray-800 rounded-lg transition-all"
-                >
+            <Card className="xl:w-[400px] flex-shrink-0 animate-fade-in flex flex-col">
+              <CardHeader className="flex flex-row justify-between items-center border-b pb-4 pt-4">
+                <CardTitle className="text-base tracking-wide m-0">Inbound Dossier</CardTitle>
+                <Button variant="ghost" size="icon" onClick={() => setSelectedLead(null)}>
                   <X size={18} />
-                </button>
-              </div>
-
-              {/* Profile Header */}
+                </Button>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-5 pt-5">
+                {/* Profile Header */}
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full bg-[#38BDF8]/20 border border-[#38BDF8]/40 text-[#38BDF8] flex items-center justify-center font-display font-black text-xl shadow-glow">
                   {leadName.charAt(0)}
@@ -438,16 +514,16 @@ export default function Leads({ searchValue = '' }) {
                   <h4 className="text-white font-extrabold text-base tracking-tight truncate">{leadName}</h4>
                   <p className="text-gray-400 text-xs font-semibold flex items-center gap-1.5 mt-0.5 truncate">
                     <Building2 size={12} className="text-gray-500" />
-                    {selectedLead.companyName || '—'}
+                    {selectedLead.companyName || 'â€”'}
                   </p>
                 </div>
               </div>
 
-              {/* AI Fit indicators */}
+              {/* AI Fit & Qualification indicators */}
               <div className="grid grid-cols-2 gap-3 p-3 bg-[#0F172A]/80 border border-gray-850 rounded-xl">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">AI Lead Match</span>
-                  <span className="font-mono text-sm font-black text-[#10B981]">{score}/100</span>
+                  <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Qualify Score</span>
+                  <span className="font-mono text-sm font-black text-[#10B981]">{selectedLead.qualificationScore || score}/100</span>
                 </div>
                 <div className="flex flex-col gap-0.5 border-l border-gray-850 pl-3">
                   <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Acquisition Source</span>
@@ -463,16 +539,60 @@ export default function Leads({ searchValue = '' }) {
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-300">
                   <Phone size={14} className="text-gray-500 w-4" />
-                  <span className="font-mono">{selectedLead.phone || '—'}</span>
+                  <span className="font-mono">{selectedLead.phone || 'â€”'}</span>
                 </div>
               </div>
 
-              {/* Notes Section */}
-              <div className="flex flex-col gap-1.5">
-                <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Inbound Intelligence Notes</h5>
-                <div className="p-3 bg-[#F59E0B]/5 border-l-4 border-[#F59E0B] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
-                  {enrichStatus === 'Enriched' ? 'AI System: LinkedIn verified and enriched contact details.' : 'Pending enrichment check.'}
+              {/* Notes & Activities Section */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Inbound Intelligence Timeline</h5>
                 </div>
+                
+                <div className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                  {isDetailsLoading ? (
+                    <span className="text-xs text-gray-500 italic">Loading timeline...</span>
+                  ) : [...dossierNotes, ...activities].length === 0 ? (
+                    <div className="p-3 bg-[#F59E0B]/5 border-l-4 border-[#F59E0B] rounded-r-lg text-xs text-gray-300 leading-relaxed italic">
+                      {enrichStatus === 'Enriched' ? 'AI System: LinkedIn verified.' : 'No notes or activities yet.'}
+                    </div>
+                  ) : (
+                    [...dossierNotes, ...activities]
+                      .sort((a, b) => new Date(b.createdAt || b.timestamp) - new Date(a.createdAt || a.timestamp))
+                      .map((item, idx) => (
+                      <div key={idx} className="p-2.5 bg-[#1E293B] border border-gray-800 rounded-lg text-xs text-gray-300">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-bold text-[#38BDF8]">{item.type !== undefined ? ['Call', 'Email', 'Meeting'][item.type] : 'Note'}</span>
+                          <span className="text-[9px] text-gray-500">{new Date(item.createdAt || item.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <p className="leading-relaxed">{item.content || item.description}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <form className="mt-2 flex gap-2" onSubmit={activityType === '3' ? handleAddNote : handleAddActivity}>
+                  <select 
+                    className="bg-[#0F172A] border border-gray-800 text-xs text-gray-300 rounded p-1.5 focus:border-[#38BDF8] outline-none"
+                    value={activityType}
+                    onChange={(e) => setActivityType(e.target.value)}
+                  >
+                    <option value="0">Call</option>
+                    <option value="1">Email</option>
+                    <option value="2">Meeting</option>
+                    <option value="3">Note</option>
+                  </select>
+                  <input 
+                    type="text" 
+                    placeholder="Log detail..."
+                    className="flex-1 bg-[#0F172A] border border-gray-800 rounded p-1.5 text-xs text-white focus:outline-none focus:border-[#38BDF8]"
+                    value={newNoteContent}
+                    onChange={(e) => setNewNoteContent(e.target.value)}
+                  />
+                  <button type="submit" className="bg-[#38BDF8] text-[#0F172A] p-1.5 rounded hover:bg-[#2563EB] transition-colors" disabled={!newNoteContent.trim()}>
+                    <Plus size={14} />
+                  </button>
+                </form>
               </div>
 
               {/* Actions footer */}
@@ -509,202 +629,257 @@ export default function Leads({ searchValue = '' }) {
                   </button>
                 </div>
               </div>
-            </div>
+              </CardContent>
+            </Card>
           );
         })()}
       </div>
 
       {/* Add Lead Modal */}
-      <Modal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Add Inbound Lead Opportunity"
-        size="md"
-      >
-        <form onSubmit={handleAddSubmit} className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Prospect Full Name *</label>
-              <input 
-                type="text" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                placeholder="e.g. Sarah Connor" 
-                value={fullName} 
-                onChange={e => setFullName(e.target.value)} 
-                required 
-              />
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-[#0F172A] border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold font-display">Add Inbound Lead Opportunity</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddSubmit} className="flex flex-col gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Prospect Full Name *</label>
+                <Input 
+                  type="text" 
+                  placeholder="e.g. Sarah Connor" 
+                  value={fullName} 
+                  onChange={e => setFullName(e.target.value)} 
+                  required 
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company Name *</label>
+                <Input 
+                  type="text" 
+                  placeholder="e.g. Cyberdyne Systems" 
+                  value={company} 
+                  onChange={e => setCompany(e.target.value)} 
+                  required 
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company Name *</label>
-              <input 
-                type="text" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                placeholder="e.g. Cyberdyne Systems" 
-                value={company} 
-                onChange={e => setCompany(e.target.value)} 
-                required 
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address *</label>
-              <input 
-                type="email" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                placeholder="e.g. s.connor@cyberdyne.jp" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address *</label>
+                <Input 
+                  type="email" 
+                  placeholder="e.g. s.connor@cyberdyne.jp" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
+                <Input 
+                  type="text" 
+                  placeholder="e.g. +81 3 5555 0199" 
+                  value={phone} 
+                  onChange={e => setPhone(e.target.value)} 
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
-              <input 
-                type="text" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                placeholder="e.g. +81 3 5555 0199" 
-                value={phone} 
-                onChange={e => setPhone(e.target.value)} 
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Lead Acquisition Source</label>
-              <select 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={source} 
-                onChange={e => setSource(e.target.value)}
-              >
-                {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Lead Acquisition Source</label>
+                <Select value={source} onValueChange={setSource}>
+                  <SelectTrigger className="w-full bg-gray-950/50 border-gray-800 text-white">
+                    <SelectValue placeholder="Select Source" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0F172A] border-gray-800 text-white">
+                    {SOURCES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger className="w-full bg-gray-950/50 border-gray-800 text-white">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0F172A] border-gray-800 text-white">
+                    {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
-              <select 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={status} 
-                onChange={e => setStatus(e.target.value)}
-              >
-                {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-          </div>
 
-          <div className="flex justify-end gap-3 mt-4">
-            <button 
-              type="button" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-gray-950 border border-gray-850 text-gray-300 hover:text-white transition-all" 
-              onClick={() => setIsAddModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
-            >
-              Add Prospect
-            </button>
-          </div>
-        </form>
-      </Modal>
+            <DialogFooter className="mt-6 border-t border-gray-800/80 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow">
+                Add Prospect
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Lead Modal */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Modify Lead Profile"
-        size="md"
-      >
-        <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Prospect Full Name *</label>
-              <input 
-                type="text" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={fullName} 
-                onChange={e => setFullName(e.target.value)} 
-                required 
-              />
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-[#0F172A] border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold font-display">Modify Lead Profile</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="flex flex-col gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Prospect Full Name *</label>
+                <Input 
+                  type="text" 
+                  value={fullName} 
+                  onChange={e => setFullName(e.target.value)} 
+                  required 
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company Name *</label>
+                <Input 
+                  type="text" 
+                  value={company} 
+                  onChange={e => setCompany(e.target.value)} 
+                  required 
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Company Name *</label>
-              <input 
-                type="text" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={company} 
-                onChange={e => setCompany(e.target.value)} 
-                required 
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address *</label>
-              <input 
-                type="email" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address *</label>
+                <Input 
+                  type="email" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
+                <Input 
+                  type="text" 
+                  value={phone} 
+                  onChange={e => setPhone(e.target.value)} 
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
-              <input 
-                type="text" 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={phone} 
-                onChange={e => setPhone(e.target.value)} 
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Lead Acquisition Source</label>
-              <select 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={source} 
-                onChange={e => setSource(e.target.value)}
-              >
-                {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Lead Acquisition Source</label>
+                <Select value={source} onValueChange={setSource}>
+                  <SelectTrigger className="w-full bg-gray-950/50 border-gray-800 text-white">
+                    <SelectValue placeholder="Select Source" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0F172A] border-gray-800 text-white">
+                    {SOURCES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger className="w-full bg-gray-950/50 border-gray-800 text-white">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0F172A] border-gray-800 text-white">
+                    {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Funnel Stage Status</label>
-              <select 
-                className="w-full bg-[#0F172A] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-[#38BDF8]" 
-                value={status} 
-                onChange={e => setStatus(e.target.value)}
-              >
-                {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-          </div>
 
-          <div className="flex justify-end gap-3 mt-4">
-            <button 
-              type="button" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-gray-950 border border-gray-850 text-gray-300 hover:text-white transition-all" 
-              onClick={() => setIsEditModalOpen(false)}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="px-5 py-2.5 rounded-lg text-sm bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow transition-all"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
-      </Modal>
+            <DialogFooter className="mt-6 border-t border-gray-800/80 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow">
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {/* Qualify Lead Modal */}
+      <Dialog open={isQualifyModalOpen} onOpenChange={setIsQualifyModalOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-[#0F172A] border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold font-display">Qualify Lead (BANT)</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleQualifySubmit} className="flex flex-col gap-4 mt-4">
+            <p className="text-xs text-gray-400 mb-2">Check all criteria that apply to calculate the lead's qualification score.</p>
+            
+            <div className="flex items-center gap-3 p-3 bg-[#1E293B] border border-gray-800 rounded-lg">
+              <input type="checkbox" id="budget" checked={bant.hasBudget} onChange={e => setBant({...bant, hasBudget: e.target.checked})} className="w-4 h-4 rounded border-gray-700 bg-[#0F172A] text-[#38BDF8] focus:ring-[#38BDF8]" />
+              <label htmlFor="budget" className="text-sm font-semibold text-gray-200 cursor-pointer">Budget Verified</label>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-[#1E293B] border border-gray-800 rounded-lg">
+              <input type="checkbox" id="authority" checked={bant.isDecisionMaker} onChange={e => setBant({...bant, isDecisionMaker: e.target.checked})} className="w-4 h-4 rounded border-gray-700 bg-[#0F172A] text-[#38BDF8] focus:ring-[#38BDF8]" />
+              <label htmlFor="authority" className="text-sm font-semibold text-gray-200 cursor-pointer">Authority (Decision Maker)</label>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-[#1E293B] border border-gray-800 rounded-lg">
+              <input type="checkbox" id="need" checked={bant.hasNeed} onChange={e => setBant({...bant, hasNeed: e.target.checked})} className="w-4 h-4 rounded border-gray-700 bg-[#0F172A] text-[#38BDF8] focus:ring-[#38BDF8]" />
+              <label htmlFor="need" className="text-sm font-semibold text-gray-200 cursor-pointer">Need Identified</label>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-[#1E293B] border border-gray-800 rounded-lg">
+              <input type="checkbox" id="timeline" checked={bant.hasTimeline} onChange={e => setBant({...bant, hasTimeline: e.target.checked})} className="w-4 h-4 rounded border-gray-700 bg-[#0F172A] text-[#38BDF8] focus:ring-[#38BDF8]" />
+              <label htmlFor="timeline" className="text-sm font-semibold text-gray-200 cursor-pointer">Timeline Established</label>
+            </div>
+
+            <DialogFooter className="mt-4 border-t border-gray-800/80 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsQualifyModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow">
+                Qualify Lead
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Lead Modal */}
+      <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
+        <DialogContent className="sm:max-w-[400px] bg-[#0F172A] border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold font-display">Assign Lead to Representative</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAssignSubmit} className="flex flex-col gap-4 mt-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Select Sales Rep</label>
+              <Select value={assignedToId} onValueChange={setAssignedToId} required>
+                <SelectTrigger className="w-full bg-gray-950/50 border-gray-800 text-white">
+                  <SelectValue placeholder="Select a team member..." />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0F172A] border-gray-800 text-white">
+                  {team.map(member => (
+                    <SelectItem key={member.id} value={member.id}>
+                      {member.firstName} {member.lastName} ({member.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <DialogFooter className="mt-6 border-t border-gray-800/80 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsAssignModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-[#38BDF8] hover:bg-[#2563EB] text-[#0F172A] font-bold shadow-glow">
+                Assign Lead
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 }

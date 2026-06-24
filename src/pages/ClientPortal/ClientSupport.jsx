@@ -15,7 +15,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useTickets } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import './ClientPortal.css';
 
@@ -194,7 +194,7 @@ export default function ClientSupport() {
             <Link to="/client" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span style={{ color: 'var(--brand-magenta)' }}>⚡</span> Technical Helpdesk
+            <span style={{ color: 'var(--brand-magenta)' }}>âš¡</span> Technical Helpdesk
           </h1>
           <p className="page-subtitle">File priority support tickets, monitor SLA timers, and review tech chat diagnostics</p>
         </div>

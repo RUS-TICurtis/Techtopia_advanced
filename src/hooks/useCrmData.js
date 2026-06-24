@@ -20,6 +20,7 @@ import {
   invitationsApi,
   vendorCategoriesApi,
   expenseCategoriesApi,
+  departmentsApi,
   usersApi,
   rolesApi,
   tenantsApi,
@@ -31,7 +32,9 @@ import {
   vendorQuotesApi,
   paymentsApi,
   settlementsApi,
-  reportsApi
+  reportsApi,
+  inventoryApi,
+  assetsApi
 } from '../lib/api';
 
 
@@ -60,7 +63,7 @@ export function useLeads() {
   });
 
   const convertMutation = useMutation({
-    mutationFn: (id) => leadsApi.convert(id),
+    mutationFn: ({ id, data }) => leadsApi.convert(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leads'] });
       queryClient.invalidateQueries({ queryKey: ['opportunities'] });
@@ -78,6 +81,36 @@ export function useLeads() {
     },
   });
 
+  const qualifyMutation = useMutation({
+    mutationFn: ({ id, data }) => leadsApi.qualify(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      auditTrack.warning('Qualify Lead', 'CRM');
+    },
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: ({ id, data }) => leadsApi.assign(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      auditTrack.info('Assign Lead', 'CRM');
+    },
+  });
+
+  const addNoteMutation = useMutation({
+    mutationFn: ({ id, data }) => leadsApi.addNote(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['leadDetails', id] });
+    },
+  });
+
+  const addActivityMutation = useMutation({
+    mutationFn: ({ id, data }) => leadsApi.addActivity(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['leadDetails', id] });
+    },
+  });
+
   return {
     ...query,
     leads: query.data || [],
@@ -85,6 +118,33 @@ export function useLeads() {
     updateLead: updateMutation.mutateAsync,
     convertLead: convertMutation.mutateAsync,
     deleteLead: deleteMutation.mutateAsync,
+    qualifyLead: qualifyMutation.mutateAsync,
+    assignLead: assignMutation.mutateAsync,
+    addLeadNote: addNoteMutation.mutateAsync,
+    addLeadActivity: addActivityMutation.mutateAsync,
+  };
+}
+
+// Lead Details Hook (Notes & Activities)
+export function useLeadDetails(leadId) {
+  const queryClient = useQueryClient();
+
+  const notesQuery = useQuery({
+    queryKey: ['leadDetails', leadId, 'notes'],
+    queryFn: () => leadsApi.getNotes(leadId),
+    enabled: !!leadId,
+  });
+
+  const activitiesQuery = useQuery({
+    queryKey: ['leadDetails', leadId, 'activities'],
+    queryFn: () => leadsApi.getActivities(leadId),
+    enabled: !!leadId,
+  });
+
+  return {
+    notes: notesQuery.data || [],
+    activities: activitiesQuery.data || [],
+    isLoading: notesQuery.isLoading || activitiesQuery.isLoading,
   };
 }
 
@@ -274,6 +334,38 @@ export function useContacts() {
     createContact: createMutation.mutateAsync,
     updateContact: updateMutation.mutateAsync,
     deleteContact: deleteMutation.mutateAsync,
+  };
+}
+
+// Departments Hook
+export function useDepartments() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['departments'],
+    queryFn: () => departmentsApi.list().catch(() => []),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => departmentsApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['departments'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => departmentsApi.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['departments'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => departmentsApi.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['departments'] }),
+  });
+
+  return {
+    departments: query.data || [],
+    isLoading: query.isLoading,
+    createDepartment: createMutation.mutateAsync,
+    updateDepartment: updateMutation.mutateAsync,
+    deleteDepartment: deleteMutation.mutateAsync,
   };
 }
 
@@ -747,21 +839,31 @@ export function useProcurement() {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['procurement'],
-    queryFn: () => apiClient.get('/api/v1/finance/procurement').then(r => r.data),
+    queryFn: () => apiClient.get('/api/v1/finance/purchase-orders').then(r => r.data),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => apiClient.post('/api/v1/finance/procurement', data).then(r => r.data),
+    mutationFn: (data) => apiClient.post('/api/v1/finance/purchase-orders', data).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
   });
 
   const approveMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/api/v1/finance/procurement/${id}/approve`).then(r => r.data),
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/purchase-orders/${id}/approve`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (id) => apiClient.post(`/api/v1/finance/procurement/${id}/reject`).then(r => r.data),
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/purchase-orders/${id}/cancel`).then(r => r.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: (id) => apiClient.post(`/api/v1/finance/purchase-orders/${id}/submit`).then(r => r.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => apiClient.delete(`/api/v1/finance/purchase-orders/${id}`).then(r => r.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['procurement'] }),
   });
 
@@ -771,6 +873,8 @@ export function useProcurement() {
     createPurchaseOrder: createMutation.mutateAsync,
     approvePurchaseOrder: approveMutation.mutateAsync,
     rejectPurchaseOrder: rejectMutation.mutateAsync,
+    submitPurchaseOrder: submitMutation.mutateAsync,
+    deletePurchaseOrder: deleteMutation.mutateAsync,
   };
 }
 
@@ -1302,6 +1406,60 @@ export function useVendorQuotes() {
     deleteQuote: deleteMutation.mutateAsync,
     evaluateQuote: evaluateMutation.mutateAsync,
     selectQuote: selectMutation.mutateAsync,
+  };
+}
+
+// ---------------------------------------------------------
+// Inventory & Assets Hooks
+// ---------------------------------------------------------
+
+export function useProducts() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['products'],
+    queryFn: () => inventoryApi.listProducts(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => inventoryApi.createProduct(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+  });
+
+  return {
+    ...query,
+    products: query.data || [],
+    createProduct: createMutation.mutateAsync,
+  };
+}
+
+export function useAssets() {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ['assets'],
+    queryFn: () => assetsApi.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => assetsApi.create(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['assets'] }),
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: (data) => assetsApi.assign(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['assets'] }),
+  });
+
+  const returnMutation = useMutation({
+    mutationFn: ({ id, data }) => assetsApi.returnAsset(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['assets'] }),
+  });
+
+  return {
+    ...query,
+    assets: query.data || [],
+    createAsset: createMutation.mutateAsync,
+    assignAsset: assignMutation.mutateAsync,
+    returnAsset: returnMutation.mutateAsync,
   };
 }
 

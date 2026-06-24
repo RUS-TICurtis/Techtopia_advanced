@@ -1,59 +1,44 @@
 import React from 'react';
-import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import BottomNav from './BottomNav';
 import CommandPalette from '../ui/CommandPalette';
 import AICopilot from '../ui/AICopilot';
 import NotificationCenter from './NotificationCenter';
 import { Toaster } from 'react-hot-toast';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/app-sidebar';
 
 export default function AppLayout({ 
   children,
   theme,
   toggleTheme,
-  sidebarCollapsed,
-  setSidebarCollapsed,
-  mobileSidebarOpen,
-  setMobileSidebarOpen
 }) {
   return (
-    <div className="app-wrapper">
-      {/* Toast Notification Provider */}
-      <Toaster position="bottom-right" reverseOrder={false} />
+    <SidebarProvider>
+      <div className="app-wrapper flex w-full h-screen overflow-hidden">
+        {/* Toast Notification Provider */}
+        <Toaster position="bottom-right" reverseOrder={false} />
 
-      {/* Global Interactive Utilities */}
-      <CommandPalette />
-      <AICopilot />
-      <NotificationCenter />
+        {/* Global Interactive Utilities */}
+        <CommandPalette />
+        <AICopilot />
+        <NotificationCenter />
 
-      {mobileSidebarOpen && (
-        <div 
-          className="sidebar-overlay" 
-          onClick={() => setMobileSidebarOpen(false)}
-        ></div>
-      )}
+        <AppSidebar theme={theme} />
 
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
-        setIsCollapsed={setSidebarCollapsed} 
-        mobileOpen={mobileSidebarOpen}
-        setMobileOpen={setMobileSidebarOpen}
-        theme={theme}
-      />
+        <SidebarInset className="flex flex-col flex-1 h-screen overflow-hidden">
+          <Navbar 
+            theme={theme} 
+            toggleTheme={toggleTheme} 
+          />
 
-      <div className={`main-content ${sidebarCollapsed ? 'collapsed' : ''}`}>
-        <Navbar 
-          theme={theme} 
-          toggleTheme={toggleTheme} 
-          onMenuClick={() => setMobileSidebarOpen(true)}
-        />
-
-        <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {children}
-        </main>
+          <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', minHeight: 0 }}>
+            {children}
+          </main>
+          
+          <BottomNav />
+        </SidebarInset>
       </div>
-      
-      <BottomNav />
-    </div>
+    </SidebarProvider>
   );
 }

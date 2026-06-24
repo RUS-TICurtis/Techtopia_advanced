@@ -251,7 +251,7 @@ export default function Tasks({ searchValue }) {
                       position: 'relative',
                       cursor: dayTasks.length > 0 ? 'pointer' : 'default'
                     }}
-                    title={dayTasks.map(t => `${t.status === 'Completed' ? '✓' : '•'} ${t.title}`).join('\n')}
+                    title={dayTasks.map(t => `${t.status === 'Completed' ? 'âœ“' : 'â€¢'} ${t.title}`).join('\n')}
                   >
                     {day}
                     {dayTasks.length > 0 && (

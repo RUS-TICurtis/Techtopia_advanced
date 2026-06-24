@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserCircle2, Plus, Search, X, ShieldAlert, Award, Briefcase, Activity } from 'lucide-react';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import './Clients.css';
 
 const TABS     = ['All', 'Active', 'Prospect', 'Inactive'];
@@ -135,7 +135,7 @@ export default function Clients({ searchValue = '' }) {
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{c.email}</div>
                   </td>
                   <td>{c.industry}</td>
-                  <td><code>{c.phone || '—'}</code></td>
+                  <td><code>{c.phone || 'â€”'}</code></td>
                   <td>
                     <Badge variant={c.status === 'Active' ? 'success' : c.status === 'Prospect' ? 'info' : 'neutral'}>
                       {c.status}

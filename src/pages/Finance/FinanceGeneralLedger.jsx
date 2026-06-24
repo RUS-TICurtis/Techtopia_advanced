@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Book, Plus, Filter, Download, Search, RefreshCw, X } from 'lucide-react';
 import './Finance.css';
 import { formatCurrency } from '../../services/finance/financeService';
+import { useAccounts } from '../../hooks/useCrmData';
 
 export default function FinanceGeneralLedger() {
   const [isLoading, setIsLoading] = useState(false);
@@ -9,7 +10,15 @@ export default function FinanceGeneralLedger() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newEntry, setNewEntry] = useState({ account: '', debit: '', credit: '', description: '' });
 
-  const ledgerAccounts = [];
+  const { accounts: rawAccounts = [], isLoading: isLoadingAccounts } = useAccounts();
+
+  const ledgerAccounts = rawAccounts.map(a => ({
+    ...a,
+    displayId: a.accountCode || a.id.split('-')[0],
+    balance: a.balance || 0,
+    status: a.isActive ? 'Active' : 'Inactive',
+    type: a.type || a.category || 'Unknown'
+  }));
 
   const handleCreateEntry = (e) => {
     e.preventDefault();
@@ -19,7 +28,7 @@ export default function FinanceGeneralLedger() {
 
   const filteredAccounts = ledgerAccounts.filter(account => 
     account.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    account.id.includes(searchTerm)
+    (account.displayId || account.id).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -62,6 +71,11 @@ export default function FinanceGeneralLedger() {
         </div>
 
         <div className="table-container">
+          {isLoadingAccounts ? (
+            <div className="flex justify-center p-8">
+              <RefreshCw className="animate-spin text-muted" size={24} />
+            </div>
+          ) : (
           <table className="custom-table">
             <thead>
               <tr>
@@ -76,14 +90,14 @@ export default function FinanceGeneralLedger() {
             <tbody>
               {filteredAccounts.map(account => (
                 <tr key={account.id}>
-                  <td className="font-mono text-xs text-brand-cyan">{account.id}</td>
+                  <td className="font-mono text-xs text-brand-cyan">{account.displayId}</td>
                   <td className="font-semibold">{account.name}</td>
                   <td>
                     <span className="badge badge-neutral badge-sm">{account.type}</span>
                   </td>
                   <td className="font-semibold">{formatCurrency(account.balance)}</td>
                   <td>
-                    <span className="badge badge-success badge-sm">{account.status}</span>
+                    <span className={`badge badge-sm ${account.status === 'Active' ? 'badge-success' : 'badge-neutral'}`}>{account.status}</span>
                   </td>
                   <td>
                     <button className="btn btn-secondary text-xs py-1 px-2">View Ledger</button>
@@ -97,6 +111,7 @@ export default function FinanceGeneralLedger() {
               )}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </div>

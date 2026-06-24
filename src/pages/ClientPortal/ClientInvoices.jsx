@@ -10,7 +10,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useInvoices } from '../../hooks/useCrmData';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
-import Badge from '../../components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import './ClientPortal.css';
 
@@ -143,7 +143,7 @@ export default function ClientInvoices() {
             <Link to="/client" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={20} />
             </Link>
-            <span style={{ color: 'var(--brand-magenta)' }}>⚡</span> Billing Ledger
+            <span style={{ color: 'var(--brand-magenta)' }}>âš¡</span> Billing Ledger
           </h1>
           <p className="page-subtitle">Secure invoicing ledger, automated Stripe processing and receipt exports</p>
         </div>
@@ -190,7 +190,7 @@ export default function ClientInvoices() {
             <input 
               type="text" 
               className="form-input font-mono" 
-              placeholder="•••• •••• •••• ••••" 
+              placeholder="â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢" 
               maxLength={19}
               value={cardNumber} 
               onChange={e => setCardNumber(e.target.value)} 
@@ -218,7 +218,7 @@ export default function ClientInvoices() {
               <input 
                 type="text" 
                 className="form-input font-mono" 
-                placeholder="•••" 
+                placeholder="â€¢â€¢â€¢" 
                 maxLength={3}
                 value={cardCVC} 
                 onChange={e => setCardCVC(e.target.value)} 

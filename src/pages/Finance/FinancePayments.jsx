@@ -260,7 +260,7 @@ export default function FinancePayments() {
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Amount (GH₵) *</label>
+                  <label>Amount (GHâ‚µ) *</label>
                   <input type="number" className="form-input" required min={0} value={manualPayment.amount}
                     onChange={e => setManualPayment(p => ({ ...p, amount: e.target.value }))} />
                 </div>

@@ -256,7 +256,7 @@ export default function FinanceExpenses() {
             {pendingApprovals.map(exp => (
               <div key={exp.id} className="po-card">
                 <div style={{ flex: 1 }}>
-                  <p className="font-semibold text-sm">{exp.description || '—'}</p>
+                  <p className="font-semibold text-sm">{exp.description || 'â€”'}</p>
                   <p className="text-xs text-muted">
                     {exp.currency} &middot; {exp.expenseDate
                       ? new Date(exp.expenseDate).toLocaleDateString()
@@ -329,11 +329,11 @@ export default function FinanceExpenses() {
                       {exp.expenseCode || String(exp.id).slice(0, 8)}
                     </span>
                   </td>
-                  <td className="font-semibold text-sm">{exp.description || '—'}</td>
+                  <td className="font-semibold text-sm">{exp.description || 'â€”'}</td>
                   <td className="font-semibold">{formatCurrency(exp.amount, exp.currency)}</td>
                   <td className="text-xs text-muted">{exp.currency || 'GHS'}</td>
                   <td className="text-xs text-muted">
-                    {exp.expenseDate ? new Date(exp.expenseDate).toLocaleDateString() : '—'}
+                    {exp.expenseDate ? new Date(exp.expenseDate).toLocaleDateString() : 'â€”'}
                   </td>
                   <td>
                     <span className={`badge badge-sm ${cfg.class}`} style={{ gap: 4 }}>
@@ -452,7 +452,7 @@ export default function FinanceExpenses() {
                       value={newExpense.categoryId}
                       onChange={e => setNewExpense(p => ({ ...p, categoryId: e.target.value }))}
                     >
-                      <option value="">Select category…</option>
+                      <option value="">Select categoryâ€¦</option>
                       {categories.map(cat => {
                         const val = cat.id || cat.categoryId || (typeof cat === 'string' ? cat : JSON.stringify(cat));
                         const label = cat.name || cat.categoryName || (typeof cat === 'string' ? cat : 'Unknown Category');
@@ -510,7 +510,7 @@ export default function FinanceExpenses() {
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
                   <Receipt size={14} />
-                  {submitting ? 'Saving…' : (newExpense.id ? 'Save Changes' : 'Create Expense (Draft)')}
+                  {submitting ? 'Savingâ€¦' : (newExpense.id ? 'Save Changes' : 'Create Expense (Draft)')}
                 </button>
               </div>
             </form>

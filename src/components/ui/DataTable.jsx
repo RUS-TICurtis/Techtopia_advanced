@@ -8,6 +8,14 @@ import {
 } from '@tanstack/react-table';
 import { ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import ContextMenu from './ContextMenu';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./table";
 import './DataTable.css';
 
 export default function DataTable({ 
@@ -40,12 +48,12 @@ export default function DataTable({
   return (
     <div className="enterprise-data-table-container">
       <div className="table-wrapper">
-        <table className="enterprise-table">
-          <thead>
+        <Table>
+          <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <th key={header.id} colSpan={header.colSpan}>
+                  <TableHead key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
                       <div
                         {...{
@@ -64,42 +72,42 @@ export default function DataTable({
                         )}
                       </div>
                     )}
-                  </th>
+                  </TableHead>
                 ))}
-              </tr>
+              </TableRow>
             ))}
-          </thead>
-          <tbody>
+          </TableHeader>
+          <TableBody>
             {loading ? (
               [...Array(pageSize)].map((_, rIdx) => (
-                <tr key={`loading-${rIdx}`}>
+                <TableRow key={`loading-${rIdx}`}>
                   {columns.map((_, cIdx) => (
-                    <td key={`loading-${rIdx}-${cIdx}`} className="p-4">
-                      <div className="skeleton h-4 w-full"></div>
-                    </td>
+                    <TableCell key={`loading-${rIdx}-${cIdx}`} className="p-4">
+                      <div className="skeleton h-4 w-full bg-muted rounded animate-pulse"></div>
+                    </TableCell>
                   ))}
-                </tr>
+                </TableRow>
               ))
             ) : data.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="text-center p-12 text-gray-500">
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center p-12 text-gray-500">
                   No records found.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               table.getRowModel().rows.map(row => {
                 const trElement = (
-                  <tr 
+                  <TableRow 
                     key={row.id} 
                     onClick={() => onRowClick && onRowClick(row.original)}
-                    className={onRowClick ? 'clickable-row' : ''}
+                    className={onRowClick ? 'cursor-pointer hover:bg-muted/50 transition-colors' : ''}
                   >
                     {row.getVisibleCells().map(cell => (
-                      <td key={cell.id}>
+                      <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
+                      </TableCell>
                     ))}
-                  </tr>
+                  </TableRow>
                 );
 
                 if (getRowContextMenuItems) {
@@ -115,43 +123,43 @@ export default function DataTable({
                 return trElement;
               })
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination Controls */}
       {data.length > 0 && !loading && (
-        <div className="table-pagination">
-          <div className="pagination-info text-sm text-gray-400">
-            Showing Page <span className="font-semibold text-white">{table.getState().pagination.pageIndex + 1}</span> of{' '}
-            <span className="font-semibold text-white">{table.getPageCount()}</span> ({data.length} records)
+        <div className="table-pagination flex items-center justify-between p-4 border-t border-border">
+          <div className="pagination-info text-sm text-muted-foreground">
+            Showing Page <span className="font-semibold text-foreground">{table.getState().pagination.pageIndex + 1}</span> of{' '}
+            <span className="font-semibold text-foreground">{table.getPageCount()}</span> ({data.length} records)
           </div>
-          <div className="pagination-buttons">
+          <div className="pagination-buttons flex gap-1">
             <button
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
-              className="btn btn-secondary px-2 py-1"
+              className="p-1 rounded bg-muted text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronsLeft size={16} />
             </button>
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="btn btn-secondary px-2 py-1"
+              className="p-1 rounded bg-muted text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="btn btn-secondary px-2 py-1"
+              className="p-1 rounded bg-muted text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight size={16} />
             </button>
             <button
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
-              className="btn btn-secondary px-2 py-1"
+              className="p-1 rounded bg-muted text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronsRight size={16} />
             </button>

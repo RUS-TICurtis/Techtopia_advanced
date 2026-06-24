@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Plus, Download, Search, CheckCircle, Clock, X, AlertCircle, FileText } from 'lucide-react';
 import { formatCurrency } from '../../services/finance/financeService';
 import './Finance.css';
@@ -192,7 +192,7 @@ export default function FinanceTaxRecords() {
               </div>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label>Taxable Amount (GH₵) *</label>
+                  <label>Taxable Amount (GH?) *</label>
                   <input type="number" className="form-input" required min={0} value={newRecord.taxableAmount}
                     onChange={e => setNewRecord(p => ({ ...p, taxableAmount: e.target.value }))} />
                 </div>

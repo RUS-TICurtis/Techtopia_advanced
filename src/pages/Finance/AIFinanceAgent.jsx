@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Sparkles, Send, User, TrendingUp, TrendingDown, AlertTriangle,
   Lightbulb, Bot, RefreshCw, Copy, ThumbsUp, ThumbsDown,
@@ -8,26 +8,26 @@ import { formatCurrency } from '../../services/finance/financeService';
 import { useFinanceStore } from '../../store/financeStore';
 import './Finance.css';
 
-// ── Static AI insights / snapshot ────────────────────────────────────────
+// -- Static AI insights / snapshot ----------------------------------------
 const INSIGHTS = [
   {
     id: 1, type: 'warning', icon: AlertTriangle, color: '#F59E0B',
     title: 'Invoice Collection Alert',
-    body: '7 invoices totaling GH₵297,000 have been outstanding for 30+ days. Clients most at risk: DataVault Inc, CyberPulse, EcoLogistics.',
+    body: '7 invoices totaling GH?297,000 have been outstanding for 30+ days. Clients most at risk: DataVault Inc, CyberPulse, EcoLogistics.',
     action: 'View Overdue Invoices',
     path: '/finance/invoices',
   },
   {
     id: 2, type: 'danger', icon: TrendingDown, color: '#EF4444',
     title: 'Cashflow Projection Risk',
-    body: 'Based on current collection velocity, projected cashflow shortfall of GH₵180,000 is expected in 27 days. Recommend accelerating collections.',
+    body: 'Based on current collection velocity, projected cashflow shortfall of GH?180,000 is expected in 27 days. Recommend accelerating collections.',
     action: 'View Cash Flow Report',
     path: '/finance/reports',
   },
   {
     id: 3, type: 'info', icon: TrendingUp, color: '#10B981',
     title: 'Revenue Milestone',
-    body: 'December revenue of GH₵341,000 sets a new monthly record — 14.4% above the FY target. Net Revenue Retention hit 122%, indicating strong expansion revenue.',
+    body: 'December revenue of GH?341,000 sets a new monthly record — 14.4% above the FY target. Net Revenue Retention hit 122%, indicating strong expansion revenue.',
     action: 'Revenue Analytics',
     path: '/finance/revenue',
   },
@@ -51,13 +51,13 @@ const QUICK_QUESTIONS = [
   'What is our churn rate trend?',
 ];
 
-// ── Pre-canned AI responses for demo ─────────────────────────────────────
+// -- Pre-canned AI responses for demo -------------------------------------
 const AI_RESPONSES = {
-  'what is our current mrr': `**Monthly Recurring Revenue (June 2026)**\n\nYour current MRR is **GH₵ 2,134,000**, reflecting a **+38.3% year-over-year** growth.\n\n**Breakdown by Plan:**\n- Enterprise: GH₵650,000 (30.5%)\n- Business: GH₵389,700 (18.3%)\n- Pro: GH₵124,750 (5.8%)\n- One-time / Services: ~GH₵969,550 (45.4%)\n\n**Key metric:** Net Revenue Retention is 122%, meaning existing customers are expanding faster than churning. This is a strong signal.`,
+  'what is our current mrr': `**Monthly Recurring Revenue (June 2026)**\n\nYour current MRR is **GH? 2,134,000**, reflecting a **+38.3% year-over-year** growth.\n\n**Breakdown by Plan:**\n- Enterprise: GH?650,000 (30.5%)\n- Business: GH?389,700 (18.3%)\n- Pro: GH?124,750 (5.8%)\n- One-time / Services: ~GH?969,550 (45.4%)\n\n**Key metric:** Net Revenue Retention is 122%, meaning existing customers are expanding faster than churning. This is a strong signal.`,
   
-  'which clients have overdue invoices': `**Overdue Invoice Report**\n\nCurrently **4 invoices** are overdue:\n\n| Client | Invoice | Amount | Days Overdue |\n|--------|---------|--------|--------------|\n| DataVault Inc | INV-2026-004 | GH₵110,000 | 14 days |\n| CyberPulse | INV-2026-003 | GH₵62,000 | 3 days |\n| BioGen Labs | INV-2026-002 | GH₵14,250 | Partial |\n| EcoLogistics | INV-2026-005 | GH₵18,750 | Due today |\n\n**Recommendation:** DataVault Inc represents the highest risk. I recommend escalating to a senior account manager and offering a 2% early payment discount.`,
+  'which clients have overdue invoices': `**Overdue Invoice Report**\n\nCurrently **4 invoices** are overdue:\n\n| Client | Invoice | Amount | Days Overdue |\n|--------|---------|--------|--------------|\n| DataVault Inc | INV-2026-004 | GH?110,000 | 14 days |\n| CyberPulse | INV-2026-003 | GH?62,000 | 3 days |\n| BioGen Labs | INV-2026-002 | GH?14,250 | Partial |\n| EcoLogistics | INV-2026-005 | GH?18,750 | Due today |\n\n**Recommendation:** DataVault Inc represents the highest risk. I recommend escalating to a senior account manager and offering a 2% early payment discount.`,
 
-  'default': `I've analysed your financial data. Here's what I found:\n\n**Quick Summary:**\n- Total revenue YTD: **GH₵2,713,000**\n- Outstanding invoices: **GH₵297,000** across 34 open invoices\n- Largest expense category: Operations (32%)\n- Current cash position is healthy with 27-day collection lag\n\nI can help you with invoice follow-ups, budget reallocation, tax planning, revenue forecasting, or any other financial query. What would you like to explore?`,
+  'default': `I've analysed your financial data. Here's what I found:\n\n**Quick Summary:**\n- Total revenue YTD: **GH?2,713,000**\n- Outstanding invoices: **GH?297,000** across 34 open invoices\n- Largest expense category: Operations (32%)\n- Current cash position is healthy with 27-day collection lag\n\nI can help you with invoice follow-ups, budget reallocation, tax planning, revenue forecasting, or any other financial query. What would you like to explore?`,
 };
 
 const getAIResponse = (query) => {
@@ -185,7 +185,7 @@ export default function AIFinanceAgent() {
           </div>
           <div>
             <h1 className="page-title" style={{ marginBottom: 2 }}>AI Finance Assistant</h1>
-            <p className="page-subtitle">Powered by Techtopia AI · Finance domain intelligence · GH₵</p>
+            <p className="page-subtitle">Powered by Techtopia AI · Finance domain intelligence · GH?</p>
           </div>
         </div>
         <div className="page-actions">
@@ -204,7 +204,7 @@ export default function AIFinanceAgent() {
         ))}
       </div>
 
-      {/* ── Chat Tab ─────────────────────────────────────────────────── */}
+      {/* -- Chat Tab --------------------------------------------------- */}
       {activeTab === 'chat' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20 }}>
           {/* Chat window */}
@@ -319,7 +319,7 @@ export default function AIFinanceAgent() {
         </div>
       )}
 
-      {/* ── Insights Tab ─────────────────────────────────────────────── */}
+      {/* -- Insights Tab ----------------------------------------------- */}
       {activeTab === 'insights' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
@@ -355,7 +355,7 @@ export default function AIFinanceAgent() {
                     <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 12 }}>{insight.body}</p>
                     <button className="btn btn-secondary" style={{ fontSize: 12, padding: '6px 14px' }}
                       onClick={() => window.location.href = insight.path}>
-                      {insight.action} →
+                      {insight.action} ?
                     </button>
                   </div>
                 </div>
@@ -365,7 +365,7 @@ export default function AIFinanceAgent() {
         </div>
       )}
 
-      {/* ── Forecast Tab ─────────────────────────────────────────────── */}
+      {/* -- Forecast Tab ----------------------------------------------- */}
       {activeTab === 'forecast' && (
         <div className="card">
           <div className="card-title">
