@@ -24,6 +24,7 @@ import Modal from '../../components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import PageContainer from '../../components/layout/PageContainer';
 import PageHeader from '../../components/layout/PageHeader';
+import PipelineFlow from './PipelineFlow';
 import './Pipeline.css';
 
 export default function Pipeline({ searchValue: externalSearchValue = '' }) {
@@ -375,159 +376,32 @@ export default function Pipeline({ searchValue: externalSearchValue = '' }) {
         </div>
       </div>
 
-      {/* Kanban Board */}
-      <div className="kanban-board-wrapper">
+      {/* React Flow Kanban Board */}
+      <div className="react-flow-wrapper mb-8">
         {isLoadingDeals ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: 'var(--text-muted)' }}>
             <span>Loading pipeline deals...</span>
           </div>
         ) : (
-          <div className="kanban-board">
-            {stages.map(colStage => {
-              const { count, value } = getStageStats(colStage);
-              const colDeals = filteredDeals.filter(d => d.stage === colStage);
-              const isOver = activeDropStage === colStage;
-              const stageColor = stageColors[colStage];
-
-              return (
-                <div 
-                  key={colStage}
-                  className={`kanban-column ${isOver ? 'drag-over' : ''}`}
-                  onDragOver={(e) => handleDragOver(e, colStage)}
-                  onDrop={(e) => handleDrop(e, colStage)}
-                  onDragLeave={() => setActiveDropStage(null)}
-                  style={{
-                    '--stage-color': stageColor,
-                    borderColor: isOver ? stageColor : 'var(--border-light)'
-                  }}
-                >
-                  {/* Column Header */}
-                  <div className="kanban-column-header" style={{ borderBottomColor: `${stageColor}33` }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageColor, boxShadow: `0 0 8px ${stageColor}` }} />
-                      <span className="kanban-column-title">{colStage}</span>
-                      <span className="kanban-column-count">{count}</span>
-                    </div>
-                    <span className="kanban-column-value">
-                      ${value.toLocaleString()}
-                    </span>
-                  </div>
-
-                  {/* Cards Wrapper */}
-                  <div className="kanban-cards-wrapper custom-scrollbar mt-3">
-                    <AnimatePresence mode="popLayout">
-                      {colDeals.map(deal => {
-                        const prob = stageProbabilities[deal.stage] || 50;
-                        return (
-                          <motion.div
-                            layout
-                            initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                            key={deal.id}
-                            className="kanban-card premium-card"
-                            draggable="true"
-                            onDragStart={() => handleDragStart(deal.id)}
-                            onDragEnd={handleDragEnd}
-                            onClick={(e) => openEditModal(deal, e)}
-                          >
-                            <div className="flex justify-between items-start gap-2 mb-2">
-                              <h4 className="kanban-card-title">{deal.name}</h4>
-                              <div className="kanban-card-actions">
-                                <button 
-                                  onClick={(e) => openEditModal(deal, e)} 
-                                  className="kanban-card-action-btn"
-                                  title="Edit Deal"
-                                >
-                                  <Edit2 size={10} />
-                                </button>
-                                <button 
-                                  onClick={(e) => handleDeleteDeal(deal.id, e)} 
-                                  className="kanban-card-action-btn delete"
-                                  title="Delete Deal"
-                                >
-                                  <Trash2 size={10} />
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="kanban-card-company-row">
-                              <Building2 size={12} />
-                              <span className="kanban-card-company-name">{deal.company?.name || 'Independent'}</span>
-                            </div>
-
-                            <div className="kanban-card-meta-row">
-                              <div className="flex items-center gap-1">
-                                <Calendar size={11} />
-                                <span>{deal.closeDate || 'No close date'}</span>
-                              </div>
-                              <div className="kanban-card-probability">
-                                <Sparkles size={9} />
-                                <span>Prob: {prob}%</span>
-                              </div>
-                            </div>
-
-                            <div className="kanban-card-footer">
-                              <span className="kanban-card-value">
-                                ${deal.amount.toLocaleString()}
-                              </span>
-                              <Badge 
-                                variant={
-                                  deal.priority === 'High' ? 'error' : 
-                                  deal.priority === 'Medium' ? 'warning' : 'neutral'
-                                }
-                              >
-                                {deal.priority}
-                              </Badge>
-                            </div>
-
-                            {/* Quick manual navigation shortcuts */}
-                            <div className="kanban-card-movers" onClick={e => e.stopPropagation()}>
-                              <button 
-                                className="mover-btn"
-                                disabled={colStage === stages[0]}
-                                onClick={() => moveDealManual(deal, -1)}
-                                title="Move back stage"
-                              >
-                                <ChevronLeft size={14} />
-                              </button>
-                              <span className="mover-label">STAGE TUNER</span>
-                              <button 
-                                className="mover-btn"
-                                disabled={colStage === stages[stages.length - 1]}
-                                onClick={() => moveDealManual(deal, 1)}
-                                title="Move next stage"
-                              >
-                                <ChevronRight size={14} />
-                              </button>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </AnimatePresence>
-
-                    {colDeals.length === 0 && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="kanban-drop-zone flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-xl p-6 text-gray-500 text-center gap-2 bg-[#0F172A]/40 min-h-[150px] transition-colors"
-                        style={{
-                          borderColor: isOver ? stageColor : 'rgba(255,255,255,0.03)'
-                        }}
-                      >
-                        <div className="w-8 h-8 rounded-full bg-gray-900/60 border border-gray-850 flex items-center justify-center mb-1">
-                          <Clock size={14} className="text-gray-600" />
-                        </div>
-                        <span className="text-xs font-semibold">Stage Empty</span>
-                        <span className="text-[10px] text-gray-600">Drag a deal card here</span>
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <PipelineFlow 
+            stages={stages}
+            stageColors={stageColors}
+            stageProbabilities={stageProbabilities}
+            deals={filteredDeals}
+            onDealMove={async (dealId, targetStage) => {
+              try {
+                await updateOpportunity({
+                  id: parseInt(dealId, 10),
+                  data: { stage: targetStage }
+                });
+                showToast('Success', 'Deal stage transitioned successfully.', 'success');
+              } catch (err) {
+                showToast('Error', 'Failed to update deal stage.', 'error');
+              }
+            }}
+            onEditDeal={openEditModal}
+            onDeleteDeal={handleDeleteDeal}
+          />
         )}
       </div>
 
