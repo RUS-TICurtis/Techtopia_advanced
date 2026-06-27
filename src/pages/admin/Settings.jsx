@@ -12,8 +12,10 @@ import {
   Server,
   Activity,
   AlertTriangle,
-  RotateCcw
+  RotateCcw,
+  CheckCircle
 } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { getApiBaseUrl, apiClient } from '../../lib/api';
 import toast from 'react-hot-toast';
@@ -22,6 +24,32 @@ import './Settings.css';
 
 export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [activeTab, setActiveTab] = useState('profile');
+  const routerLocation = useLocation();
+  const navigate = useNavigate();
+
+  // Integrations state
+  const [msConnectionStatus, setMsConnectionStatus] = useState({ isConnected: false, email: '' });
+  const [isLoadingMsStatus, setIsLoadingMsStatus] = useState(true);
+
+  useEffect(() => {
+    // Check for success redirect
+    const searchParams = new URLSearchParams(routerLocation.search);
+    if (searchParams.get('msIntegration') === 'success') {
+      toast.success('Successfully connected to Microsoft 365!');
+      setActiveTab('integrations');
+      // Clean up URL
+      navigate('/settings', { replace: true });
+    }
+
+    // Fetch initial status
+    const fetchStatus = async () => {
+      setIsLoadingMsStatus(true);
+      const status = await microsoftIntegrationService.checkConnectionStatus();
+      setMsConnectionStatus(status);
+      setIsLoadingMsStatus(false);
+    };
+    fetchStatus();
+  }, [routerLocation.search, navigate]);
   
   // Profile form states
   const { user: authUser, updateUserAvatar, updateProfile } = useAuthStore();
@@ -470,17 +498,32 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                     padding: 20, background: 'var(--bg-app)', border: '1px solid var(--border-light)',
                     borderRadius: 'var(--radius-md)'
                   }}>
-                    <button 
-                      type="button" 
-                      className="btn btn-primary" 
-                      onClick={() => microsoftIntegrationService.connectMicrosoftAccount()}
-                      style={{ padding: '10px 20px' }}
-                    >
-                      Connect with Microsoft
-                    </button>
+                    {msConnectionStatus.isConnected ? (
+                      <button 
+                        type="button" 
+                        className="btn btn-secondary" 
+                        disabled
+                        style={{ padding: '10px 20px', color: 'var(--brand-green)', borderColor: 'var(--brand-green)' }}
+                      >
+                        <CheckCircle size={16} style={{ marginRight: 6 }}/> Connected
+                      </button>
+                    ) : (
+                      <button 
+                        type="button" 
+                        className="btn btn-primary" 
+                        onClick={() => microsoftIntegrationService.connectMicrosoftAccount()}
+                        style={{ padding: '10px 20px' }}
+                      >
+                        Connect with Microsoft
+                      </button>
+                    )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-title)' }}>Status: Not Connected</span>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Click to authenticate and authorize Techtopia CRM.</span>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-title)' }}>
+                        {msConnectionStatus.isConnected ? 'Status: Connected' : 'Status: Not Connected'}
+                      </span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        {isLoadingMsStatus ? 'Checking connection...' : (msConnectionStatus.isConnected ? `Connected as: ${msConnectionStatus.email}` : 'Click to authenticate and authorize Techtopia CRM.')}
+                      </span>
                     </div>
                   </div>
                 </div>

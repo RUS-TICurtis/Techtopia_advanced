@@ -14,6 +14,17 @@ const microsoftIntegrationService = {
     }
   },
 
+  // Check Microsoft connection status
+  checkConnectionStatus: async () => {
+    try {
+      const response = await api.get('/api/graph/auth/status');
+      return response.data; // { isConnected: true/false, email: "..." }
+    } catch (error) {
+      console.error("Failed to check connection status", error);
+      return { isConnected: false };
+    }
+  },
+
   // Check if a workspace mapping exists for a specific project
   getProjectWorkspace: async (projectId) => {
     try {
