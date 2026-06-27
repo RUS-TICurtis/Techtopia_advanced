@@ -4,7 +4,8 @@ const microsoftIntegrationService = {
   // Initiates the OAuth flow to connect Microsoft Graph
   connectMicrosoftAccount: async () => {
     try {
-      const response = await api.get('/api/graph/auth/connect');
+      const frontendUrl = window.location.origin + '/settings';
+      const response = await api.get(`/api/graph/auth/connect?frontendUrl=${encodeURIComponent(frontendUrl)}`);
       if (response.data && response.data.authUrl) {
         window.location.href = response.data.authUrl;
       }
