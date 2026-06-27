@@ -2,10 +2,15 @@ import { apiClient as api, getApiBaseUrl } from '../lib/api';
 
 const microsoftIntegrationService = {
   // Initiates the OAuth flow to connect Microsoft Graph
-  connectMicrosoftAccount: () => {
-    // Redirect the browser directly to the endpoint since it performs an OAuth redirect
-    const baseUrl = getApiBaseUrl().replace(/\/$/, ''); // Remove trailing slash if present
-    window.location.href = `${baseUrl}/api/graph/auth/connect`;
+  connectMicrosoftAccount: async () => {
+    try {
+      const response = await api.get('/api/graph/auth/connect');
+      if (response.data && response.data.authUrl) {
+        window.location.href = response.data.authUrl;
+      }
+    } catch (error) {
+      console.error("Failed to fetch auth URL", error);
+    }
   },
 
   // Check if a workspace mapping exists for a specific project
