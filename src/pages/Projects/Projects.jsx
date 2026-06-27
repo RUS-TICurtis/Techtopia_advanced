@@ -44,6 +44,7 @@ export default function Projects() {
   const [health, setHealth] = useState('On Track');
   const [owner, setOwner] = useState('Curtis Miller');
   const [description, setDescription] = useState('');
+  const [enableMicrosoftWorkspace, setEnableMicrosoftWorkspace] = useState(false);
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
@@ -60,7 +61,8 @@ export default function Projects() {
         startDate: startDate || new Date().toISOString().split('T')[0],
         dueDate: dueDate || new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         owner,
-        description
+        description,
+        enableMicrosoftWorkspace
       });
 
       setIsAddModalOpen(false);
@@ -68,6 +70,7 @@ export default function Projects() {
       // Reset fields
       setTitle(''); setCompany(''); setBudget(''); setSpent('');
       setStartDate(''); setDueDate(''); setHealth('On Track'); setDescription('');
+      setEnableMicrosoftWorkspace(false);
 
       showToast('Project Created', `Project "${title}" has been successfully added.`, 'success');
     } catch (err) {
@@ -366,6 +369,22 @@ export default function Projects() {
               value={description} 
               onChange={e => setDescription(e.target.value)}
             />
+          </div>
+
+          <div className="flex items-center gap-3 mt-2 p-3 bg-[#1E293B]/40 border border-gray-800 rounded-lg">
+            <input 
+              type="checkbox" 
+              id="enable-ms-workspace"
+              className="w-4 h-4 rounded border-gray-800 bg-[#0F172A] text-[#10B981] focus:ring-[#10B981]"
+              checked={enableMicrosoftWorkspace}
+              onChange={e => setEnableMicrosoftWorkspace(e.target.checked)}
+            />
+            <div className="flex flex-col">
+              <label htmlFor="enable-ms-workspace" className="text-sm font-bold text-white cursor-pointer">
+                Enable Microsoft 365 Workspace
+              </label>
+              <span className="text-xs text-gray-500">Automatically provisions a Microsoft Teams channel and SharePoint document library.</span>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 mt-4">

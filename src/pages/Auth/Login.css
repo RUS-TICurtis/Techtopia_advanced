@@ -8,7 +8,8 @@
 /* Left Panel */
 .login-branding {
   flex: 1;
-  background-color: #0F172A; /* Deep dark background */
+  background-color: #0F172A;
+  /* Deep dark background */
   color: white;
   position: relative;
   overflow: hidden;
@@ -53,6 +54,7 @@
   background: linear-gradient(135deg, #ffffff 0%, #A3AED0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-align: start;
 }
 
 .login-hero-text h1 {
@@ -143,6 +145,7 @@
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -307,7 +310,7 @@
   .logo-symbol {
     font-size: 24px;
   }
-  
+
   .logo-text {
     font-size: 20px;
   }
@@ -326,7 +329,7 @@
   .login-features {
     display: none;
   }
-  
+
   .login-form-wrapper {
     padding: 16px;
   }
@@ -370,6 +373,72 @@
 [data-theme="dark"] .remember-me input {
   accent-color: var(--brand-cyan);
 }
-  /* .login-branding {
-    padding: 2;
-  } */
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
+}
+
+.login-divider span {
+  padding: 0 16px;
+}
+
+[data-theme="dark"] .login-divider::before,
+[data-theme="dark"] .login-divider::after {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.social-login-container {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background-color: transparent;
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-radius: 8px;
+  color: var(--text-main, #1e293b);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.social-btn:active {
+  transform: translateY(0);
+}
+
+[data-theme="dark"] .social-btn {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .social-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}

@@ -17,6 +17,7 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { getApiBaseUrl, apiClient } from '../../lib/api';
 import toast from 'react-hot-toast';
+import microsoftIntegrationService from '../../services/microsoftIntegrationService';
 import './Settings.css';
 
 export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
@@ -241,6 +242,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     { id: 'company',    label: 'Company Settings', icon: Building2 },
     { id: 'appearance', label: 'Appearance',       icon: Palette },
     { id: 'security',   label: 'Security',         icon: Lock },
+    { id: 'integrations',label: 'Integrations',    icon: SettingsIcon },
     { id: 'developer',  label: 'API Settings',     icon: Server }
   ];
 
@@ -448,6 +450,41 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                   <button type="submit" className="btn btn-primary">Change Credentials</button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* INTEGRATIONS */}
+          {activeTab === 'integrations' && (
+            <div className="settings-section">
+              <h2 className="settings-section-title">Integrations</h2>
+              
+              <div className="settings-form-grid">
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label>Microsoft 365 Workspace Integration</label>
+                  <p className="settings-security-hint" style={{ marginTop: 4, marginBottom: 16 }}>
+                    Connect your Microsoft 365 account to automatically provision Microsoft Teams, SharePoint sites, and sync calendars with Techtopia projects.
+                  </p>
+                  
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 16,
+                    padding: 20, background: 'var(--bg-app)', border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-md)'
+                  }}>
+                    <button 
+                      type="button" 
+                      className="btn btn-primary" 
+                      onClick={() => microsoftIntegrationService.connectMicrosoftAccount()}
+                      style={{ padding: '10px 20px' }}
+                    >
+                      Connect with Microsoft
+                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-title)' }}>Status: Not Connected</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Click to authenticate and authorize Techtopia CRM.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

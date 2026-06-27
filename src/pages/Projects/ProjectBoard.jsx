@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Plus, 
@@ -16,13 +16,15 @@ import {
   SlidersHorizontal,
   Sparkles,
   Play,
-  RotateCcw
+  RotateCcw,
+  Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTasks, useContacts, useProjects } from '../../hooks/useCrmData';
 import Modal from '../../components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
+import microsoftIntegrationService from '../../services/microsoftIntegrationService';
 import './Projects.css';
 
 export default function ProjectBoard() {
@@ -40,6 +42,18 @@ export default function ProjectBoard() {
   const tasks = projectId 
     ? allTasks.filter(t => t.project?.id?.toString() === projectId.toString()) 
     : allTasks;
+
+  const [workspace, setWorkspace] = useState(null);
+
+  useEffect(() => {
+    if (projectId) {
+      microsoftIntegrationService.getProjectWorkspace(projectId)
+        .then(data => {
+          if (data) setWorkspace(data);
+        })
+        .catch(err => console.error("Error fetching workspace", err));
+    }
+  }, [projectId]);
 
   // Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -249,6 +263,30 @@ export default function ProjectBoard() {
           <Plus size={18} /> New Sprint Task
         </button>
       </div>
+
+      {workspace && (
+        <div className="mb-6 p-4 bg-[#1E293B]/60 border border-[#38BDF8]/30 rounded-xl flex items-center justify-between shadow-glow">
+          <div className="flex items-center gap-3">
+            <Sparkles className="text-[#38BDF8]" size={24} />
+            <div>
+              <h3 className="text-white font-bold text-sm">Microsoft 365 Workspace Active</h3>
+              <p className="text-xs text-gray-400">Collaboration tools are provisioned for this project.</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            {workspace.microsoftTeamId && (
+              <a href={`https://teams.microsoft.com/l/team/${workspace.microsoftTeamId}/conversations`} target="_blank" rel="noreferrer" className="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5 border-gray-700 text-[#38BDF8] hover:text-white hover:bg-[#38BDF8]/20 transition-all">
+                <Users size={14} /> Open MS Teams
+              </a>
+            )}
+            {workspace.sharePointSiteId && (
+              <a href={`https://tenant.sharepoint.com/sites/Project-${workspace.projectId}`} target="_blank" rel="noreferrer" className="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5 border-gray-700 text-[#10B981] hover:text-white hover:bg-[#10B981]/20 transition-all">
+                <FolderKanban size={14} /> Open SharePoint
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Board Column view */}
       <div className="kanban-board-wrapper">

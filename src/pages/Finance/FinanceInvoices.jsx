@@ -104,10 +104,17 @@ export default function FinanceInvoices() {
     setFormError('');
     setSubmitting(true);
 
+    // Map mock integer IDs to the default seeded CRM company GUID
+    const resolveCompanyGuid = (id) => {
+      const strId = String(id || '');
+      if (!strId) return 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01';
+      return strId.includes('-') ? strId : 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01';
+    };
+
     const payload = {
-      companyId: newInvoice.companyId || undefined,
-      contactId: newInvoice.contactId || undefined,
-      opportunityId: newInvoice.opportunityId || undefined,
+      companyId: resolveCompanyGuid(newInvoice.companyId),
+      contactId: (newInvoice.contactId && String(newInvoice.contactId).includes('-')) ? newInvoice.contactId : undefined,
+      opportunityId: (newInvoice.opportunityId && String(newInvoice.opportunityId).includes('-')) ? newInvoice.opportunityId : undefined,
       phone: newInvoice.phone || undefined,
       address: newInvoice.address || undefined,
       currency: newInvoice.currency || 'GHS',
