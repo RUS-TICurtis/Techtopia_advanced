@@ -5,7 +5,7 @@
 import axios from 'axios';
 
 // ─── Config ───────────────────────────────────────────────
-const API_BASE = import.meta.env.VITE_API_URL || 'https://techtopiagh-crm.onrender.com/';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5102/';
 
 export function getApiBaseUrl() {
   const savedUrl = localStorage.getItem('crm_api_url');
@@ -13,7 +13,7 @@ export function getApiBaseUrl() {
     return savedUrl.endsWith('/') ? savedUrl : `${savedUrl}/`;
   }
   
-  const envUrl = import.meta.env.VITE_API_URL || 'https://techtopiagh-crm.onrender.com/';
+  const envUrl = import.meta.env.VITE_API_URL || 'http://localhost:5102/';
   return envUrl.endsWith('/') ? envUrl : `${envUrl}/`;
 }
 
@@ -31,6 +31,7 @@ apiClient.interceptors.request.use(
     const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
     if (token) config.headers.Authorization = `Bearer ${token}`;
     config.headers['Tenant-Id'] = tenantId;
+    config.headers['X-Tenant-ID'] = tenantId; // Needed by ProjectEndpoints.cs
     return config;
   },
   (error) => Promise.reject(error)
@@ -263,7 +264,71 @@ export const contactsApi = createMockResourceService('crm_contacts', MOCK_CONTAC
 export const companiesApi = createMockResourceService('crm_companies', MOCK_COMPANIES);
 export const dealsApi = createMockResourceService('crm_deals', MOCK_DEALS);
 export const clientsApi = contactsApi;
-export const projectsApi = createMockResourceService('crm_projects', MOCK_PROJECTS);
+const mapProjectDto = (p) => ({
+  id: p.id,
+  name: p.name,
+  title: p.name, // Frontend often uses 'title' or 'name' interchangeably for projects
+  status: p.status || 'Active',
+  progress: p.progressPercentage || 0,
+  client: p.customerName || "Internal",
+  manager: p.ownerName || "Unassigned",
+  startDate: p.startDate ? p.startDate.split('T')[0] : null,
+  endDate: p.endDate ? p.endDate.split('T')[0] : null,
+  dueDate: p.endDate ? p.endDate.split('T')[0] : null, // Frontend Kanban uses 'dueDate'
+  description: p.description || '',
+  enableMicrosoftWorkspace: p.enableMicrosoftWorkspace || false,
+  budget: 0,
+  spent: 0,
+  health: p.healthStatus || 'On Track',
+  owner: p.ownerName || "Unassigned",
+  createdAt: p.createdAt
+});
+
+export const projectsApi = {
+  list: async (params) => {
+    const response = await apiClient.get('/api/projects', { params });
+    const data = Array.isArray(response.data) ? response.data : (response.data?.data || []);
+    return data.map(mapProjectDto);
+  },
+  get: async (id) => {
+    const response = await apiClient.get(`/api/projects/${id}`);
+    return mapProjectDto(response.data);
+  },
+  create: async (data) => {
+    // Map frontend fields to backend CreateProjectRequest
+    // Ensure dates are full ISO strings for ASP.NET Core to parse correctly
+    const toIso = (d) => d ? new Date(d).toISOString() : undefined;
+    const backendData = {
+      Name: data.title || data.name,
+      Description: data.description || null,
+      ProjectType: data.projectType || "Client",
+      Priority: data.priority || "Medium",
+      StartDate: toIso(data.startDate),
+      EndDate: toIso(data.dueDate || data.endDate),
+      EnableMicrosoftWorkspace: data.enableMicrosoftWorkspace ?? false
+    };
+    const response = await apiClient.post('/api/projects', backendData);
+    return mapProjectDto(response.data);
+  },
+  update: async (id, data) => {
+    // Map frontend fields to backend UpdateProjectRequest
+    const backendData = {
+      Name: data.title || data.name,
+      Description: data.description,
+      ProjectType: "Client",
+      Status: data.status,
+      Priority: "Medium",
+      StartDate: data.startDate,
+      EndDate: data.dueDate || data.endDate
+    };
+    const response = await apiClient.put(`/api/projects/${id}`, backendData);
+    return mapProjectDto(response.data);
+  },
+  delete: async (id) => {
+    await apiClient.delete(`/api/projects/${id}`);
+    return { success: true };
+  }
+};
 export const tasksApi = createMockResourceService('crm_tasks', MOCK_TASKS);
 export const ticketsApi = createMockResourceService('crm_tickets', MOCK_TICKETS);
 

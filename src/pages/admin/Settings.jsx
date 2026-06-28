@@ -39,6 +39,10 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
       setActiveTab('integrations');
       // Clean up URL
       navigate('/settings', { replace: true });
+    } else if (searchParams.get('msIntegration') === 'admin_consent_success') {
+      toast.success('Successfully authorized organization for Microsoft Teams!');
+      setActiveTab('integrations');
+      navigate('/settings', { replace: true });
     }
 
     // Fetch initial status
@@ -523,6 +527,34 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                       </span>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                         {isLoadingMsStatus ? 'Checking connection...' : (msConnectionStatus.isConnected ? `Connected as: ${msConnectionStatus.email}` : 'Click to authenticate and authorize Techtopia CRM.')}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Multi-Tenant Organization Authorization */}
+                  <label style={{ marginTop: 24 }}>Organization Authorization (Administrators Only)</label>
+                  <p className="settings-security-hint" style={{ marginTop: 4, marginBottom: 16 }}>
+                    For Microsoft Teams and workspaces to be created automatically, a Global Administrator must grant tenant-wide consent for your organization.
+                  </p>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 16,
+                    padding: 20, background: 'var(--bg-app)', border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-md)'
+                  }}>
+                    <button 
+                      type="button" 
+                      className="btn btn-secondary" 
+                      onClick={() => microsoftIntegrationService.connectOrganization()}
+                      style={{ padding: '10px 20px', borderColor: 'var(--brand-purple)', color: 'var(--brand-purple)' }}
+                    >
+                      Authorize Organization
+                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-title)' }}>
+                        Tenant-wide Admin Consent
+                      </span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        Requires Microsoft 365 Global Administrator privileges.
                       </span>
                     </div>
                   </div>

@@ -74,8 +74,12 @@ export default function Projects() {
 
       showToast('Project Created', `Project "${title}" has been successfully added.`, 'success');
     } catch (err) {
-      console.error(err);
-      showToast('Creation Failed', 'Failed to create new project.', 'error');
+      console.error('Create project error:', err);
+      const errors = err?.response?.data?.errors;
+      const errorMsg = errors
+        ? Object.entries(errors).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' | ')
+        : err?.response?.data?.title || 'Failed to create new project.';
+      showToast('Creation Failed', errorMsg, 'error');
     }
   };
 
