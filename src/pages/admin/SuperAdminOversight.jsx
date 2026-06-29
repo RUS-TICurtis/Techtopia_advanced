@@ -7,7 +7,7 @@ import {
   LogIn, Ban, Key, RefreshCw, X, Check, Lock, ShieldAlert,
   Server, Globe, Activity, Plus, Edit2, Trash2
 } from 'lucide-react';
-import { tenantsApi } from '../../lib/api';
+import { tenantsApi } from '../../lib/systemApi';
 import './SuperAdminOversight.css';
 
 export default function SuperAdminOversight() {
@@ -30,17 +30,7 @@ export default function SuperAdminOversight() {
       ? { name: localStorage.getItem('crm_impersonated_tenant_name') || 'Impersonated Tenant' }
       : null
   );
-  const [showMfaModal, setShowMfaModal] = useState(false);
-  const [mfaCode, setMfaCode] = useState('');
-  const [mfaError, setMfaError] = useState('');
-
-  // Suspense threats metrics
-  const [threats, setThreats] = useState({
-    bruteForceAttempts: 0,
-    blockedIps: 12,
-    systemUptime: '99.998%',
-    cpuUsage: 22
-  });
+  // Suspense threats metrics coming soon
 
   useEffect(() => {
     fetchTenants();
@@ -119,25 +109,13 @@ export default function SuperAdminOversight() {
 
   const handleStartImpersonate = (tenant) => {
     setImpersonatingTenant(tenant);
-    setMfaCode('');
-    setMfaError('');
-    setShowMfaModal(true);
-  };
-
-  const handleVerifyMfa = (e) => {
-    e.preventDefault();
-    if (mfaCode === '123456' || mfaCode === '000000') {
-      setShowMfaModal(false);
-      setIsImpersonating(true);
-      
-      localStorage.setItem('crm_tenant_id', impersonatingTenant.id);
-      localStorage.setItem('crm_is_impersonating', 'true');
-      localStorage.setItem('crm_impersonated_tenant_name', impersonatingTenant.name);
-      
-      window.location.href = '/admin/oversight';
-    } else {
-      setMfaError('Invalid Super Admin MFA credentials. Impersonation rejected.');
-    }
+    setIsImpersonating(true);
+    
+    localStorage.setItem('crm_tenant_id', tenant.id);
+    localStorage.setItem('crm_is_impersonating', 'true');
+    localStorage.setItem('crm_impersonated_tenant_name', tenant.name);
+    
+    window.location.href = '/admin/oversight';
   };
 
   const handleStopImpersonate = () => {
@@ -149,9 +127,7 @@ export default function SuperAdminOversight() {
     window.location.href = '/admin/oversight';
   };
 
-  const handleRevokeSessions = (tenantName) => {
-    alert(`âš¡ [Revoke Signal Dispatched] - Forcefully invalidated all active WebAuthn/MFA tokens and sessions for ${tenantName}.`);
-  };
+
 
   return (
     <PageContainer className="super-admin-oversight-page">
@@ -185,46 +161,9 @@ export default function SuperAdminOversight() {
       {error && <div className="error-banner mb-4 p-4 bg-red-950/40 border border-red-900/50 rounded-xl text-red-400">{error}</div>}
 
       {/* Global Threat Center & Server Monitor */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
-          <div className="icon-box p-3 bg-red-950/20 border border-red-900/30 rounded-xl">
-            <ShieldAlert size={20} className="text-[#EF4444]" />
-          </div>
-          <div>
-            <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Threat Level</div>
-            <div className="text-white text-lg font-bold font-display">NOMINAL</div>
-          </div>
-        </div>
-
-        <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
-          <div className="icon-box p-3 bg-[#38BDF8]/10 border border-[#38BDF8]/20 rounded-xl">
-            <Globe size={20} className="text-[#38BDF8]" />
-          </div>
-          <div>
-            <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Blocked IP Vectors</div>
-            <div className="text-white text-lg font-bold font-display">{threats.blockedIps} Addresses</div>
-          </div>
-        </div>
-
-        <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
-          <div className="icon-box p-3 bg-green-950/20 border border-green-900/30 rounded-xl">
-            <Server size={20} className="text-[#10B981]" />
-          </div>
-          <div>
-            <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Core Cluster Uptime</div>
-            <div className="text-white text-lg font-bold font-display">{threats.systemUptime}</div>
-          </div>
-        </div>
-
-        <div className="card stat-card bg-gray-900/35 border border-gray-850 p-4 rounded-xl flex items-center gap-4">
-          <div className="icon-box p-3 bg-purple-950/20 border border-purple-900/30 rounded-xl">
-            <Activity size={20} className="text-[#6366F1]" />
-          </div>
-          <div>
-            <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Global DB Load</div>
-            <div className="text-white text-lg font-bold font-display">{threats.cpuUsage}% CPU</div>
-          </div>
-        </div>
+      <div className="card stat-card bg-gray-900/35 border border-gray-850 p-6 rounded-xl flex items-center justify-center gap-4 mb-6">
+        <ShieldAlert size={24} className="text-gray-600" />
+        <div className="text-gray-500 font-bold tracking-wider">THREAT CENTER & METRICS (COMING SOON)</div>
       </div>
 
       {/* Tenants Registry */}
@@ -270,11 +209,11 @@ export default function SuperAdminOversight() {
                         <LogIn size={11} /> Impersonate
                       </button>
                       <button 
-                        onClick={() => handleRevokeSessions(t.name)}
-                        className="btn btn-secondary py-1.5 px-3 text-[10px] flex items-center gap-1 hover:text-[#6366F1] border-gray-800"
-                        disabled={!t.isActive}
+                        className="btn btn-secondary py-1.5 px-3 text-[10px] flex items-center gap-1 text-gray-600 border-gray-800 cursor-not-allowed"
+                        disabled
+                        title="Coming Soon"
                       >
-                        <Key size={11} /> Revoke
+                        <Key size={11} /> Revoke (Coming Soon)
                       </button>
                       <button 
                         onClick={() => handleOpenEditTenant(t)}
@@ -376,85 +315,12 @@ export default function SuperAdminOversight() {
             You are securely examining the active database tables and storage indexes for **{impersonatingTenant?.name}**. All actions taken will generate cryptographic compliance entries under SOC2 Section 4.1.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div className="bg-gray-950/60 border border-gray-900 p-4 rounded-xl">
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block mb-1">MFA Compliance Rate</span>
-              <span className="text-white text-lg font-bold font-mono">100% Secure</span>
-              <p className="text-gray-500 text-[10px] mt-2">All tenant admins and finance roles have valid multi-factor keys registered.</p>
-            </div>
-            <div className="bg-gray-950/60 border border-gray-900 p-4 rounded-xl">
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block mb-1">Active DB Queries</span>
-              <span className="text-white text-lg font-bold font-mono">0.02ms Yield</span>
-              <p className="text-gray-500 text-[10px] mt-2">Core SQLite synchronization queries are responding within nominal boundaries.</p>
-            </div>
-            <div className="bg-gray-950/60 border border-gray-900 p-4 rounded-xl">
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider block mb-1">Access Control Denials</span>
-              <span className="text-white text-lg font-bold font-mono">0 Events</span>
-              <p className="text-gray-500 text-[10px] mt-2">Zero anomalous RBAC or ABAC authentication bypass claims recorded.</p>
-            </div>
+          <div className="bg-gray-950/60 border border-gray-900 p-6 rounded-xl flex items-center justify-center">
+            <span className="text-gray-500 font-bold uppercase tracking-wider text-sm">Diagnostic Metrics Coming Soon</span>
           </div>
         </div>
       )}
 
-      {/* SOC2 Verification MFA Modal */}
-      {showMfaModal && (
-        <div className="mfa-oversight-modal-overlay">
-          <div className="mfa-oversight-modal bg-[#0F172A] border border-gray-800 p-6 rounded-xl max-w-sm w-full shadow-2xl relative">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2 text-red-500 font-bold font-display text-sm tracking-wide">
-                <Lock size={16} /> Break-Glass Authorization
-              </div>
-              <button 
-                onClick={() => setShowMfaModal(false)}
-                className="text-gray-500 hover:text-white"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            <p className="text-gray-400 text-xs leading-relaxed mb-4">
-              You are instantiating an Impersonation session on **{impersonatingTenant?.name}**. This requires Super Admin Multi-Factor token re-authentication under SOC2 requirements.
-            </p>
-
-            <form onSubmit={handleVerifyMfa} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">6-Digit Admin OTP Key</label>
-                <input 
-                  type="password" 
-                  placeholder="e.g. 123456"
-                  maxLength={6}
-                  value={mfaCode}
-                  onChange={(e) => setMfaCode(e.target.value)}
-                  className="w-full text-center tracking-widest bg-gray-950 border border-gray-800 rounded-lg p-3 text-white text-lg font-mono focus:outline-none focus:border-[#EF4444]"
-                  autoComplete="one-time-code"
-                />
-              </div>
-
-              {mfaError && (
-                <div className="text-red-500 font-bold text-[10px] bg-red-950/20 border border-red-900/40 p-2.5 rounded-lg flex items-center gap-1.5">
-                  <AlertTriangle size={12} /> {mfaError}
-                </div>
-              )}
-
-              <div className="flex gap-3 justify-end mt-2">
-                <button 
-                  type="button"
-                  onClick={() => setShowMfaModal(false)}
-                  className="px-4 py-2 bg-gray-950 border border-gray-850 text-gray-400 hover:text-white rounded-lg text-xs font-semibold"
-                >
-                  Abort
-                </button>
-                <button 
-                  type="submit"
-                  className="px-4 py-2 bg-[#EF4444] hover:bg-[#EF4444] text-white rounded-lg text-xs font-bold shadow-red flex items-center gap-1.5"
-                >
-                  <ShieldCheck size={14} /> Authorize Impersonate
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </PageContainer>
   );
 }

@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import auditTrack from '../services/audit/auditService';
 import { 
   leadsApi, 
-  projectsApi, 
   invoicesApi, 
   ticketsApi, 
   analyticsApi, 
@@ -10,7 +9,6 @@ import {
   companiesApi, 
   dealsApi, 
   tasksApi, 
-  auditApi, 
   notificationsApi,
   apiClient,
   contractsApi,
@@ -23,7 +21,6 @@ import {
   departmentsApi,
   usersApi,
   rolesApi,
-  tenantsApi,
   permissionsApi,
   accountsApi,
   journalEntriesApi,
@@ -36,6 +33,8 @@ import {
   inventoryApi,
   assetsApi
 } from '../lib/api';
+import { projectsApi } from '../lib/projectsApi';
+import { auditApi, tenantsApi } from '../lib/systemApi';
 
 
 // Leads Hook

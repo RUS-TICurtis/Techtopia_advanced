@@ -1,221 +1,287 @@
 import React, { useState } from 'react';
-import { UserCircle2, Plus, Search, X, ShieldAlert, Award, Briefcase, Activity } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
-import './Clients.css';
+import { useCompanies } from '../../hooks/useCrmData';
+import {
+  Building2,
+  Plus,
+  Search,
+  MoreHorizontal,
+  Globe,
+  Phone,
+  MapPin,
+  Building
+} from 'lucide-react';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '../../components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '../../components/ui/dropdown-menu';
+import { Skeleton } from '../../components/ui/Skeleton';
 
-const TABS     = ['All', 'Active', 'Prospect', 'Inactive'];
-const INDUSTRIES = ['Technology', 'Finance', 'Healthcare', 'Retail', 'Manufacturing', 'Education', 'Other'];
-
-const emptyForm = {
-  companyName: '', industry: 'Technology', status: 'Prospect',
-  website: '', phone: '', address: '', contactName: '', email: ''
-};
-
-export default function Clients({ searchValue = '' }) {
-  const [clients, setClients]   = useState([
-    { id: '1', companyName: 'CyberPulse Security', industry: 'Technology', status: 'Active', contactName: 'Curtis Miller', email: 'curtis@cyberpulse.io', phone: '+1 (555) 019-9233' },
-    { id: '2', companyName: 'BioGen Lab Systems', industry: 'Healthcare', status: 'Prospect', contactName: 'Catherine Song', email: 'c.song@biogen.com', phone: '+1 (555) 014-8821' },
-    { id: '3', companyName: 'Roma Tech Inc.', industry: 'Finance', status: 'Active', contactName: 'Faye Morgan', email: 'f.morgan@romatech.eu', phone: '+39 06 555 1290' },
-  ]);
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm]          = useState(emptyForm);
-  const [activeTab, setActiveTab] = useState('All');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setClients(prev => [...prev, { ...form, id: Date.now() }]);
-    setForm(emptyForm);
-    setShowModal(false);
-  };
-
-  const filtered = clients.filter(c => {
-    const matchesSearch = (c.companyName || '').toLowerCase().includes((searchValue || '').toLowerCase()) ||
-      (c.contactName || '').toLowerCase().includes((searchValue || '').toLowerCase());
-    const matchesTab = activeTab === 'All' || c.status === activeTab;
-    return matchesSearch && matchesTab;
+export default function Clients() {
+  const { data: companies = [], isLoading, createCompany, updateCompany, deleteCompany } = useCompanies();
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingCompany, setEditingCompany] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    industry: '',
+    website: '',
+    phone: '',
+    address: ''
   });
 
-  const metrics = [
-    { label: 'Total Clients', value: clients.length, icon: UserCircle2, color: 'var(--brand-blue)' },
-    { label: 'Active',        value: clients.filter(c => c.status === 'Active').length, icon: Award, color: 'var(--brand-green)' },
-    { label: 'Prospects',     value: clients.filter(c => c.status === 'Prospect').length, icon: Briefcase, color: 'var(--brand-cyan)' },
-    { label: 'Inactive',      value: clients.filter(c => c.status === 'Inactive').length, icon: ShieldAlert, color: 'var(--brand-magenta)' }
-  ];
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredCompanies = companies.filter(c =>
+    c.type === 'Client' &&
+    (c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.industry?.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const handleNewClick = () => {
+    setEditingCompany(null);
+    setFormData({ name: '', type: 'Client', industry: '', website: '', phone: '', address: '' });
+    setIsDialogOpen(true);
+  };
+
+  const handleEditClick = (company) => {
+    setEditingCompany(company);
+    setFormData({
+      name: company.name || '',
+      type: company.type || 'Client',
+      industry: company.industry || '',
+      website: company.website || '',
+      phone: company.phone || '',
+      address: company.address || ''
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsCreating(true);
+    try {
+      if (editingCompany) {
+        await updateCompany({ id: editingCompany.id, data: formData });
+      } else {
+        await createCompany(formData);
+      }
+      setIsDialogOpen(false);
+      setEditingCompany(null);
+      setFormData({ name: '', type: 'Client', industry: '', website: '', phone: '', address: '' });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (confirm('Are you sure you want to delete this company?')) {
+      await deleteCompany(id);
+    }
+  };
 
   return (
-    <div className="page-container clients-page">
-      <div className="page-header flex justify-between items-center mb-6">
+    <div className="p-8 h-full flex flex-col space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="page-title flex items-center gap-2">
-            <UserCircle2 className="text-[#3B82F6]" />
-            Corporate Clients
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+            <Building className="h-8 w-8 text-indigo-600" />
+            Clients
           </h1>
-          <p className="page-subtitle">Manage executive business client accounts & profiles</p>
+          <p className="text-slate-500 mt-1">Manage your active clients and won accounts.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          <Plus size={18} /> New Client
-        </button>
-      </div>
 
-      {/* Premium KPI Metrics */}
-      <div className="metrics-grid mb-6">
-        {metrics.map(m => {
-          const Icon = m.icon;
-          return (
-            <div key={m.label} className="card metric-card">
-              <div className="metric-icon-wrapper" style={{ background: `${m.color}15` }}>
-                <Icon size={22} style={{ color: m.color }} />
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-indigo-600 hover:bg-indigo-700" onClick={handleNewClick}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Client
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{editingCompany ? 'Edit Client' : 'Create New Client'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Company Name *</label>
+                <Input
+                  required
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. Acme Corp"
+                />
               </div>
-              <div className="metric-info">
-                <span className="metric-label">{m.label}</span>
-                <span className="metric-value">{m.value}</span>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Industry</label>
+                <Input
+                  value={formData.industry}
+                  onChange={e => setFormData({ ...formData, industry: e.target.value })}
+                  placeholder="e.g. Software"
+                />
               </div>
-            </div>
-          );
-        })}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Website</label>
+                <Input
+                  type="url"
+                  value={formData.website}
+                  onChange={e => setFormData({ ...formData, website: e.target.value })}
+                  placeholder="https://"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Phone</label>
+                <Input
+                  value={formData.phone}
+                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="+1 (555) 000-0000"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Address</label>
+                <Input
+                  value={formData.address}
+                  onChange={e => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="123 Main St"
+                />
+              </div>
+              <div className="pt-4 flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => { setIsDialogOpen(false); setEditingCompany(null); }}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isCreating} className="bg-indigo-600 hover:bg-indigo-700">
+                  {isCreating ? 'Saving...' : (editingCompany ? 'Save Changes' : 'Create Client')}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {/* Tabs Row */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div className="clients-tabs flex gap-2">
-          {TABS.map(t => (
-            <button
-              key={t}
-              className={`clients-tab ${activeTab === t ? 'active' : ''}`}
-              onClick={() => setActiveTab(t)}
-            >
-              {t}
-              <span className="clients-tab-count">
-                {t === 'All' ? clients.length : clients.filter(c => c.status === t).length}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <div className="search-wrapper w-full md:max-w-xs" style={{ margin: 0 }}>
-          <Search size={16} className="search-icon" />
-          <input 
-            className="search-input w-full" 
-            placeholder="Search clients..." 
-            value={searchValue}  
-            style={{
-              backgroundColor: 'var(--bg-app)',
-              borderColor: 'var(--border-light)',
-              color: 'var(--text-main)'
-            }}
-          />
-        </div>
+      {/* Filters & Search */}
+      <div className="flex items-center space-x-2p-3 rounded-lg border border-slate-200 shadow-sm">
+        <Search className="h-5 w-5 ml-2" />
+        <Input
+          placeholder="Search clients by name or industry..."
+          className="border-0 shadow-none focus-visible:ring-0 px-2"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
-      {/* Table grid */}
-      {filtered.length === 0 ? (
-        <div className="empty-state card">
-          <UserCircle2 size={48} className="empty-icon" />
-          <h3>No clients cataloged</h3>
-          <p>Register your first business account to initialize portfolios.</p>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            <Plus size={18} /> New Client
-          </button>
-        </div>
-      ) : (
-        <div className="table-container card" style={{ padding: 0 }}>
-          <table className="custom-table">
-            <thead>
+      <div className="flex-1 rounded-xl border  shadow-sm overflow-hidden flex flex-col">
+        <div className="overflow-x-auto flex-1">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs uppercase  border-b">
               <tr>
-                <th>Company</th><th>Primary Contact</th><th>Industry</th>
-                <th>Phone</th><th>Status</th>
+                <th className="px-6 py-4 font-semibold">Client Name</th>
+                <th className="px-6 py-4 font-semibold">Industry</th>
+                <th className="px-6 py-4 font-semibold">Contact Info</th>
+                <th className="px-6 py-4 font-semibold">Location</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {filtered.map(c => (
-                <tr key={c.id}>
-                  <td style={{ fontWeight: 700, color: 'var(--text-title)' }}>{c.companyName}</td>
-                  <td>
-                    <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{c.contactName}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{c.email}</div>
-                  </td>
-                  <td>{c.industry}</td>
-                  <td><code>{c.phone || 'â€”'}</code></td>
-                  <td>
-                    <Badge variant={c.status === 'Active' ? 'success' : c.status === 'Prospect' ? 'info' : 'neutral'}>
-                      {c.status}
-                    </Badge>
+            <tbody className="divide-y ">
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-24" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-40" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-20" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></td>
+                  </tr>
+                ))
+              ) : filteredCompanies.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <Building className="h-12 w-12 text-indigo-600 mb-3" />
+                      <p className="text-lg font-medium">No clients found</p>
+                      <p className="text-sm text-slate-500 mt-1">Get started by creating a new client account.</p>
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredCompanies.map((company) => (
+                  <tr key={company.id} className=" transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg  border flex items-center justify-center text-indigo-600 font-bold">
+                          {company.name?.charAt(0).toUpperCase() || <Building className="h-5 w-5" />}
+                        </div>
+                        <div>
+                          <div className="font-semibold ">{company.name}</div>
+                          <div className="text-xs  mt-0.5">Added {new Date(company.createdAt).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 ">
+                      {company.industry ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                          {company.industry}
+                        </span>
+                      ) : '-'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1.5  text-xs">
+                        {company.website && (
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-3.5 w-3.5 " />
+                            <a href={company.website} target="_blank" rel="noreferrer" className="hover:text-indigo-600 hover:underline">
+                              {company.website.replace(/^https?:\/\//, '')}
+                            </a>
+                          </div>
+                        )}
+                        {company.phone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-3.5 w-3.5" />
+                            {company.phone}
+                          </div>
+                        )}
+                        {!company.website && !company.phone && '-'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 ">
+                      {company.address ? (
+                        <div className="flex items-center gap-2 text-xs">
+                          <MapPin className="h-3.5 w-3.5 " />
+                          <span className="truncate max-w-[150px]" title={company.address}>{company.address}</span>
+                        </div>
+                      ) : '-'}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0  transition-colors">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuItem onClick={() => handleEditClick(company)}>Edit Company</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(company.id)}>Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-      )}
-
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>New Client Account</h2>
-              <button className="btn-icon" onClick={() => setShowModal(false)}><X size={20} /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="modal-body">
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Company Name *</label>
-                  <input className="form-input" required value={form.companyName}
-                    onChange={e => setForm({...form, companyName: e.target.value})} />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Industry</label>
-                  <select className="form-input" value={form.industry}
-                    onChange={e => setForm({...form, industry: e.target.value})}>
-                    {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Contact Name</label>
-                  <input className="form-input" value={form.contactName}
-                    onChange={e => setForm({...form, contactName: e.target.value})} />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Email</label>
-                  <input className="form-input" type="email" value={form.email}
-                    onChange={e => setForm({...form, email: e.target.value})} />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Phone</label>
-                  <input className="form-input" value={form.phone}
-                    onChange={e => setForm({...form, phone: e.target.value})} />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Status</label>
-                  <select className="form-input" value={form.status}
-                    onChange={e => setForm({...form, status: e.target.value})}>
-                    {['Active','Prospect','Inactive'].map(s => <option key={s}>{s}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Website</label>
-                  <input className="form-input" placeholder="https://" value={form.website}
-                    onChange={e => setForm({...form, website: e.target.value})} />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Address</label>
-                  <input className="form-input" value={form.address}
-                    onChange={e => setForm({...form, address: e.target.value})} />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Add Client</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

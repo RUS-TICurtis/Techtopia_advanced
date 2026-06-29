@@ -4,6 +4,7 @@ import * as React from "react"
 import { useLocation } from "react-router-dom"
 import { useAuthStore } from "@/store/authStore"
 import { hasPermission } from "@/services/auth/authService"
+import { tenantsApi } from "@/lib/systemApi"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
@@ -26,28 +27,71 @@ export function AppSidebar({
   const user = useAuthStore(state => state.user);
   const location = useLocation();
 
-  // 1. Configure Tenants / Teams
-  const teams = [
-    { id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', name: "Techtopia Corp", plan: "HQ", logo: <Building size={16} className="text-[#38BDF8]" /> },
-    { id: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', name: "Acme Enterprises", plan: "Enterprise", logo: <Building size={16} className="text-[#38BDF8]" /> },
-  ];
+  const [dbTeams, setDbTeams] = React.useState([]);
 
-  if (user?.role === 'super_admin' || user?.role === 'platform_owner') {
-    teams.push({
-      id: 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13',
-      name: "Platform Super Admin",
-      plan: "Platform Operator",
-      logo: <ShieldCheck size={16} className="text-[#EF4444]" />
-    });
-  }
+  React.useEffect(() => {
+    const fetchTeams = async () => {
+      // Only fetch all tenants if user has permission
+      if (user?.role === 'super_admin' || user?.role === 'platform_owner' || hasPermission(user, 'system.manage_tenants')) {
+        try {
+          const res = await tenantsApi.list();
+          const fetchedTenants = Array.isArray(res) ? res : (res.data || []);
+          
+          const mappedTeams = fetchedTenants.map(t => ({
+            id: t.id,
+            name: t.name,
+            plan: t.plan || "Workspace",
+            logo: <Building size={16} className="text-[#38BDF8]" />
+          }));
+          
+          // Optionally add the platform operator pseudo-tenant
+          if (user?.role === 'super_admin' || user?.role === 'platform_owner') {
+            mappedTeams.push({
+              id: 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13',
+              name: "Platform Super Admin",
+              plan: "Platform Operator",
+              logo: <ShieldCheck size={16} className="text-[#EF4444]" />
+            });
+          }
+
+          setDbTeams(mappedTeams);
+        } catch (error) {
+          console.error("Failed to fetch tenants for sidebar", error);
+          setDbTeams([{
+            id: user?.tenantId || 'default',
+            name: user?.clientCompany || 'My Workspace',
+            plan: 'Standard',
+            logo: <Building size={16} className="text-[#38BDF8]" />
+          }]);
+        }
+      } else {
+        // Normal users only see their own single workspace
+        setDbTeams([
+          {
+            id: user?.tenantId || 'default',
+            name: user?.clientCompany || 'My Workspace',
+            plan: 'Standard',
+            logo: <Building size={16} className="text-[#38BDF8]" />
+          }
+        ]);
+      }
+    };
+    
+    if (user) {
+      fetchTeams();
+    }
+  }, [user]);
 
   // Find active team from localStorage
-  const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
-  const activeTeam = teams.find(t => t.id === tenantId) || teams[0];
+  const tenantId = localStorage.getItem('crm_tenant_id');
+  const activeTeam = dbTeams.find(t => t.id === tenantId) || dbTeams[0] || {
+    id: 'default',
+    name: 'Loading...',
+    plan: '',
+    logo: <Building size={16} className="text-gray-500" />
+  };
 
-  // Reorder teams so active is first, or just let TeamSwitcher handle it (we pass teams array, it manages its own state, but we should initialize it)
-  // Wait, TeamSwitcher initializes to `teams[0]`. So let's reorder:
-  const sortedTeams = [activeTeam, ...teams.filter(t => t.id !== activeTeam.id)];
+  const sortedTeams = [activeTeam, ...dbTeams.filter(t => t.id !== activeTeam.id)];
 
   // 2. Build Navigation Data
   // Determine active item

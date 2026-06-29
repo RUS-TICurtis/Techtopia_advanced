@@ -96,9 +96,7 @@ export default function Leads({ searchValue = '' }) {
         lastName,
         email,
         phone,
-        companyName: company,
-        source,
-        status
+        companyName: company
       });
       setIsAddModalOpen(false);
       clearForm();
@@ -136,7 +134,6 @@ export default function Leads({ searchValue = '' }) {
           email,
           phone,
           companyName: company,
-          source,
           status
         }
       });
@@ -158,7 +155,9 @@ export default function Leads({ searchValue = '' }) {
         }));
       }
     } catch (err) {
-      showToast('Error', err.response?.data?.message || 'Failed to modify lead.', 'error');
+      const errorDetails = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+      console.error('Update failed:', err.response?.data || err);
+      showToast('Error', `Failed to modify lead. Details: ${errorDetails}`, 'error');
     }
   };
 

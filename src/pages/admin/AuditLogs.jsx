@@ -1,256 +1,206 @@
-import React, { useState, useEffect } from 'react';
-import { useAuditLogs } from '../../hooks/useCrmData';
-import { auditApi } from '../../lib/api';
-import { Search, ShieldAlert, ArrowDownToLine, RefreshCw, WifiOff } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
-import './AuditLogs.css';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Download, Search, AlertCircle, Info, AlertTriangle, XOctagon } from 'lucide-react';
+import { auditApi } from '../../lib/systemApi';
+import DataTable from '../../components/ui/DataTable';
+import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { showToast as toast } from '../../components/ui/Toast';
+
+const getSeverityIcon = (severity) => {
+  switch (severity) {
+    case 1: return <AlertTriangle className="w-4 h-4 text-warning-main" />;
+    case 2: return <XOctagon className="w-4 h-4 text-error-main" />;
+    case 3: return <AlertCircle className="w-4 h-4 text-error-dark" />;
+    default: return <Info className="w-4 h-4 text-info-main" />;
+  }
+};
+
+const getSeverityBadge = (severity) => {
+  switch (severity) {
+    case 1: return <Badge variant="warning">Warning</Badge>;
+    case 2: return <Badge variant="destructive">Error</Badge>;
+    case 3: return <Badge variant="destructive">Critical</Badge>;
+    default: return <Badge variant="info">Info</Badge>;
+  }
+};
 
 export default function AuditLogs() {
-  const { logs = [], isLoading, refetch } = useAuditLogs();
-  const [search, setSearch] = useState('');
-  const [severity, setSeverity] = useState('');
-  const [page, setPage] = useState(1);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [severityFilter, setSeverityFilter] = useState('all');
+  const [moduleFilter, setModuleFilter] = useState('all');
 
-  // Track browser online/offline status for the indicator banner.
+  // Fetch initial data
   useEffect(() => {
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
+    fetchLogs();
   }, []);
 
-  /**
-   * Resolve severity for a log entry.
-   *
-   * Prefer the backend-stamped `severity` field which will be one of:
-   *   'info' | 'warning' | 'critical'
-   *
-   * Fall back to client-side derivation only for legacy/mock records that
-   * pre-date the backend integration and do not carry a severity field.
-   */
-  const getSeverity = (log) => {
-    // --- Backend-stamped field (production path) ---
-    if (log.severity) {
-      const s = log.severity.toLowerCase();
-      if (s === 'critical' || s === 'danger') return 'Danger';
-      if (s === 'warning') return 'Warning';
-      return 'Info';
-    }
-    // --- Legacy client-side derivation (fallback for mock data only) ---
-    const act = (log.action || '').toUpperCase();
-    if (act.includes('DELETE') || act.includes('REMOVE') || act.includes('REVOKE') || act.includes('PURGE')) {
-      return 'Danger';
-    }
-    if (act.includes('UPDATE') || act.includes('EDIT') || act.includes('MODIFY')) {
-      return 'Warning';
-    }
-    return 'Info';
-  };
-
-  const filteredLogs = logs.filter(log => {
-    const logActor = log.actor || log.user || '';
-    const logAction = log.action || '';
-    const logModule = log.module || log.resource || '';
-    const logSeverity = getSeverity(log);
-
-    const matchesSearch =
-      logActor.toLowerCase().includes(search.toLowerCase()) ||
-      logAction.toLowerCase().includes(search.toLowerCase()) ||
-      logModule.toLowerCase().includes(search.toLowerCase());
-
-    const matchesSeverity = !severity || logSeverity.toLowerCase() === severity.toLowerCase();
-
-    return matchesSearch && matchesSeverity;
-  });
-
-  const limit = 10;
-  const totalPages = Math.ceil(filteredLogs.length / limit) || 1;
-  const paginatedLogs = filteredLogs.slice((page - 1) * limit, page * limit);
-
-  /**
-   * Export: calls the backend export endpoint (which returns a server-generated
-   * file with all logs and proper IP/actor stamping). Falls back to a client-side
-   * blob when the backend is offline.
-   */
-  const handleExportData = async () => {
-    setIsExporting(true);
+  const fetchLogs = async () => {
+    setLoading(true);
     try {
-      const blob = await auditApi.export('json');
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = `techtopia_crm_audit_logs_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
+      const response = await auditApi.list({ pageSize: 500 }); // Fetch a large chunk for client-side pagination
+      setLogs(response.data || response); // Handle both {data} and array formats
+    } catch (error) {
+      toast.error('Failed to load audit logs');
     } finally {
-      setIsExporting(false);
+      setLoading(false);
     }
   };
+
+  const handleExport = async () => {
+    try {
+      toast.info('Exporting audit logs...');
+      const blob = await auditApi.export({ format: 'csv' });
+      
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `audit_logs_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      toast.error('Failed to export audit logs');
+    }
+  };
+
+  const columns = useMemo(() => [
+    {
+      header: 'Timestamp',
+      accessorKey: 'timestamp',
+      cell: ({ row }) => (
+        <span className="text-sm text-foreground-muted whitespace-nowrap">
+          {new Date(row.original.timestamp).toLocaleString()}
+        </span>
+      )
+    },
+    {
+      header: 'Severity',
+      accessorKey: 'severity',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          {getSeverityIcon(row.original.severity)}
+          {getSeverityBadge(row.original.severity)}
+        </div>
+      )
+    },
+    {
+      header: 'Actor',
+      accessorKey: 'actor',
+      cell: ({ row }) => (
+        <span className="text-sm font-medium text-foreground">{row.original.actor}</span>
+      )
+    },
+    {
+      header: 'Module & Action',
+      accessorKey: 'action',
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold text-foreground">{row.original.action}</span>
+          <span className="text-xs text-foreground-muted">{row.original.module}</span>
+        </div>
+      )
+    },
+    {
+      header: 'IP Address',
+      accessorKey: 'ipAddress',
+      cell: ({ row }) => (
+        <span className="text-sm font-mono text-foreground-muted">{row.original.ipAddress || 'N/A'}</span>
+      )
+    },
+  ], []);
+
+  const filteredLogs = useMemo(() => {
+    return logs.filter(log => {
+      const matchesSearch = 
+        log.actor?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        log.action?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesSeverity = severityFilter === 'all' || log.severity?.toString() === severityFilter;
+      const matchesModule = moduleFilter === 'all' || log.module === moduleFilter;
+
+      return matchesSearch && matchesSeverity && matchesModule;
+    });
+  }, [logs, searchTerm, severityFilter, moduleFilter]);
+
+  const uniqueModules = useMemo(() => {
+    return [...new Set(logs.map(log => log.module))].filter(Boolean);
+  }, [logs]);
 
   return (
-    <div className="page-container audit-logs-page">
-      <div className="page-header flex justify-between items-center mb-6">
+    <div className="p-6 md:p-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Header section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="page-title flex items-center gap-2">
-            <ShieldAlert className="text-[#EF4444]" />
-            Security &amp; Audit Trail
-          </h1>
-          <p className="page-subtitle">
-            Real-time security logs, RBAC policy audits, and data access compliance records.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Audit Logs</h1>
+          <p className="text-foreground-muted mt-1">Monitor system activities, user actions, and security events.</p>
         </div>
-        <button
-          onClick={handleExportData}
-          disabled={isExporting}
-          className="btn btn-secondary flex items-center gap-2"
-        >
-          <ArrowDownToLine size={16} />
-          {isExporting ? 'Exportingâ€¦' : 'Export Logs'}
-        </button>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={fetchLogs} disabled={loading}>
+            Refresh
+          </Button>
+          <Button onClick={handleExport} className="gap-2">
+            <Download className="w-4 h-4" />
+            Export CSV
+          </Button>
+        </div>
       </div>
 
-      {/* Offline indicator */}
-      {isOffline && (
-        <div
-          className="flex items-center gap-2 px-4 py-2 mb-4 rounded-lg text-sm font-medium"
-          style={{ background: 'var(--color-warning-bg, #451a03)', color: '#fbbf24', border: '1px solid #92400e' }}
-        >
-          <WifiOff size={15} />
-          You are offline. Showing cached logs â€” new events will be queued and synced when connectivity is restored.
-        </div>
-      )}
-
-      {/* Filters Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-500" size={16} />
-          <input
-            type="text"
-            placeholder="Search by user, action, resource..."
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="search-input w-full pl-10"
-            style={{
-              backgroundColor: 'var(--bg-app)',
-              borderColor: 'var(--border-light)',
-              color: 'var(--text-main)'
-            }}
+      {/* Filters section */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center bg-surface-elevated border border-border p-4 rounded-xl shadow-sm">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted" />
+          <Input 
+            placeholder="Search by actor or action..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 w-full"
           />
         </div>
-        <div className="flex gap-2">
-          <select
-            value={severity}
-            onChange={(e) => { setSeverity(e.target.value); setPage(1); }}
-            className={`form-input severity-select ${
-              severity === 'Info' ? 'sel-info' :
-              severity === 'Warning' ? 'sel-warning' :
-              severity === 'Danger' ? 'sel-danger' : ''
-            }`}
-            style={{ minWidth: 160 }}
-          >
-            <option value="">All Severities</option>
-            <option value="Info">Info</option>
-            <option value="Warning">Warning</option>
-            <option value="Danger">Critical</option>
-          </select>
-          <button onClick={() => refetch()} className="btn btn-secondary px-3" title="Refresh">
-            <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
-          </button>
+        
+        <div className="w-full sm:w-48">
+          <Select value={severityFilter} onValueChange={setSeverityFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="All Severities" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Severities</SelectItem>
+              <SelectItem value="0">Info</SelectItem>
+              <SelectItem value="1">Warning</SelectItem>
+              <SelectItem value="2">Error</SelectItem>
+              <SelectItem value="3">Critical</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="w-full sm:w-48">
+          <Select value={moduleFilter} onValueChange={setModuleFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="All Modules" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Modules</SelectItem>
+              {uniqueModules.map(module => (
+                <SelectItem key={module} value={module}>{module}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Table Container */}
-      <div className="table-container card" style={{ padding: 0 }}>
-        <table className="custom-table">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>User</th>
-              <th>Action</th>
-              <th>Resource / Module</th>
-              <th>IP Address</th>
-              <th>Severity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              [...Array(5)].map((_, i) => (
-                <tr key={i} className="animate-pulse">
-                  <td className="p-4"><div className="skeleton h-4 w-24"></div></td>
-                  <td className="p-4"><div className="skeleton h-4 w-36"></div></td>
-                  <td className="p-4"><div className="skeleton h-4 w-48"></div></td>
-                  <td className="p-4"><div className="skeleton h-4 w-16"></div></td>
-                  <td className="p-4"><div className="skeleton h-4 w-28"></div></td>
-                  <td className="p-4"><div className="skeleton h-4 w-12"></div></td>
-                </tr>
-              ))
-            ) : paginatedLogs.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="p-12 text-center text-gray-500">
-                  No security audit logs match your search.
-                </td>
-              </tr>
-            ) : (
-              paginatedLogs.map((log) => {
-                const logSeverity = getSeverity(log);
-                return (
-                  <tr key={log.id}>
-                    <td className="font-mono" style={{ fontSize: 11 }}>{new Date(log.timestamp).toLocaleString()}</td>
-                    <td style={{ fontWeight: 600, color: 'var(--text-title)' }}>{log.actor || log.user}</td>
-                    <td>{log.action}</td>
-                    <td><code style={{ fontSize: 11, color: 'var(--text-muted)' }}>{log.module || log.resource}</code></td>
-                    <td>
-                      <code title={log.ip ? 'Server-resolved IP' : 'IP unavailable'}>
-                        {log.ip || 'â€”'}
-                      </code>
-                    </td>
-                    <td>
-                      <Badge variant={
-                        logSeverity === 'Danger' ? 'error' :
-                        logSeverity === 'Warning' ? 'warning' : 'info'
-                      }>
-                        {logSeverity}
-                      </Badge>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-
-        {/* Pagination */}
-        <div className="flex justify-between items-center p-4 border-t border-light" style={{ borderTop: '1px solid var(--border-light)' }}>
-          <span className="text-xs text-gray-500">
-            Showing Page {page} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="btn btn-secondary px-3 py-1 text-xs"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="btn btn-secondary px-3 py-1 text-xs"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+      {/* Table section */}
+      <div className="bg-surface border border-border rounded-xl shadow-sm overflow-hidden">
+        <DataTable 
+          columns={columns} 
+          data={filteredLogs} 
+          loading={loading} 
+          pageSize={15} 
+        />
       </div>
     </div>
   );
 }
-

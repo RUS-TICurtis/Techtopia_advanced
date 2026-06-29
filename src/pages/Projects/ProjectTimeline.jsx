@@ -13,7 +13,9 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/button';
 import { useProjects } from '../../hooks/useCrmData';
+import PageContainer from '../../components/layout/PageContainer';
 import './Projects.css';
 
 export default function ProjectTimeline() {
@@ -43,19 +45,19 @@ export default function ProjectTimeline() {
 
   const getHealthColor = (h) => {
     switch (h) {
-      case 'On Track': return '#10B981'; // Green
-      case 'At Risk': return '#F59E0B'; // Yellow
-      case 'Off Track': return '#EF4444'; // Magenta
-      case 'Completed': return '#3B82F6'; // Blue
-      default: return '#64748B';
+      case 'On Track': return '#10b981'; // Emerald
+      case 'At Risk': return '#f59e0b'; // Amber
+      case 'Off Track': return '#ef4444'; // Red
+      case 'Completed': return '#3b82f6'; // Blue
+      default: return '#64748b'; // Slate
     }
   };
 
   if (isLoading) {
     return (
-      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#38BDF8]"></div>
-      </div>
+      <PageContainer className="flex items-center justify-center min-h-[300px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </PageContainer>
     );
   }
 
@@ -104,34 +106,38 @@ export default function ProjectTimeline() {
   };
 
   return (
-    <div className="page-container projects-page project-timeline-page">
-      <div className="page-header flex justify-between items-center mb-6">
+    <PageContainer className="projects-page project-timeline-page">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="page-title flex items-center gap-2">
-            <Link to="/projects" className="text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft size={20} />
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Link to="/projects" className="text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft className="w-5 h-5" />
             </Link>
-            <span className="text-[#38BDF8]">?</span> Portfolio Gantt Timeline
+            <span className="text-primary">🚀</span> Portfolio Gantt Timeline
           </h1>
-          <p className="page-subtitle">Visual sprint tracking, project windows, and milestone delivery targets</p>
+          <p className="text-sm text-muted-foreground mt-1">Visual sprint tracking, project windows, and milestone delivery targets</p>
         </div>
         <div className="flex gap-2">
-          <Link to="/projects" className="btn btn-secondary text-xs px-3 py-2 border-gray-800 text-gray-400 hover:text-white">
-            List View
-          </Link>
-          <Link to="/projects/board" className="btn btn-secondary text-xs px-3 py-2 flex items-center gap-1.5 border-gray-800 text-gray-400 hover:text-white">
-            <FolderKanban size={14} /> Kanban Board
-          </Link>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/projects">
+              List View
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/projects/board" className="gap-2">
+              <FolderKanban className="w-4 h-4" /> Kanban Board
+            </Link>
+          </Button>
         </div>
       </div>
 
-      <div className="card premium-panel overflow-hidden p-6 bg-[#1E293B]/40 border border-gray-800/80 backdrop-blur-md">
+      <div className="bg-card text-card-foreground border border-border rounded-xl p-6 shadow-sm overflow-hidden">
         
         {/* Timeline Header (Months) */}
         <div className="timeline-gantt-wrapper relative mt-4">
-          <div className="gantt-months-grid grid grid-cols-6 border-b border-gray-800 pb-3 text-xs text-gray-500 font-mono font-bold tracking-wider text-center">
+          <div className="gantt-months-grid grid grid-cols-6 border-b border-border pb-3 text-xs text-muted-foreground font-mono font-semibold tracking-wider text-center">
             {timelineMonths.map(m => (
-              <div key={m.name} className="border-r border-gray-850/40 last:border-r-0">
+              <div key={m.name} className="border-r border-border last:border-r-0">
                 {m.name.toUpperCase()} 2026
               </div>
             ))}
@@ -140,7 +146,7 @@ export default function ProjectTimeline() {
           {/* Grid vertical gridlines */}
           <div className="absolute inset-0 top-8 grid grid-cols-6 pointer-events-none">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="border-r border-gray-850/15 last:border-r-0 h-full"></div>
+              <div key={i} className="border-r border-border border-dashed opacity-50 last:border-r-0 h-full"></div>
             ))}
           </div>
 
@@ -151,78 +157,73 @@ export default function ProjectTimeline() {
               const color = getHealthColor(proj.health);
               
               return (
-                <div key={proj.id} className="gantt-row flex flex-col gap-2 border-b border-gray-850/15 pb-6 last:border-0 last:pb-0">
+                <div key={proj.id} className="flex flex-col gap-2 border-b border-border pb-6 last:border-0 last:pb-0">
                   
                   {/* Row Details Label */}
                   <div className="flex justify-between items-center text-xs">
                     <div className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                      <span className="font-bold text-white text-sm">{proj.title}</span>
-                      <span className="text-[10px] text-gray-500 font-semibold flex items-center gap-1">
-                        <Building2 size={10} /> {proj.company}
+                      <span className="font-semibold text-foreground text-sm">{proj.title}</span>
+                      <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                        <Building2 className="w-3 h-3" /> {proj.company}
                       </span>
                     </div>
-                    <span className="text-gray-400 font-mono text-[10px] font-bold">
-                      {proj.startDate} <span className="text-gray-600">to</span> {proj.dueDate}
+                    <span className="text-muted-foreground font-mono text-[10px] font-medium">
+                      {proj.startDate} <span className="opacity-60 mx-1">to</span> {proj.dueDate}
                     </span>
                   </div>
 
                   {/* Gantt Bar Lane */}
-                  <div className="gantt-lane relative w-full h-8 bg-gray-950/40 border border-gray-850 rounded-lg">
+                  <div className="relative w-full h-8 bg-muted border border-border rounded-lg overflow-hidden">
                     
                     {/* Project Bar */}
                     <div 
-                      className="absolute top-1 bottom-1 rounded-md flex items-center px-3 overflow-hidden select-none hover:shadow-glow transition-all"
+                      className="absolute top-1 bottom-1 rounded-md flex items-center px-3 select-none transition-all hover:opacity-90"
                       style={{
                         left: pos.left,
                         width: pos.width,
-                        background: `linear-gradient(90deg, ${color}33 0%, ${color}10 100%)`,
-                        border: `1px solid ${color}50`
+                        backgroundColor: `${color}33`,
+                        border: `1px solid ${color}`
                       }}
                     >
                       {/* Bar Fill representing Progress */}
                       <div 
-                        className="absolute left-0 top-0 bottom-0 opacity-20 rounded-r-none rounded-md"
+                        className="absolute left-0 top-0 bottom-0 opacity-40 rounded-r-none rounded-md"
                         style={{
                           width: `${proj.progress}%`,
                           backgroundColor: color
                         }}
                       />
                       
-                      <div className="relative z-10 flex items-center justify-between w-full text-[10px] font-black text-white font-mono uppercase tracking-wider">
-                        <span className="truncate">{proj.progress}% Done</span>
-                        <span>{proj.owner}</span>
+                      <div className="relative z-10 flex items-center justify-between w-full text-[10px] font-bold text-foreground font-mono uppercase tracking-wider mix-blend-difference">
+                        <span className="truncate mr-2">{proj.progress}% Done</span>
+                        <span className="truncate">{proj.owner}</span>
                       </div>
                     </div>
 
                     {/* Milestones mapped on top of the bar */}
                     {proj.milestones && proj.milestones.map((ms, mIdx) => {
                       const msPos = calculateMilestonePosition(ms.date, proj.startDate, proj.dueDate);
-                      // Calculate coordinate relative to the Gantt Bar's absolute position
-                      // Since msPos is percentage of the bar, we can place a diamond element inside the bar!
                       return (
                         <div 
                           key={mIdx} 
-                          className="absolute top-1/2 -translate-y-1/2 group"
+                          className="absolute top-1/2 -translate-y-1/2 group z-20"
                           style={{
                             left: `calc(${pos.left} + (${pos.width} * (${msPos} / 100)))`
                           }}
                         >
                           {/* Diamond Milestone marker */}
                           <div 
-                            className="w-3.5 h-3.5 rotate-45 border-2 border-gray-950 flex items-center justify-center cursor-help transition-all duration-200 hover:scale-125"
-                            style={{
-                              backgroundColor: color,
-                              boxShadow: `0 0 6px ${color}`
-                            }}
+                            className="w-3.5 h-3.5 rotate-45 border-2 border-background flex items-center justify-center cursor-help transition-transform hover:scale-125"
+                            style={{ backgroundColor: color }}
                           />
 
                           {/* Hover tooltip showing milestone details */}
-                          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#1E293B] border border-gray-800 text-[10px] text-gray-300 font-bold px-2 py-1.5 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-55 flex flex-col gap-0.5 pointer-events-none">
-                            <span className="text-white font-black flex items-center gap-1">
-                              <Flag size={9} style={{ color }} /> {ms.name}
+                          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-popover text-popover-foreground border border-border text-[10px] px-2.5 py-1.5 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap flex flex-col gap-0.5 pointer-events-none">
+                            <span className="font-semibold flex items-center gap-1.5">
+                              <Flag className="w-3 h-3" style={{ color }} /> {ms.name}
                             </span>
-                            <span className="font-mono text-gray-500">Scheduled: {ms.date}</span>
+                            <span className="font-mono text-muted-foreground">Scheduled: {ms.date}</span>
                           </div>
                         </div>
                       );
@@ -240,12 +241,12 @@ export default function ProjectTimeline() {
       </div>
 
       {/* Info card describing timeline capabilities */}
-      <div className="card p-4 bg-[#F59E0B]/5 border-l-4 border-l-[#F59E0B] flex gap-3 text-xs leading-relaxed text-gray-300">
-        <Sparkles size={18} className="text-[#F59E0B] flex-shrink-0 mt-0.5" />
+      <div className="mt-6 p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg flex gap-3 text-sm text-foreground">
+        <Sparkles className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
         <div>
-          <span className="font-bold text-white">Timeline Sprint Tracking activated.</span> Hover over the glowing diamond milestone tags inside the Gantt lanes to view detailed target scheduled cutover dates. Drag deliverables in the <Link to="/projects/board" className="text-[#38BDF8] font-bold underline hover:text-white transition-colors">Kanban Board</Link> to adjust completion velocities.
+          <span className="font-semibold text-amber-500">Timeline Sprint Tracking activated.</span> Hover over the diamond milestone tags inside the Gantt lanes to view detailed target scheduled cutover dates. Drag deliverables in the <Link to="/projects/board" className="text-primary font-medium hover:underline">Kanban Board</Link> to adjust completion velocities.
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

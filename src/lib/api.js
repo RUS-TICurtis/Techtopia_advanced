@@ -164,17 +164,23 @@ const MOCK_SETTLEMENTS = [
 ];
 
 function createMockResourceService(storageKey, defaultData) {
+  const getStorageKey = () => {
+    const tenantId = localStorage.getItem('crm_tenant_id') || 'default';
+    return `${storageKey}_${tenantId}`;
+  };
+
   const getItems = () => {
-    const data = localStorage.getItem(storageKey);
+    const key = getStorageKey();
+    const data = localStorage.getItem(key);
     if (!data) {
-      localStorage.setItem(storageKey, JSON.stringify(defaultData));
+      localStorage.setItem(key, JSON.stringify(defaultData));
       return defaultData;
     }
     return JSON.parse(data);
   };
   
   const saveItems = (items) => {
-    localStorage.setItem(storageKey, JSON.stringify(items));
+    localStorage.setItem(getStorageKey(), JSON.stringify(items));
   };
 
   return {
@@ -250,7 +256,7 @@ export const invitationsApi = {
 };
 
 export const leadsApi = {
-  ...createResourceService('/api/v1/leads'),
+  ...createPutResourceService('/api/v1/leads'),
   convert: (id, data = {}) => apiClient.post(`/api/v1/leads/${id}/convert`, data).then(r => r.data),
   qualify: (id, data) => apiClient.post(`/api/v1/leads/${id}/qualify`, data).then(r => r.data),
   assign: (id, data) => apiClient.post(`/api/v1/leads/${id}/assign`, data).then(r => r.data),
@@ -260,75 +266,11 @@ export const leadsApi = {
   addActivity: (id, data) => apiClient.post(`/api/v1/leads/${id}/activities`, data).then(r => r.data),
 };
 
-export const contactsApi = createMockResourceService('crm_contacts', MOCK_CONTACTS);
-export const companiesApi = createMockResourceService('crm_companies', MOCK_COMPANIES);
-export const dealsApi = createMockResourceService('crm_deals', MOCK_DEALS);
+export const contactsApi = createPutResourceService('/api/v1/crm/contacts');
+export const companiesApi = createPutResourceService('/api/v1/crm/companies');
+export const dealsApi = createPutResourceService('/api/v1/crm/opportunities');
 export const clientsApi = contactsApi;
-const mapProjectDto = (p) => ({
-  id: p.id,
-  name: p.name,
-  title: p.name, // Frontend often uses 'title' or 'name' interchangeably for projects
-  status: p.status || 'Active',
-  progress: p.progressPercentage || 0,
-  client: p.customerName || "Internal",
-  manager: p.ownerName || "Unassigned",
-  startDate: p.startDate ? p.startDate.split('T')[0] : null,
-  endDate: p.endDate ? p.endDate.split('T')[0] : null,
-  dueDate: p.endDate ? p.endDate.split('T')[0] : null, // Frontend Kanban uses 'dueDate'
-  description: p.description || '',
-  enableMicrosoftWorkspace: p.enableMicrosoftWorkspace || false,
-  budget: 0,
-  spent: 0,
-  health: p.healthStatus || 'On Track',
-  owner: p.ownerName || "Unassigned",
-  createdAt: p.createdAt
-});
 
-export const projectsApi = {
-  list: async (params) => {
-    const response = await apiClient.get('/api/projects', { params });
-    const data = Array.isArray(response.data) ? response.data : (response.data?.data || []);
-    return data.map(mapProjectDto);
-  },
-  get: async (id) => {
-    const response = await apiClient.get(`/api/projects/${id}`);
-    return mapProjectDto(response.data);
-  },
-  create: async (data) => {
-    // Map frontend fields to backend CreateProjectRequest
-    // Ensure dates are full ISO strings for ASP.NET Core to parse correctly
-    const toIso = (d) => d ? new Date(d).toISOString() : undefined;
-    const backendData = {
-      Name: data.title || data.name,
-      Description: data.description || null,
-      ProjectType: data.projectType || "Client",
-      Priority: data.priority || "Medium",
-      StartDate: toIso(data.startDate),
-      EndDate: toIso(data.dueDate || data.endDate),
-      EnableMicrosoftWorkspace: data.enableMicrosoftWorkspace ?? false
-    };
-    const response = await apiClient.post('/api/projects', backendData);
-    return mapProjectDto(response.data);
-  },
-  update: async (id, data) => {
-    // Map frontend fields to backend UpdateProjectRequest
-    const backendData = {
-      Name: data.title || data.name,
-      Description: data.description,
-      ProjectType: "Client",
-      Status: data.status,
-      Priority: "Medium",
-      StartDate: data.startDate,
-      EndDate: data.dueDate || data.endDate
-    };
-    const response = await apiClient.put(`/api/projects/${id}`, backendData);
-    return mapProjectDto(response.data);
-  },
-  delete: async (id) => {
-    await apiClient.delete(`/api/projects/${id}`);
-    return { success: true };
-  }
-};
 export const tasksApi = createMockResourceService('crm_tasks', MOCK_TASKS);
 export const ticketsApi = createMockResourceService('crm_tickets', MOCK_TICKETS);
 
@@ -389,56 +331,7 @@ export const expenseCategoriesApi = {
 export const contractsApi = createPutResourceService('/api/v1/finance/contracts');
 export const teamApi = createResourceService('/api/v1/hr/employees');
 export const departmentsApi = createPutResourceService('/api/v1/hr/departments');
-export const auditApi = {
-  /**
-   * Fetch audit event records from the backend.
-   * Falls back to static MOCK_AUDIT_LOGS when the backend is unreachable
-   * (network error / server offline) so the UI is never left empty during
-   * development or when the backend hasn't been deployed yet.
-   *
-   * Supported query params (forwarded to backend):
-   *   page, limit, severity, module, actor, from, to
-   */
-  list: async (params) => {
-    try {
-      const response = await apiClient.get('/api/v1/system/audit-logs', { params });
-      // Backend may return { data: [...] } or the array directly
-      return Array.isArray(response.data) ? response.data : (response.data?.data ?? []);
-    } catch (err) {
-      // Only fall back for genuine network failures (no response from server).
-      // 4xx/5xx errors propagate normally so the UI can surface them.
-      if (!err.response) {
-        console.warn('[auditApi] Backend unreachable — returning mock audit logs.');
-        return MOCK_AUDIT_LOGS;
-      }
-      throw err;
-    }
-  },
 
-  /**
-   * Trigger a server-generated export file download.
-   * Falls back to a client-side JSON Blob when the backend is unreachable.
-   *
-   * @param {'json'|'csv'} [format='json']
-   */
-  export: async (format = 'json') => {
-    try {
-      const response = await apiClient.get('/api/v1/system/audit-logs/export', {
-        params: { format },
-        responseType: 'blob',
-      });
-      return response.data; // already a Blob
-    } catch (err) {
-      if (!err.response) {
-        // Offline fallback — export whatever is cached in localStorage
-        const cached = localStorage.getItem('crm_audit_logs');
-        const logs = cached ? JSON.parse(cached) : MOCK_AUDIT_LOGS;
-        return new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
-      }
-      throw err;
-    }
-  },
-};
 
 export const analyticsApi = {
   summary: async (params) => {
@@ -607,7 +500,7 @@ export const filesApi = {
   getSignedUrl: (id) => apiClient.get(`/files/${id}/url`).then(r => r.data),
 };
 
-export const tenantsApi = createPutResourceService('/api/v1/system/tenants');
+
 
 export const permissionsApi = {
   list: () => apiClient.get('/api/v1/permissions').then(r => r.data),
