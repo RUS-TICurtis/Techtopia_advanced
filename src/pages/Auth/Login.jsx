@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import { Sparkles, ArrowRight, ShieldCheck, Mail, Lock, Cpu } from 'lucide-react';
 import { getApiBaseUrl } from '../../lib/api';
 import './Login.css';
-import logo from "\\src\\assets\\logomark.png"
+import logo from "../../assets/logomark.png"
 import { Button } from '@base-ui/react';
 import { MotionGlobalConfig } from 'framer-motion';
 
