@@ -31,7 +31,7 @@ const microsoftIntegrationService = {
   checkConnectionStatus: async () => {
     try {
       const response = await api.get('/api/tenants/current/microsoft/status');
-      return response.data; // { isConnected: true/false, microsoftTenantId: "...", lastSyncAt: "..." }
+      return response.data;
     } catch (error) {
       console.error("Failed to check connection status", error);
       return { isConnected: false };
@@ -60,9 +60,77 @@ const microsoftIntegrationService = {
     }
   },
 
+  // ─── Directory ────────────────────────────────────────────────────────────
+
+  // Get all synced Entra ID users with presence and profile data
+  getDirectoryUsers: async () => {
+    try {
+      const response = await api.get('/api/tenants/current/microsoft/directory/users');
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch directory users", error);
+      return [];
+    }
+  },
+
+  // Get all synced Azure AD Groups / Departments
+  getDirectoryGroups: async () => {
+    try {
+      const response = await api.get('/api/tenants/current/microsoft/directory/groups');
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch directory groups", error);
+      return [];
+    }
+  },
+
+  // ─── Calendar ────────────────────────────────────────────────────────────
+
+  // Get all synced calendar events for a date range
+  getCalendarEvents: async (from, to) => {
+    try {
+      const params = new URLSearchParams();
+      if (from) params.append('from', from.toISOString());
+      if (to) params.append('to', to.toISOString());
+      const response = await api.get(`/api/tenants/current/microsoft/calendar/events?${params.toString()}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch calendar events", error);
+      return [];
+    }
+  },
+
+  // ─── Per-Employee ─────────────────────────────────────────────────────────
+
+  // Get live presence and profile photo for a specific employee
+  getEmployeePresence: async (employeeId) => {
+    try {
+      const response = await api.get(`/api/tenants/current/microsoft/employees/${employeeId}/presence`);
+      return response.data;
+    } catch (error) {
+      if (error.response?.status !== 404) {
+        console.error("Failed to fetch employee presence", error);
+      }
+      return null;
+    }
+  },
+
+  // Get upcoming calendar events for a specific employee
+  getEmployeeCalendar: async (employeeId) => {
+    try {
+      const response = await api.get(`/api/tenants/current/microsoft/employees/${employeeId}/calendar`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch employee calendar", error);
+      return [];
+    }
+  },
+
+  // ─── Workspace helpers ────────────────────────────────────────────────────
+
   // Check if a workspace mapping exists for a specific project
   getProjectWorkspace: async (projectId) => {
-    // FALLBACK: If the frontend is using mock numerical IDs (instead of backend Guids), 
+    // FALLBACK: If the frontend is using mock numerical IDs (instead of backend Guids),
     // simulate a successful workspace creation so the UI banner is visible!
     if (!isNaN(projectId)) {
       return {
@@ -78,12 +146,9 @@ const microsoftIntegrationService = {
       const response = await api.get(`/api/projects/${projectId}/workspace`);
       return response.data;
     } catch (error) {
-      // 404 = no workspace provisioned yet (Teams job still pending Azure permissions)
-      // This is expected behavior — silently return null so UI shows "pending" state
       if (error.response && error.response.status === 404) {
         return null;
       }
-      // Only log unexpected errors
       console.error("Workspace fetch failed unexpectedly", error);
       return null;
     }

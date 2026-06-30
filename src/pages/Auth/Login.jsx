@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { Sparkles, ArrowRight, ShieldCheck, Mail, Lock, Cpu } from 'lucide-react';
+import { getApiBaseUrl } from '../../lib/api';
 import './Login.css';
 import logo from "\\src\\assets\\logomark.png"
 import { Button } from '@base-ui/react';
@@ -121,7 +122,15 @@ export default function AuthLogin() {
                 Google
               </Button>
               
-              <Button type="button" className="social-btn">
+              <Button 
+                type="button" 
+                className="social-btn"
+                onClick={() => {
+                  const backendUrl = getApiBaseUrl();
+                  const frontendUrl = encodeURIComponent(window.location.origin + '/');
+                  window.location.href = `${backendUrl}api/v1/auth/microsoft/login?frontendUrl=${frontendUrl}`;
+                }}
+              >
                 <svg width="20" height="20" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
                   <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
                   <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>

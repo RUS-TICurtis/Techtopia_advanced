@@ -58,7 +58,9 @@ apiClient.interceptors.response.use(
         originalRequest.baseURL = apiBase;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        window.location.href = '/auth/login';
+        if (!window.location.pathname.startsWith('/auth/login')) {
+          window.location.href = '/auth/login';
+        }
       }
     }
     return Promise.reject(error);

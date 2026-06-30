@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Plus as PlusIcon, Search as MagnifyingGlassIcon, X as XIcon, Edit2 as EditIcon, Trash2 as TrashIcon, Eye as EyeIcon } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus as PlusIcon, Search as MagnifyingGlassIcon, X as XIcon, Edit2 as EditIcon, Trash2 as TrashIcon, Eye as EyeIcon, Video, Calendar, User, MapPin, ChevronRight } from 'lucide-react';
 import { hrEmployeesApi, hrDepartmentsApi } from '../../lib/hrApi';
 import { usersApi } from '../../lib/api';
+import microsoftIntegrationService from '../../services/microsoftIntegrationService';
 
 export default function Employees() {
   const [search, setSearch] = useState('');
@@ -12,6 +13,7 @@ export default function Employees() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [deletingEmployee, setDeletingEmployee] = useState(null);
+  const [viewingEmployee, setViewingEmployee] = useState(null);
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -215,7 +217,9 @@ export default function Employees() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-3">
-                        <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 flex items-center gap-1">
+                        <button
+                          onClick={() => setViewingEmployee(person)}
+                          className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 flex items-center gap-1">
                           <EyeIcon size={16} /> View
                         </button>
                         <button 
@@ -368,6 +372,140 @@ export default function Employees() {
           </div>
         </div>
       )}
+      {/* Microsoft 365 Employee Panel */}
+      {viewingEmployee && (
+        <MicrosoftEmployeePanel employee={viewingEmployee} onClose={() => setViewingEmployee(null)} />
+      )}
+    </div>
+  );
+}
+
+// ─── Microsoft 365 Employee Panel ────────────────────────────────────────────
+const PRESENCE_CFG = {
+  Available:        { color: '#22c55e', label: 'Available' },
+  Busy:             { color: '#ef4444', label: 'Busy' },
+  DoNotDisturb:     { color: '#ef4444', label: 'Do Not Disturb' },
+  BeRightBack:      { color: '#f59e0b', label: 'Be Right Back' },
+  Away:             { color: '#f59e0b', label: 'Away' },
+  Offline:          { color: '#6b7280', label: 'Offline' },
+  Oof:              { color: '#8b5cf6', label: 'Out of Office' },
+  PresenceUnknown:  { color: '#6b7280', label: 'Unknown' },
+};
+
+function MicrosoftEmployeePanel({ employee, onClose }) {
+  const [presence, setPresence] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!employee?.id) return;
+    setLoading(true);
+    Promise.all([
+      microsoftIntegrationService.getEmployeePresence(employee.id),
+      microsoftIntegrationService.getEmployeeCalendar(employee.id),
+    ]).then(([p, e]) => {
+      setPresence(p);
+      setEvents(Array.isArray(e) ? e : []);
+    }).finally(() => setLoading(false));
+  }, [employee?.id]);
+
+  const presenceCfg = PRESENCE_CFG[presence?.presenceStatus] || PRESENCE_CFG.PresenceUnknown;
+  const initials = employee.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, right: 0, bottom: 0, width: 340,
+      background: '#0a1628', borderLeft: '1px solid #1e2a3a',
+      zIndex: 1000, display: 'flex', flexDirection: 'column',
+      boxShadow: '-8px 0 32px rgba(0,0,0,0.5)', fontFamily: "'Inter', system-ui, sans-serif"
+    }}>
+      {/* Header */}
+      <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e2a3a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <svg width="18" height="18" viewBox="0 0 23 23" fill="none"><path d="M1 1h10v10H1z" fill="#f25022"/><path d="M12 1h10v10H12z" fill="#7fba00"/><path d="M1 12h10v10H1z" fill="#00a4ef"/><path d="M12 12h10v10H12z" fill="#ffb900"/></svg>
+          <span style={{ fontWeight: 700, color: '#f1f5f9', fontSize: 14 }}>Microsoft 365 Profile</span>
+        </div>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: 4 }}>
+          <XIcon size={18} />
+        </button>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+        {/* Avatar & Name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, color: '#fff' }}>{initials}</div>
+            {presence && (
+              <span style={{ position: 'absolute', bottom: 0, right: 0, width: 14, height: 14, borderRadius: '50%', background: presenceCfg.color, border: '2px solid #0a1628' }} />
+            )}
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: 16 }}>{employee.name}</div>
+            <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{employee.role}</div>
+            <div style={{ fontSize: 11, color: '#475569', marginTop: 1 }}>{employee.department}</div>
+          </div>
+        </div>
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '30px 0', color: '#64748b', fontSize: 13 }}>Loading Microsoft data...</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            {/* Presence */}
+            {presence ? (
+              <div style={{ padding: '12px 16px', borderRadius: 10, background: '#0d1829', border: '1px solid #1e2a3a' }}>
+                <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600, marginBottom: 8 }}>Teams Presence</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: presenceCfg.color, boxShadow: `0 0 0 2px ${presenceCfg.color}30` }} />
+                  <span style={{ fontSize: 14, fontWeight: 600, color: presenceCfg.color }}>{presenceCfg.label}</span>
+                </div>
+                {presence.presenceActivity && presence.presenceActivity !== presence.presenceStatus && (
+                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{presence.presenceActivity}</div>
+                )}
+              </div>
+            ) : (
+              <div style={{ padding: '12px 16px', borderRadius: 10, background: '#0d1829', border: '1px solid #1e2a3a', color: '#64748b', fontSize: 13 }}>
+                No Microsoft 365 data. This employee may not be synced with Entra ID.
+              </div>
+            )}
+
+            {/* Quick Actions */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Quick Actions</div>
+              <a href={`https://teams.microsoft.com/l/chat/0/0?users=${employee.raw?.user?.email || ''}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 8, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', textDecoration: 'none', color: '#a5b4fc' }}>
+                <Video size={15} />
+                <span style={{ fontSize: 13, fontWeight: 500 }}>Message in Teams</span>
+                <ChevronRight size={13} style={{ marginLeft: 'auto' }} />
+              </a>
+            </div>
+
+            {/* Upcoming Calendar */}
+            <div>
+              <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600, marginBottom: 8 }}>Upcoming Events</div>
+              {events.length === 0 ? (
+                <div style={{ fontSize: 13, color: '#475569', padding: '10px 14px', borderRadius: 8, background: '#0d1829', border: '1px solid #1e2a3a' }}>No upcoming events</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {events.slice(0, 4).map(ev => (
+                    <div key={ev.id} style={{ padding: '10px 14px', borderRadius: 8, background: '#0d1829', border: '1px solid #1e2a3a' }}>
+                      <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.subject || '(No subject)'}</div>
+                      <div style={{ fontSize: 11, color: '#64748b', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Calendar size={11} />
+                        {new Date(ev.startDateTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} ·{' '}
+                        {new Date(ev.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {ev.isOnlineMeeting && <Video size={11} color="#60a5fa" style={{ marginLeft: 4 }} />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
+      </div>
     </div>
   );
 }
