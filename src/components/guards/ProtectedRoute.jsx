@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { hasPermission } from '../../services/auth/authService';
-import Unauthorized from '../../pages/admin/Unauthorized';
+const Unauthorized = lazy(() => import('../../pages/admin/Unauthorized'));
 import { ROLES } from '../../constants/permissions';
 
 export default function ProtectedRoute({ permission }) {
@@ -24,7 +24,11 @@ export default function ProtectedRoute({ permission }) {
 
   // Strict permission gating using centralized RBAC
   if (permission && !hasPermission(user, permission)) {
-    return <Unauthorized />;
+    return (
+      <Suspense fallback={null}>
+        <Unauthorized />
+      </Suspense>
+    );
   }
 
   return <Outlet />;
