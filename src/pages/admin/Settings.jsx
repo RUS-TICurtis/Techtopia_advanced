@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { 
-  User, 
+import {
+  User,
   Settings as SettingsIcon,
-  Lock, 
-  Camera, 
-  Check, 
-  Eye, 
+  Lock,
+  Camera,
+  Check,
+  Eye,
   EyeOff,
   Building2,
   Palette,
@@ -44,17 +44,54 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
       setActiveTab('integrations');
       navigate('/settings', { replace: true });
     }
+  }
+  )
 
-    // Fetch initial status
-    const fetchStatus = async () => {
-      setIsLoadingMsStatus(true);
-      const status = await microsoftIntegrationService.checkConnectionStatus();
-      setMsConnectionStatus(status);
-      setIsLoadingMsStatus(false);
-    };
+  // Fetch initial status
+  const fetchStatus = async () => {
+    setIsLoadingMsStatus(true);
+    const status = await microsoftIntegrationService.checkConnectionStatus();
+    setMsConnectionStatus(status);
+    setIsLoadingMsStatus(false);
+  };
+
+  useEffect(() => {
+    // Check for success redirect
+    const searchParams = new URLSearchParams(routerLocation.search);
+    if (searchParams.get('msIntegration') === 'success') {
+      toast.success('Successfully connected to Microsoft 365!');
+      setActiveTab('integrations');
+      // Clean up URL
+      navigate('/settings', { replace: true });
+    } else if (searchParams.get('msIntegration') === 'admin_consent_success') {
+      toast.success('Successfully authorized organization for Microsoft Teams!');
+      setActiveTab('integrations');
+      navigate('/settings', { replace: true });
+    }
+
     fetchStatus();
   }, [routerLocation.search, navigate]);
-  
+
+  const handleDisconnect = async () => {
+    try {
+      await microsoftIntegrationService.disconnectMicrosoftAccount();
+      toast.success('Successfully disconnected from Microsoft 365');
+      fetchStatus();
+    } catch (error) {
+      toast.error('Failed to disconnect');
+    }
+  };
+
+  const handleTriggerSync = async (type) => {
+    try {
+      await microsoftIntegrationService.triggerSync(type);
+      toast.success(`Sync for ${type} triggered successfully`);
+      setTimeout(fetchStatus, 2000); // refresh status after 2s
+    } catch (error) {
+      toast.error(`Failed to trigger ${type} sync`);
+    }
+  };
+
   // Profile form states
   const { user: authUser, updateUserAvatar, updateProfile } = useAuthStore();
   const [name, setName] = useState(authUser?.name || '');
@@ -82,7 +119,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
   const processFile = (file) => {
     if (!file) return;
-    
+
     // Size check: max 2MB
     const maxBytes = 2 * 1024 * 1024;
     if (file.size > maxBytes) {
@@ -114,7 +151,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       processFile(e.dataTransfer.files[0]);
     }
@@ -134,7 +171,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Feedback states
   const [profileSuccess, setProfileSuccess] = useState('');
   const [securitySuccess, setSecuritySuccess] = useState('');
@@ -144,16 +181,16 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     const nameParts = name.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
-    const updated = { 
-      firstName, 
-      lastName, 
-      phoneNumber: phone 
+    const updated = {
+      firstName,
+      lastName,
+      phoneNumber: phone
     };
     const res = await updateProfile(updated);
     if (res.success) {
-      if (onProfileUpdate) onProfileUpdate({ 
-        name: `${firstName} ${lastName}`.trim(), 
-        phone 
+      if (onProfileUpdate) onProfileUpdate({
+        name: `${firstName} ${lastName}`.trim(),
+        phone
       });
       setProfileSuccess('Profile successfully updated!');
     } else {
@@ -179,7 +216,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     const saved = localStorage.getItem('crm_api_env');
     return saved || 'auto';
   });
-  
+
   const [customApiUrl, setCustomApiUrl] = useState(() => {
     return localStorage.getItem('crm_api_url_custom') || '';
   });
@@ -193,10 +230,10 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
   const handleSaveApiSettings = (e) => {
     e.preventDefault();
-    
+
     // Save active API env
     localStorage.setItem('crm_api_env', apiEnv);
-    
+
     // Calculate final API URL based on selection
     let resolvedUrl = '';
     if (apiEnv === 'production') {
@@ -215,17 +252,17 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     } else {
       localStorage.removeItem('crm_api_url');
     }
-    
+
     // Save tenant ID
     localStorage.setItem('crm_tenant_id', activeTenantId);
-    
+
     toast.success('Developer API settings saved successfully!');
   };
 
   const handleTestConnection = async () => {
     setConnectionStatus('testing');
     setConnectionError('');
-    
+
     let urlToTest = '';
     if (apiEnv === 'production') {
       urlToTest = 'https://techtopiagh-crm.onrender.com/';
@@ -248,9 +285,9 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
     }
 
     try {
-      const response = await apiClient.get(urlToTest, { 
+      const response = await apiClient.get(urlToTest, {
         timeout: 5000,
-        headers: { 'Tenant-Id': activeTenantId } 
+        headers: { 'Tenant-Id': activeTenantId }
       });
       if (response.status === 200 || response.data) {
         setConnectionStatus('success');
@@ -270,12 +307,12 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
   };
 
   const TABS = [
-    { id: 'profile',    label: 'My Profile',       icon: User },
-    { id: 'company',    label: 'Company Settings', icon: Building2 },
-    { id: 'appearance', label: 'Appearance',       icon: Palette },
-    { id: 'security',   label: 'Security',         icon: Lock },
-    { id: 'integrations',label: 'Integrations',    icon: SettingsIcon },
-    { id: 'developer',  label: 'API Settings',     icon: Server }
+    { id: 'profile', label: 'My Profile', icon: User },
+    { id: 'company', label: 'Company Settings', icon: Building2 },
+    { id: 'appearance', label: 'Appearance', icon: Palette },
+    { id: 'security', label: 'Security', icon: Lock },
+    { id: 'integrations', label: 'Integrations', icon: SettingsIcon },
+    { id: 'developer', label: 'API Settings', icon: Server }
   ];
 
   return (
@@ -308,7 +345,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
         {/* Settings Content Area */}
         <div className="card settings-content">
-          
+
           {/* PROFILE */}
           {activeTab === 'profile' && (
             <div className="settings-section">
@@ -317,7 +354,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                 <div className="settings-profile-layout">
                   {/* Avatar Panel */}
                   <div className="settings-avatar-panel">
-                    <div 
+                    <div
                       className={`settings-avatar-wrapper ${dragActive ? 'drag-active' : ''}`}
                       onDragEnter={handleDrag}
                       onDragLeave={handleDrag}
@@ -326,12 +363,12 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                       onClick={() => fileInputRef.current?.click()}
                       title="Drag and drop or click to upload avatar"
                     >
-                      <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        style={{ display: 'none' }} 
-                        accept="image/*" 
-                        onChange={handleFileChange} 
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        accept="image/*"
+                        onChange={handleFileChange}
                       />
                       {avatarUrl ? (
                         <img src={avatarUrl} alt="Avatar" className="uploaded-avatar" />
@@ -396,11 +433,11 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
               <div className="settings-form-grid">
                 <div className="form-group">
                   <label>Company Name</label>
-                  <input type="text" className="form-input" value={companyName} onChange={e=>setCompanyName(e.target.value)} />
+                  <input type="text" className="form-input" value={companyName} onChange={e => setCompanyName(e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label>Company Website</label>
-                  <input type="text" className="form-input" value={companyWebsite} onChange={e=>setCompanyWebsite(e.target.value)} />
+                  <input type="text" className="form-input" value={companyWebsite} onChange={e => setCompanyWebsite(e.target.value)} />
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
@@ -414,14 +451,14 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
             <div className="settings-section">
               <h2 className="settings-section-title">Appearance Mode</h2>
               <div className="settings-theme-grid">
-                <div 
+                <div
                   className={`settings-theme-card ${theme === 'light' ? 'active' : ''}`}
                   onClick={() => theme === 'dark' && toggleTheme()}
                 >
                   <div className="settings-theme-preview light"></div>
                   <span>Clean Light Mode</span>
                 </div>
-                <div 
+                <div
                   className={`settings-theme-card ${theme === 'dark' ? 'active' : ''}`}
                   onClick={() => theme === 'light' && toggleTheme()}
                 >
@@ -440,16 +477,16 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                 <div className="form-group">
                   <label>Current Account Password</label>
                   <div style={{ position: 'relative' }}>
-                    <input 
-                      type={showPassword ? "text" : "password"} 
-                      className="form-input" 
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      className="form-input"
                       placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                       value={currentPassword}
                       onChange={e => setCurrentPassword(e.target.value)}
                       required
                       autoComplete="current-password"
                     />
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="settings-pw-toggle"
@@ -461,9 +498,9 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
                 <div className="form-group">
                   <label>New Credentials Password</label>
-                  <input 
-                    type="password" 
-                    className="form-input" 
+                  <input
+                    type="password"
+                    className="form-input"
                     placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
@@ -486,51 +523,94 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
           )}
 
           {/* INTEGRATIONS */}
-          {activeTab === 'integrations' && (
+          {activeTab === 'integrations' ? (
             <div className="settings-section">
               <h2 className="settings-section-title">Integrations</h2>
-              
+
               <div className="settings-form-grid">
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label>Microsoft 365 Workspace Integration</label>
                   <p className="settings-security-hint" style={{ marginTop: 4, marginBottom: 16 }}>
                     Connect your Microsoft 365 account to automatically provision Microsoft Teams, SharePoint sites, and sync calendars with Techtopia projects.
                   </p>
-                  
+
                   <div style={{
                     display: 'flex', alignItems: 'center', gap: 16,
                     padding: 20, background: 'var(--bg-app)', border: '1px solid var(--border-light)',
                     borderRadius: 'var(--radius-md)'
                   }}>
                     {msConnectionStatus.isConnected ? (
-                      <button 
-                        type="button" 
-                        className="btn btn-secondary" 
-                        disabled
-                        style={{ padding: '10px 20px', color: 'var(--brand-green)', borderColor: 'var(--brand-green)' }}
-                      >
-                        <CheckCircle size={16} style={{ marginRight: 6 }}/> Connected
-                      </button>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            disabled
+                            style={{ padding: '10px 20px', color: 'var(--brand-green)', borderColor: 'var(--brand-green)' }}
+                          >
+                            <CheckCircle size={16} style={{ marginRight: 6 }} /> Connected
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={handleDisconnect}
+                            style={{ padding: '8px 16px', color: 'var(--error)', borderColor: 'var(--error)' }}
+                          >
+                            Disconnect
+                          </button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-title)' }}>
+                            Status: Connected
+                          </span>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                            Tenant ID: {msConnectionStatus.microsoftTenantId || 'Loading...'}
+                          </span>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                            Last Sync: {msConnectionStatus.lastSyncAt ? new Date(msConnectionStatus.lastSyncAt).toLocaleString() : 'Never'}
+                          </span>
+                        </div>
+
+                        <div style={{ borderTop: '1px solid var(--border-light)', marginTop: 8, paddingTop: 16 }}>
+                          <label style={{ fontSize: 13, fontWeight: 500, marginBottom: 12, display: 'block' }}>Manual Sync</label>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            <button type="button" className="btn btn-secondary" onClick={() => handleTriggerSync('Users')}>
+                              Sync Users
+                            </button>
+                            <button type="button" className="btn btn-secondary" onClick={() => handleTriggerSync('Groups')}>
+                              Sync Groups
+                            </button>
+                            <button type="button" className="btn btn-secondary" onClick={() => handleTriggerSync('Calendars')}>
+                              Sync Calendars
+                            </button>
+                            <button type="button" className="btn btn-primary" onClick={() => handleTriggerSync('All')}>
+                              Sync All
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     ) : (
-                      <button 
-                        type="button" 
-                        className="btn btn-primary" 
-                        onClick={() => microsoftIntegrationService.connectMicrosoftAccount()}
-                        style={{ padding: '10px 20px' }}
-                      >
-                        Connect with Microsoft
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => microsoftIntegrationService.connectMicrosoftAccount()}
+                          style={{ padding: '10px 20px' }}
+                        >
+                          Connect with Microsoft
+                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-title)' }}>
+                            Status: Not Connected
+                          </span>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                            {isLoadingMsStatus ? 'Checking connection...' : 'Click to authenticate and authorize Techtopia CRM.'}
+                          </span>
+                        </div>
+                      </>
                     )}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-title)' }}>
-                        {msConnectionStatus.isConnected ? 'Status: Connected' : 'Status: Not Connected'}
-                      </span>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                        {isLoadingMsStatus ? 'Checking connection...' : (msConnectionStatus.isConnected ? `Connected as: ${msConnectionStatus.email}` : 'Click to authenticate and authorize Techtopia CRM.')}
-                      </span>
-                    </div>
                   </div>
-                  
+
                   {/* Multi-Tenant Organization Authorization */}
                   <label style={{ marginTop: 24 }}>Organization Authorization (Administrators Only)</label>
                   <p className="settings-security-hint" style={{ marginTop: 4, marginBottom: 16 }}>
@@ -541,9 +621,9 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                     padding: 20, background: 'var(--bg-app)', border: '1px solid var(--border-light)',
                     borderRadius: 'var(--radius-md)'
                   }}>
-                    <button 
-                      type="button" 
-                      className="btn btn-secondary" 
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
                       onClick={() => microsoftIntegrationService.connectOrganization()}
                       style={{ padding: '10px 20px', borderColor: 'var(--brand-purple)', color: 'var(--brand-purple)' }}
                     >
@@ -561,7 +641,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
 
           {/* DEVELOPER API SETTINGS */}
           {activeTab === 'developer' && (
@@ -573,7 +653,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
 
               <form onSubmit={handleSaveApiSettings} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div className="settings-form-grid">
-                  
+
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label>Active Backend Target Environment</label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, marginTop: 8 }}>
@@ -584,7 +664,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                         { id: 'production', name: 'Production API', desc: 'onrender.com' },
                         { id: 'custom', name: 'Custom Gateway', desc: 'Configure manual IP' }
                       ].map(env => (
-                        <div 
+                        <div
                           key={env.id}
                           className={`settings-theme-card ${apiEnv === env.id ? 'active' : ''}`}
                           style={{ padding: '12px 14px', height: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}
@@ -600,10 +680,10 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                   {apiEnv === 'custom' && (
                     <div className="form-group" style={{ gridColumn: 'span 2' }}>
                       <label>Custom Backend Service URL</label>
-                      <input 
-                        type="url" 
-                        className="form-input" 
-                        placeholder="https://api.yourdomain.com/" 
+                      <input
+                        type="url"
+                        className="form-input"
+                        placeholder="https://api.yourdomain.com/"
                         value={customApiUrl}
                         onChange={e => setCustomApiUrl(e.target.value)}
                         required={apiEnv === 'custom'}
@@ -614,9 +694,9 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                   <div className="form-group" style={{ gridColumn: 'span 2' }}>
                     <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span>Active Boundary Tenant Identifier (Tenant-Id)</span>
-                      <button 
-                        type="button" 
-                        className="btn-icon" 
+                      <button
+                        type="button"
+                        className="btn-icon"
                         style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4, height: 'auto', width: 'auto', color: 'var(--brand-cyan)' }}
                         onClick={resetTenantId}
                         title="Reset to default developer tenant"
@@ -624,10 +704,10 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                         <RotateCcw size={11} /> Reset Default
                       </button>
                     </label>
-                    <input 
-                      type="text" 
-                      className="form-input font-mono" 
-                      placeholder="e.g. a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" 
+                    <input
+                      type="text"
+                      className="form-input font-mono"
+                      placeholder="e.g. a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
                       value={activeTenantId}
                       onChange={e => setActiveTenantId(e.target.value)}
                       required
@@ -644,9 +724,9 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                       padding: 14, background: 'var(--bg-app)', border: '1px solid var(--border-light)',
                       borderRadius: 'var(--radius-md)'
                     }}>
-                      <button 
-                        type="button" 
-                        className="btn btn-secondary" 
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
                         onClick={handleTestConnection}
                         disabled={connectionStatus === 'testing'}
                         style={{ padding: '8px 16px', fontSize: 12 }}
@@ -654,7 +734,7 @@ export default function Settings({ theme, toggleTheme, onProfileUpdate }) {
                         <Activity size={14} className={connectionStatus === 'testing' ? 'animate-spin' : ''} />
                         {connectionStatus === 'testing' ? 'Testing...' : 'Test Connection'}
                       </button>
-                      
+
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {connectionStatus === 'idle' && (
                           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Idle. Click test to ping host service.</span>

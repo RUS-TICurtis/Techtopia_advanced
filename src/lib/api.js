@@ -20,16 +20,15 @@ export function getApiBaseUrl() {
 export const apiClient = axios.create({
   baseURL: getApiBaseUrl(),
   timeout: 15000,
+  withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
 
-// ─── Request Interceptor — attach JWT + tenant ─────────────
+// ─── Request Interceptor — attach tenant ─────────────
 apiClient.interceptors.request.use(
   (config) => {
     config.baseURL = getApiBaseUrl();
-    const token = localStorage.getItem('crm_access_token');
     const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
-    if (token) config.headers.Authorization = `Bearer ${token}`;
     config.headers['Tenant-Id'] = tenantId;
     config.headers['X-Tenant-ID'] = tenantId; // Needed by ProjectEndpoints.cs
     return config;
@@ -42,33 +41,23 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/login') && !originalRequest.url.includes('/auth/refresh')) {
       originalRequest._retry = true;
       try {
-        const accessToken = localStorage.getItem('crm_access_token');
-        const refreshToken = localStorage.getItem('crm_refresh_token');
         const tenantId = localStorage.getItem('crm_tenant_id') || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
-        if (refreshToken && accessToken) {
-          const apiBase = getApiBaseUrl();
-          const { data } = await axios.post(`${apiBase}api/v1/auth/refresh`, {
-            token: accessToken,
-            refreshToken
-          }, {
-            headers: {
-              'Tenant-Id': tenantId,
-              'Content-Type': 'application/json'
-            }
-          });
-          localStorage.setItem('crm_access_token', data.accessToken);
-          localStorage.setItem('crm_refresh_token', data.refreshToken);
-          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-          // Sync base URL of the retried request
-          originalRequest.baseURL = apiBase;
-          return apiClient(originalRequest);
-        }
+        const apiBase = getApiBaseUrl();
+        await axios.post(`${apiBase}api/v1/auth/refresh`, {}, {
+          withCredentials: true,
+          headers: {
+            'Tenant-Id': tenantId,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        // Sync base URL of the retried request
+        originalRequest.baseURL = apiBase;
+        return apiClient(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem('crm_access_token');
-        localStorage.removeItem('crm_refresh_token');
         window.location.href = '/auth/login';
       }
     }
@@ -223,7 +212,7 @@ function createMockResourceService(storageKey, defaultData) {
 export const authApi = {
   login: (credentials) => apiClient.post('/api/v1/auth/login', credentials).then(r => r.data),
   logout: () => apiClient.post('/api/v1/auth/logout').then(r => r.data),
-  refresh: (token, refreshToken) => apiClient.post('/api/v1/auth/refresh', { token, refreshToken }).then(r => r.data),
+  refresh: () => apiClient.post('/api/v1/auth/refresh').then(r => r.data),
   me: () => apiClient.get('/api/v1/users/me').then(r => r.data),
   updateProfile: (data) => apiClient.put('/api/v1/users/me', data).then(r => r.data),
   uploadProfileImage: (formData) => apiClient.post('/api/v1/users/me/profile-image', formData, {

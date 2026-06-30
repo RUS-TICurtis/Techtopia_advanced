@@ -51,9 +51,6 @@ export const useAuthStore = create(
         try {
           const res = await authApi.login({ email, password });
           
-          localStorage.setItem('crm_access_token', res.accessToken);
-          localStorage.setItem('crm_refresh_token', res.refreshToken);
-
           const mappedUser = mapUser(res.user);
 
           set({
@@ -79,16 +76,6 @@ export const useAuthStore = create(
       },
 
       hydrateAuth: async () => {
-        const accessToken = localStorage.getItem('crm_access_token');
-
-        if (!accessToken) {
-          set({
-            authStatus: 'UNAUTHENTICATED',
-            isAuthenticated: false,
-            user: null,
-          });
-          return;
-        }
 
         try {
           const profile = await authApi.me();
@@ -100,15 +87,11 @@ export const useAuthStore = create(
             lastActivity: Date.now(),
           });
         } catch {
-          // Token might be expired, try refreshing
-          const refreshToken = localStorage.getItem('crm_refresh_token');
-          if (refreshToken) {
-            try {
-              const refreshRes = await authApi.refresh(accessToken, refreshToken);
-              localStorage.setItem('crm_access_token', refreshRes.accessToken);
-              localStorage.setItem('crm_refresh_token', refreshRes.refreshToken);
-
-              const mappedUser = mapUser(refreshRes.user);
+          // Try refreshing using the httpOnly cookie
+          try {
+            const refreshRes = await authApi.refresh();
+            
+            const mappedUser = mapUser(refreshRes.user);
 
               set({
                 user: mappedUser,
@@ -117,14 +100,12 @@ export const useAuthStore = create(
                 lastActivity: Date.now(),
               });
               return;
-            } catch {
-              // Refresh failed
-            }
+          } catch (error) {
+            // Refresh failed
+            console.error("Failed to restore session via refresh token", error);
           }
 
           // Clean up on failure
-          localStorage.removeItem('crm_access_token');
-          localStorage.removeItem('crm_refresh_token');
           set({
             user: null,
             isAuthenticated: false,
@@ -139,8 +120,6 @@ export const useAuthStore = create(
         } catch {
           // Ignore logout error
         }
-        localStorage.removeItem('crm_access_token');
-        localStorage.removeItem('crm_refresh_token');
         set({
           user: null,
           isAuthenticated: false,

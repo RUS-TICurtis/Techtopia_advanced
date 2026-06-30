@@ -41,6 +41,7 @@ const Settings = lazy(() => import('../pages/admin/Settings'));
 const AuditLogs = lazy(() => import('../pages/admin/AuditLogs'));
 const Automations = lazy(() => import('../pages/admin/Automations'));
 const SuperAdminOversight = lazy(() => import('../pages/admin/SuperAdminOversight'));
+const IntegrationDashboard = lazy(() => import('../pages/admin/IntegrationDashboard'));
 const DeveloperConsole = lazy(() => import('../pages/admin/DeveloperConsole'));
 const Unauthorized = lazy(() => import('../pages/admin/Unauthorized'));
 
@@ -206,6 +207,7 @@ export default function AppRoutes({ toggleTheme, theme, onProfileUpdate, searchV
 
           <Route element={<ProtectedRoute permission={PERMISSIONS.SECURITY_SETTINGS} />}>
             <Route path="/admin/oversight" element={<SuperAdminOversight />} />
+            <Route path="/admin/integration-dashboard" element={<IntegrationDashboard />} />
             <Route path="/developer" element={<DeveloperConsole />} />
           </Route>
 

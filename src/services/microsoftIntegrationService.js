@@ -30,11 +30,33 @@ const microsoftIntegrationService = {
   // Check Microsoft connection status
   checkConnectionStatus: async () => {
     try {
-      const response = await api.get('/api/graph/auth/status');
-      return response.data; // { isConnected: true/false, email: "..." }
+      const response = await api.get('/api/tenants/current/microsoft/status');
+      return response.data; // { isConnected: true/false, microsoftTenantId: "...", lastSyncAt: "..." }
     } catch (error) {
       console.error("Failed to check connection status", error);
       return { isConnected: false };
+    }
+  },
+
+  // Disconnect Microsoft account
+  disconnectMicrosoftAccount: async () => {
+    try {
+      const response = await api.post('/api/tenants/current/microsoft/disconnect');
+      return response.data;
+    } catch (error) {
+      console.error("Failed to disconnect", error);
+      throw error;
+    }
+  },
+
+  // Trigger manual sync
+  triggerSync: async (type) => {
+    try {
+      const response = await api.post('/api/tenants/current/microsoft/sync', { type });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to trigger sync", error);
+      throw error;
     }
   },
 

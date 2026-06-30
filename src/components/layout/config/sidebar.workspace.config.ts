@@ -110,6 +110,7 @@ export const WORKSPACE_ITEMS: WorkspaceItem[] = [
 
   // Admin Group
   { id: 'oversight', label: 'Super Admin Oversight', url: '/admin/oversight', group: 'admin', permission: PERMISSIONS.BILLING_ADMIN_SETTINGS },
+  { id: 'integration-dashboard', label: 'Integration Dashboard', url: '/admin/integration-dashboard', group: 'admin', permission: PERMISSIONS.SECURITY_SETTINGS },
   { id: 'audit-logs', label: 'Audit Compliance', url: '/audit-logs', group: 'admin', permission: PERMISSIONS.VIEW_AUDIT },
   { id: 'developer', label: 'Developer Portal', url: '/developer', group: 'admin', permission: PERMISSIONS.VIEW_SETTINGS },
   { id: 'settings', label: 'System Settings', url: '/settings', group: 'admin', permission: PERMISSIONS.VIEW_SETTINGS },
